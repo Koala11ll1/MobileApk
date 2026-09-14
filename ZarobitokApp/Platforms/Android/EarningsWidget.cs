@@ -17,14 +17,12 @@ namespace ZarobitokApp.Platforms.Android;
 {
     AppWidgetManager.ActionAppwidgetUpdate,
     EarningsWidget.ActionTick,
-    EarningsWidget.ActionToggle,
     Intent.ActionUserPresent   // розблокування екрана — освіжаємо суму одразу
 })]
 [MetaData("android.appwidget.provider", Resource = "@xml/widget_info")]
 public class EarningsWidget : AppWidgetProvider
 {
     public const string ActionTick = "com.zarobitok.widget.TICK";
-    public const string ActionToggle = "com.zarobitok.widget.TOGGLE";
 
     public override void OnUpdate(Context context, AppWidgetManager manager, int[] appWidgetIds)
     {
@@ -36,19 +34,10 @@ public class EarningsWidget : AppWidgetProvider
     {
         base.OnReceive(context, intent);
 
-        switch (intent.Action)
-        {
-            case ActionTick:
-            case Intent.ActionUserPresent:
-                RefreshAll(context);
-                break;
-
-            // Тап по віджету запускає/зупиняє зміну без відкриття апки.
-            case ActionToggle:
-                if (ShiftStore.Load().IsRunning) ShiftManager.StopShift();
-                else ShiftManager.StartShift();
-                break;
-        }
+        // Віджет лише показує дані: керування зміною живе в апці,
+        // щоб випадковий тап по домашньому екрану не завершив зміну.
+        if (intent.Action is ActionTick or Intent.ActionUserPresent)
+            RefreshAll(context);
     }
 
     public override void OnEnabled(Context context)
@@ -112,13 +101,6 @@ public class EarningsWidget : AppWidgetProvider
             views.SetViewVisibility(Resource.Id.widget_chrono, ViewStates.Gone);
             views.SetViewVisibility(Resource.Id.widget_idle, ViewStates.Visible);
         }
-
-        // Тап по віджету — старт/стоп зміни.
-        var toggleIntent = new Intent(context, typeof(EarningsWidget));
-        toggleIntent.SetAction(ActionToggle);
-        views.SetOnClickPendingIntent(Resource.Id.widget_root,
-            PendingIntent.GetBroadcast(context, 0, toggleIntent,
-                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable));
 
         manager.UpdateAppWidget(widgetId, views);
     }

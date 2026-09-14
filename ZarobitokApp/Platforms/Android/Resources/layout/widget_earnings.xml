@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="Тап — почати зміну"
+        android:text="Зміна не активна"
         android:textSize="16sp"
         android:textColor="#FF9CA3AF"
         android:visibility="gone" />

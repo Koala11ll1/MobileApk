@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ZarobitokApp.Pages.HistoryPage"
+             Title="Журнал"
+             BackgroundColor="#0B0B12">
+
+    <Grid RowDefinitions="Auto,*" Padding="20,20,20,0" RowSpacing="10">
+
+        <Label Grid.Row="0"
+               Text="Зміни зберігаються на телефоні. Помилково створену можна видалити."
+               FontSize="12"
+               TextColor="#6B7280" />
+
+        <CollectionView Grid.Row="1" x:Name="HistoryView" IsGrouped="True">
+            <CollectionView.EmptyView>
+                <Label Text="Поки порожньо"
+                       TextColor="#4B5563"
+                       HorizontalOptions="Center"
+                       Margin="0,24" />
+            </CollectionView.EmptyView>
+
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate>
+                    <Grid Padding="4,16,4,6" ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding DayText}"
+                               TextColor="#9CA3AF"
+                               FontSize="13"
+                               FontAttributes="Bold" />
+                        <Label Grid.Column="1"
+                               Text="{Binding TotalText}"
+                               TextColor="#4ADE80"
+                               FontSize="13"
+                               FontAttributes="Bold" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding TimeText}" TextColor="White" FontSize="15" />
+                            <Label Text="{Binding DetailText}" TextColor="#6B7280" FontSize="12" />
+                        </VerticalStackLayout>
+
+                        <Label Grid.Column="1"
+                               Text="{Binding AmountText}"
+                               TextColor="#4ADE80"
+                               FontAttributes="Bold"
+                               FontSize="16"
+                               VerticalOptions="Center" />
+
+                        <Button Grid.Column="2"
+                                Text="✕"
+                                FontSize="16"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                Padding="0"
+                                CornerRadius="12"
+                                BackgroundColor="#1C1C26"
+                                TextColor="#F87171"
+                                VerticalOptions="Center"
+                                CommandParameter="{Binding .}"
+                                Clicked="OnDeleteClicked" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

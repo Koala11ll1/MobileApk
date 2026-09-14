@@ -89,6 +89,16 @@ public static class ShiftStore
         }
     }
 
+    /// <summary>Викинути помилково створену зміну з журналу.</summary>
+    public static void RemoveLogAt(int index)
+    {
+        var log = LoadLog();
+        if (index < 0 || index >= log.Count) return;
+
+        log.RemoveAt(index);
+        WriteKey(KeyLog, JsonSerializer.Serialize(log, JsonOpts));
+    }
+
     public static void AppendLog(ShiftLogEntry entry)
     {
         var log = LoadLog();

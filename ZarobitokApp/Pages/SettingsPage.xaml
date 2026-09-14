@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ZarobitokApp.Pages.SettingsPage"
+             Title="Налаштування"
+             BackgroundColor="#0B0B12">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="НАЛАШТУВАННЯ ЗМІНИ"
+                   FontSize="12"
+                   TextColor="#6B7280"
+                   Margin="4,8,0,0" />
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Ставка за годину" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="RateEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Валюта" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="CurrencyEntry"
+                               MaxLength="4"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Планова тривалість, год" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="PlannedEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Неоплачувана перерва, хв" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="BreakEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Коефіцієнт понаднормових" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="OvertimeEntry"
+                               Keyboard="Numeric"
+                               Placeholder="1.0 — без доплати"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки."
+                   FontSize="12"
+                   TextColor="#6B7280"
+                   Margin="4,0,4,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
