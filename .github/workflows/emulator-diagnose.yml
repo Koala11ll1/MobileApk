@@ -26,7 +26,7 @@ jobs:
           -c Debug
           -p:AndroidPackageFormat=apk
           -p:EmbedAssembliesIntoApk=true
-          -p:RuntimeIdentifiers="android-arm64;android-x64"
+          -p:RuntimeIdentifier=android-x64
 
       - name: Enable KVM
         run: |
