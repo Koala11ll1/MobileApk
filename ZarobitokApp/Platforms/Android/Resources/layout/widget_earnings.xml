@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="14dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/widget_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0.00 ₴"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFFFF"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium" />
+
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="6dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#FF4ADE80"
+        android:progressBackgroundTint="#33FFFFFF" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Єдиний елемент, який тікає САМ у процесі лаунчера.
+             Наш код для цього не виконується взагалі. -->
+        <Chronometer
+            android:id="@+id/widget_chrono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#FF4ADE80"
+            android:format="%s" />
+
+        <!-- Показуємо замість хронометра, коли зміна не активна -->
+        <TextView
+            android:id="@+id/widget_idle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Зміна не активна"
+            android:textSize="13sp"
+            android:textColor="#FF9CA3AF"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/widget_rate"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Тап — почати"
+            android:textSize="12sp"
+            android:textColor="#FF9CA3AF"
+            android:gravity="end"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+</LinearLayout>

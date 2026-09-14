@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ZarobitokApp.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Bg">#0B0B12</Color>
+            <Color x:Key="Card">#12121A</Color>
+            <Color x:Key="Accent">#4ADE80</Color>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

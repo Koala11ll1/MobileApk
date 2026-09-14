@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Єдиний потрібний дозвіл: відновити розклад після перезавантаження.
+         Ні FOREGROUND_SERVICE, ні POST_NOTIFICATIONS, ні SCHEDULE_EXACT_ALARM
+         цій версії не потрібні. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/appicon"
+        android:roundIcon="@mipmap/appicon_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true" />
+</manifest>

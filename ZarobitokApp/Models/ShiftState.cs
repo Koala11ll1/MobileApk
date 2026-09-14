@@ -1,0 +1,48 @@
+using System.Text.Json.Serialization;
+
+namespace ZarobitokApp.Models;
+
+/// <summary>
+/// Стан поточної зміни. Зберігаємо ЧАС СТАРТУ, а не накопичену суму —
+/// тоді після перезавантаження телефона або вбивства процесу
+/// сума перерахується правильно.
+/// </summary>
+public sealed class ShiftState
+{
+    /// <summary>Ставка за годину (у валюті користувача).</summary>
+    public decimal RatePerHour { get; set; } = 100m;
+
+    /// <summary>Символ валюти для відображення.</summary>
+    public string Currency { get; set; } = "₴";
+
+    /// <summary>UTC-час початку зміни. Null — зміна не запущена.</summary>
+    public DateTime? StartedAtUtc { get; set; }
+
+    /// <summary>Неоплачувана перерва в хвилинах (віднімається від часу зміни).</summary>
+    public int UnpaidBreakMinutes { get; set; }
+
+    /// <summary>Планова тривалість зміни в годинах — для прогрес-бару.</summary>
+    public double PlannedHours { get; set; } = 8;
+
+    /// <summary>Коефіцієнт понаднормових після планових годин (1.0 = без доплати).</summary>
+    public decimal OvertimeMultiplier { get; set; } = 1.0m;
+
+    /// <summary>Сума, зароблена за попередні завершені зміни сьогодні.</summary>
+    public decimal EarnedEarlierToday { get; set; }
+
+    /// <summary>Дата (локальна), до якої належить EarnedEarlierToday.</summary>
+    public DateTime TodayStamp { get; set; } = DateTime.Today;
+
+    [JsonIgnore]
+    public bool IsRunning => StartedAtUtc.HasValue;
+}
+
+/// <summary>Запис у журналі завершених змін.</summary>
+public sealed record ShiftLogEntry(
+    DateTime StartedAtUtc,
+    DateTime EndedAtUtc,
+    decimal RatePerHour,
+    decimal Earned)
+{
+    public TimeSpan Duration => EndedAtUtc - StartedAtUtc;
+}
