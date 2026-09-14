@@ -26,6 +26,8 @@ jobs:
           -c Debug
           -p:AndroidPackageFormat=apk
           -p:EmbedAssembliesIntoApk=true
+          -p:RuntimeIdentifiers=android-arm64
+          -p:AndroidIncludeDebugSymbols=false
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
