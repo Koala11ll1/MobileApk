@@ -18,6 +18,10 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
 
+        var crash = ShiftStore.TakeLastCrash();
+        if (crash is not null)
+            _ = DisplayAlert("Останній збій застосунку", crash, "OK");
+
         LoadSettingsIntoUi();
         LoadHistory();
 

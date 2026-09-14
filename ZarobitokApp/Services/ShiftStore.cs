@@ -55,6 +55,20 @@ public static class ShiftStore
         }
     }
 
+    // ---- Діагностика: останній незловлений виняток ----
+
+    public const string CrashKey = "last_crash";
+
+    /// <summary>Повертає текст останнього збою (якщо є) і одразу його очищує.</summary>
+    public static string? TakeLastCrash()
+    {
+        var crash = ReadKey(CrashKey);
+        if (string.IsNullOrEmpty(crash)) return null;
+
+        WriteKey(CrashKey, string.Empty);
+        return crash;
+    }
+
     // ---- Журнал завершених змін ----
 
     private const string KeyLog = "shift_log_json";
