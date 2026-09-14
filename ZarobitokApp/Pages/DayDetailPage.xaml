@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ZarobitokApp.Pages.DayDetailPage"
+             BackgroundColor="#0B0B12">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Зароблено за день" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Grid.Column="1" x:Name="TotalLabel"
+                               FontSize="17" FontAttributes="Bold" TextColor="#4ADE80" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Відпрацьовано" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Grid.Column="1" x:Name="HoursLabel" FontSize="14" TextColor="White" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Змін за день" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Grid.Column="1" x:Name="ShiftCountLabel" FontSize="14" TextColor="White" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#22FFFFFF" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Середня ₴/год по ставці" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Grid.Column="1" x:Name="AvgRateLabel" FontSize="14" TextColor="White" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Середня ₴/год з допзаробітком" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Grid.Column="1" x:Name="AvgEffectiveLabel"
+                               FontSize="14" FontAttributes="Bold" TextColor="#4ADE80" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#22FFFFFF" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Допзаробіток за день" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Grid.Column="1" x:Name="ExtrasTotalLabel" FontSize="14" TextColor="White" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="ЗМІНИ ЦЬОГО ДНЯ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+            <CollectionView x:Name="ShiftsView">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="14,10" ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding TimeText}" TextColor="White" FontSize="15" />
+                                <Label Text="{Binding DetailText}" TextColor="#6B7280" FontSize="12" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1"
+                                   Text="{Binding AmountText}"
+                                   TextColor="#4ADE80"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="ДОПЗАРОБІТОК ЗА ДЕНЬ, ПО ВИДАХ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+            <CollectionView x:Name="ExtrasBreakdownView">
+                <CollectionView.EmptyView>
+                    <Label Text="Не було" TextColor="#4B5563" HorizontalOptions="Center" Margin="0,12" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="14,8" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding LabelText}" TextColor="White" FontSize="14" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding AmountText}"
+                                   TextColor="#4ADE80"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Закрити"
+                    Clicked="OnCloseClicked"
+                    BackgroundColor="#1C1C26"
+                    TextColor="#9CA3AF"
+                    CornerRadius="14"
+                    HeightRequest="48"
+                    Margin="0,8,0,20" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

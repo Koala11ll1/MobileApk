@@ -6,6 +6,7 @@ namespace ZarobitokApp.Pages;
 public sealed class ShiftRow
 {
     public required int Index { get; init; }
+    public required DateTime Day { get; init; }
     public required string TimeText { get; init; }
     public required string DetailText { get; init; }
     public required string AmountText { get; init; }
@@ -42,9 +43,12 @@ public partial class HistoryPage : ContentPage
         var s = ShiftStore.Load();
         var log = ShiftStore.LoadLog();
 
+        // Групуємо за днем ЗАВЕРШЕННЯ зміни — так само, як EarnedToday
+        // рахує "сьогодні". Інакше зміна через північ показувалась би
+        // під іншим днем тут, ніж на вкладці «Зміна» й у віджеті.
         HistoryView.ItemsSource = log
             .Select((entry, index) => (entry, index))
-            .GroupBy(x => x.entry.StartedAtUtc.ToLocalTime().Date)
+            .GroupBy(x => x.entry.EndedAtUtc.ToLocalTime().Date)
             .OrderByDescending(g => g.Key)
             .Select(g => new DayGroup(
                 DayText(g.Key),
@@ -53,12 +57,30 @@ public partial class HistoryPage : ContentPage
                  .Select(x => new ShiftRow
                  {
                      Index = x.index,
+                     Day = g.Key,
                      TimeText = $"{x.entry.StartedAtUtc.ToLocalTime():HH:mm} — {x.entry.EndedAtUtc.ToLocalTime():HH:mm}",
                      DetailText = $"{EarningsCalculator.FormatDuration(x.entry.Duration)} · " +
                                   $"{x.entry.RatePerHour:0.##} {s.Currency}/год",
                      AmountText = EarningsCalculator.Format(x.entry.Earned, s.Currency)
                  })))
             .ToList();
+    }
+
+    private async void OnRowTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.Parameter is not ShiftRow row) return;
+
+        var s = ShiftStore.Load();
+        var day = row.Day;
+
+        var dayEntries = ShiftStore.LoadLog()
+            .Where(x => x.EndedAtUtc.ToLocalTime().Date == day)
+            .ToList();
+        var dayExtras = ShiftStore.LoadExtras()
+            .Where(x => x.AtUtc.ToLocalTime().Date == day)
+            .ToList();
+
+        await Navigation.PushModalAsync(new DayDetailPage(day, s.Currency, dayEntries, dayExtras));
     }
 
     private async void OnDeleteClicked(object? sender, EventArgs e)

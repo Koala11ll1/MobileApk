@@ -8,7 +8,7 @@
     <Grid RowDefinitions="Auto,*" Padding="20,20,20,0" RowSpacing="10">
 
         <Label Grid.Row="0"
-               Text="Зміни зберігаються на телефоні. Помилково створену можна видалити."
+               Text="Тапни по зміні, щоб побачити деталі за день. Зміни зберігаються на телефоні, помилково створену можна видалити."
                FontSize="12"
                TextColor="#6B7280" />
 
@@ -39,6 +39,10 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRowTapped" CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{Binding TimeText}" TextColor="White" FontSize="15" />
                             <Label Text="{Binding DetailText}" TextColor="#6B7280" FontSize="12" />

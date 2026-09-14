@@ -49,7 +49,7 @@ public static class ShiftManager
         if (!s.IsRunning) return;
 
         var now = DateTime.UtcNow;
-        var earned = EarningsCalculator.EarnedThisShift(s, now);
+        var earned = EarningsCalculator.EarnedThisShiftWithExtras(s, ShiftStore.LoadExtras(), now);
 
         ShiftStore.AppendLog(new ShiftLogEntry(
             s.StartedAtUtc!.Value, now, s.RatePerHour, earned));
@@ -58,6 +58,22 @@ public static class ShiftManager
         ShiftStore.Save(s);
 
         SyncSchedule();
+        PushWidget();
+    }
+
+    /// <summary>Додати одноразовий допзаробіток до поточної зміни.</summary>
+    public static void AddExtra(string label, decimal amount)
+    {
+        var s = ShiftStore.Load();
+        if (!s.IsRunning) return;
+
+        ShiftStore.AddExtra(new ExtraEarning(Guid.NewGuid(), DateTime.UtcNow, label, amount));
+        PushWidget();
+    }
+
+    public static void RemoveExtra(Guid id)
+    {
+        ShiftStore.RemoveExtra(id);
         PushWidget();
     }
 

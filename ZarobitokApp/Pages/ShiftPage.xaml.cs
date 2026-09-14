@@ -9,9 +9,11 @@ public partial class ShiftPage : ContentPage
     private IDispatcherTimer? _timer;
     private bool _loading;
 
-    // Журнал кешуємо: Refresh() бігає щосекунди, і розбирати JSON
-    // на кожен тик заради підсумку за день — марна робота.
+    // Журнал і допзаробітки кешуємо: Refresh() бігає щосекунди, а розбирати
+    // JSON на кожен тик заради підсумку за день — марна робота. Кеш
+    // оновлюється при відкритті сторінки й одразу після старту/стопу зміни.
     private List<ShiftLogEntry> _log = new();
+    private List<ExtraEarning> _extras = new();
 
     public ShiftPage()
     {
@@ -23,6 +25,7 @@ public partial class ShiftPage : ContentPage
         base.OnAppearing();
 
         _log = ShiftStore.LoadLog();
+        _extras = ShiftStore.LoadExtras();
         LoadStartTimeIntoUi();
 
         _timer = Dispatcher.CreateTimer();
@@ -46,11 +49,11 @@ public partial class ShiftPage : ContentPage
         var now = DateTime.UtcNow;
         var today = DateTime.Today;
 
-        var thisShift = EarningsCalculator.EarnedThisShift(s, now);
+        var thisShift = EarningsCalculator.EarnedThisShiftWithExtras(s, _extras, now);
         var paid = EarningsCalculator.PaidElapsed(s, now);
 
         AmountLabel.Text = EarningsCalculator.Format(
-            EarningsCalculator.EarnedToday(s, _log, now), s.Currency);
+            EarningsCalculator.EarnedToday(s, _log, _extras, now), s.Currency);
 
         PerSecondLabel.Text =
             $"+{EarningsCalculator.PerSecond(s):0.0000} {s.Currency}/сек";
@@ -67,7 +70,7 @@ public partial class ShiftPage : ContentPage
 
         var todayEntries = _log.Where(e => e.EndedAtUtc.ToLocalTime().Date == today).ToList();
         TodayLabel.Text = EarningsCalculator.Format(
-            EarningsCalculator.EarnedToday(s, _log, now), s.Currency);
+            EarningsCalculator.EarnedToday(s, _log, _extras, now), s.Currency);
         TodayCountLabel.Text = todayEntries.Count.ToString();
 
         var todayWorked = todayEntries.Aggregate(TimeSpan.Zero, (sum, e) => sum + e.Duration) + paid;
@@ -105,6 +108,7 @@ public partial class ShiftPage : ContentPage
         else ShiftManager.StartShiftAt(ToUtcStart(StartTimePicker.Time));
 
         _log = ShiftStore.LoadLog();
+        _extras = ShiftStore.LoadExtras();
         LoadStartTimeIntoUi();
         Refresh();
     }

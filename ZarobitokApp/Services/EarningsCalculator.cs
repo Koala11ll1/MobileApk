@@ -36,19 +36,32 @@ public static class EarningsCalculator
              + overtimeSeconds * perSecond * s.OvertimeMultiplier;
     }
 
+    /// <summary>Сума допзаробітків у проміжку [fromUtc, toUtc].</summary>
+    public static decimal ExtrasTotal(IEnumerable<ExtraEarning> extras, DateTime fromUtc, DateTime toUtc)
+        => extras.Where(x => x.AtUtc >= fromUtc && x.AtUtc <= toUtc).Sum(x => x.Amount);
+
+    /// <summary>Скільки набігло за поточну зміну разом із допзаробітками.</summary>
+    public static decimal EarnedThisShiftWithExtras(ShiftState s, IEnumerable<ExtraEarning> extras, DateTime nowUtc)
+    {
+        if (s.StartedAtUtc is null) return 0m;
+        return EarnedThisShift(s, nowUtc) + ExtrasTotal(extras, s.StartedAtUtc.Value, nowUtc);
+    }
+
     /// <summary>
-    /// Загальна сума за сьогодні: завершені сьогодні зміни + поточна.
+    /// Загальна сума за сьогодні: завершені сьогодні зміни (вже разом з їхніми
+    /// допзаробітками — вони враховані в Earned при завершенні зміни) + поточна.
     /// Рахується з журналу, а не з окремого лічильника — інакше та сама
     /// сума жила б у двох місцях і розходилась на зміні через північ.
     /// </summary>
-    public static decimal EarnedToday(ShiftState s, IEnumerable<ShiftLogEntry> log, DateTime nowUtc)
+    public static decimal EarnedToday(
+        ShiftState s, IEnumerable<ShiftLogEntry> log, IEnumerable<ExtraEarning> extras, DateTime nowUtc)
     {
         var today = DateTime.Today;
         var earlier = log
             .Where(e => e.EndedAtUtc.ToLocalTime().Date == today)
             .Sum(e => e.Earned);
 
-        return earlier + EarnedThisShift(s, nowUtc);
+        return earlier + EarnedThisShiftWithExtras(s, extras, nowUtc);
     }
 
     /// <summary>Скільки капає за секунду — для підпису у віджеті.</summary>

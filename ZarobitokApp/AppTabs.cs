@@ -13,6 +13,7 @@ public class AppTabs : TabbedPage
         UnselectedTabColor = Color.FromArgb("#6B7280");
 
         Children.Add(new ShiftPage());
+        Children.Add(new ExtrasPage());
         Children.Add(new HistoryPage());
         Children.Add(new SettingsPage());
     }

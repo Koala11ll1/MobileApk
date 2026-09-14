@@ -76,7 +76,8 @@ public class EarningsWidget : AppWidgetProvider
 
         views.SetTextViewText(Resource.Id.widget_amount,
             EarningsCalculator.Format(
-                EarningsCalculator.EarnedToday(state, ShiftStore.LoadLog(), now), state.Currency));
+                EarningsCalculator.EarnedToday(state, ShiftStore.LoadLog(), ShiftStore.LoadExtras(), now),
+                state.Currency));
 
         if (state.IsRunning)
         {

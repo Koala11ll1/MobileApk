@@ -107,6 +107,41 @@ public static class ShiftStore
         WriteKey(KeyLog, JsonSerializer.Serialize(log, JsonOpts));
     }
 
+    // ---- Допзаробітки (одноразові суми під час зміни) ----
+
+    private const string KeyExtras = "extra_earnings_json";
+
+    public static List<ExtraEarning> LoadExtras()
+    {
+        var raw = ReadKey(KeyExtras);
+        if (string.IsNullOrWhiteSpace(raw)) return new List<ExtraEarning>();
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<ExtraEarning>>(raw, JsonOpts)
+                   ?? new List<ExtraEarning>();
+        }
+        catch (JsonException)
+        {
+            return new List<ExtraEarning>();
+        }
+    }
+
+    public static void AddExtra(ExtraEarning extra)
+    {
+        var extras = LoadExtras();
+        extras.Insert(0, extra);
+        if (extras.Count > 500) extras.RemoveRange(500, extras.Count - 500);
+        WriteKey(KeyExtras, JsonSerializer.Serialize(extras, JsonOpts));
+    }
+
+    public static void RemoveExtra(Guid id)
+    {
+        var extras = LoadExtras();
+        extras.RemoveAll(x => x.Id == id);
+        WriteKey(KeyExtras, JsonSerializer.Serialize(extras, JsonOpts));
+    }
+
     // ---- Платформозалежна частина ----
 
     private static string? ReadRaw() => ReadKey(KeyState);

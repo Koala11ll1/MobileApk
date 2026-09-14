@@ -40,3 +40,15 @@ public sealed record ShiftLogEntry(
 {
     public TimeSpan Duration => EndedAtUtc - StartedAtUtc;
 }
+
+/// <summary>
+/// Одноразовий допзаробіток (продаж тощо), додається лише під час
+/// активної зміни — його AtUtc завжди потрапляє в проміжок [StartedAtUtc, ...]
+/// тієї зміни, тому окремо прив'язувати його до зміни не треба: приналежність
+/// визначається порівнянням часових міток, як і решта математики в апці.
+/// </summary>
+public sealed record ExtraEarning(
+    Guid Id,
+    DateTime AtUtc,
+    string Label,
+    decimal Amount);
