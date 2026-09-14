@@ -1,13 +1,39 @@
+using System.ComponentModel;
 using System.Globalization;
 using ZarobitokApp.Models;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp;
 
+/// <summary>Рядок журналу — одна завершена зміна.</summary>
+public sealed class ShiftRow
+{
+    public required string TimeText { get; init; }
+    public required string DetailText { get; init; }
+    public required string AmountText { get; init; }
+}
+
+/// <summary>Один день журналу з підсумком за нього.</summary>
+public sealed class DayGroup : List<ShiftRow>
+{
+    public DayGroup(string dayText, string totalText, IEnumerable<ShiftRow> rows) : base(rows)
+    {
+        DayText = dayText;
+        TotalText = totalText;
+    }
+
+    public string DayText { get; }
+    public string TotalText { get; }
+}
+
 public partial class MainPage : ContentPage
 {
     private IDispatcherTimer? _timer;
     private bool _loading;
+
+    // Журнал кешуємо: Refresh() бігає щосекунди, і розбирати JSON
+    // на кожен тик заради суми за день — марна робота.
+    private List<ShiftLogEntry> _log = new();
 
     public MainPage()
     {
@@ -18,8 +44,8 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
 
-        LoadSettingsIntoUi();
         LoadHistory();
+        LoadSettingsIntoUi();
 
         // Всередині апки обмежень немає — тікаємо щосекунди.
         _timer = Dispatcher.CreateTimer();
@@ -43,7 +69,7 @@ public partial class MainPage : ContentPage
         var now = DateTime.UtcNow;
 
         AmountLabel.Text = EarningsCalculator.Format(
-            EarningsCalculator.EarnedToday(s, now), s.Currency);
+            EarningsCalculator.EarnedToday(s, _log, now), s.Currency);
 
         PerSecondLabel.Text =
             $"+{EarningsCalculator.PerSecond(s):0.0000} {s.Currency}/сек";
@@ -54,6 +80,8 @@ public partial class MainPage : ContentPage
             ElapsedLabel.Text = $"Зміна триває {EarningsCalculator.FormatDuration(elapsed)}";
             ShiftProgress.Progress = EarningsCalculator.Progress(s, now);
 
+            StartHintLabel.Text = "Можна пересунути, якщо натиснув не вчасно";
+
             ToggleButton.Text = "Завершити зміну";
             ToggleButton.BackgroundColor = Color.FromArgb("#F87171");
             ToggleButton.TextColor = Color.FromArgb("#2A0A0A");
@@ -62,6 +90,8 @@ public partial class MainPage : ContentPage
         {
             ElapsedLabel.Text = "Зміна не активна";
             ShiftProgress.Progress = 0;
+
+            StartHintLabel.Text = "Зміна почнеться з цього часу";
 
             ToggleButton.Text = "Почати зміну";
             ToggleButton.BackgroundColor = Color.FromArgb("#4ADE80");
@@ -74,10 +104,33 @@ public partial class MainPage : ContentPage
         var s = ShiftStore.Load();
 
         if (s.IsRunning) ShiftManager.StopShift();
-        else ShiftManager.StartShift();
+        else ShiftManager.StartShiftAt(ToUtcStart(StartTimePicker.Time));
 
         LoadHistory();
+        LoadSettingsIntoUi();
         Refresh();
+    }
+
+    private void OnStartTimeChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (_loading || e.PropertyName != TimePicker.TimeProperty.PropertyName) return;
+
+        // Поки зміна не запущена, пікер — просто заготовка на майбутній старт.
+        if (!ShiftStore.Load().IsRunning) return;
+
+        ShiftManager.SetShiftStart(ToUtcStart(StartTimePicker.Time));
+        Refresh();
+    }
+
+    /// <summary>
+    /// Пікер дає лише час доби. Якщо він сьогодні ще не настав —
+    /// значить зміна почалась учора: так працює нічна зміна.
+    /// </summary>
+    private static DateTime ToUtcStart(TimeSpan timeOfDay)
+    {
+        var local = DateTime.Today + timeOfDay;
+        if (local > DateTime.Now) local = local.AddDays(-1);
+        return local.ToUniversalTime();
     }
 
     private void LoadSettingsIntoUi()
@@ -90,6 +143,10 @@ public partial class MainPage : ContentPage
         PlannedEntry.Text = s.PlannedHours.ToString(CultureInfo.InvariantCulture);
         BreakEntry.Text = s.UnpaidBreakMinutes.ToString(CultureInfo.InvariantCulture);
         OvertimeEntry.Text = s.OvertimeMultiplier.ToString(CultureInfo.InvariantCulture);
+
+        StartTimePicker.Time = s.IsRunning
+            ? s.StartedAtUtc!.Value.ToLocalTime().TimeOfDay
+            : DateTime.Now.TimeOfDay;
 
         _loading = false;
     }
@@ -122,16 +179,30 @@ public partial class MainPage : ContentPage
     private void LoadHistory()
     {
         var s = ShiftStore.Load();
+        _log = ShiftStore.LoadLog();
 
-        HistoryView.ItemsSource = ShiftStore.LoadLog()
-            .Select(x => new
-            {
-                DateText = x.StartedAtUtc.ToLocalTime().ToString("dd.MM, HH:mm"),
-                DetailText = $"{EarningsCalculator.FormatDuration(x.Duration)} · " +
-                             $"{x.RatePerHour:0.##} {s.Currency}/год",
-                AmountText = EarningsCalculator.Format(x.Earned, s.Currency)
-            })
+        HistoryView.ItemsSource = _log
+            .GroupBy(x => x.StartedAtUtc.ToLocalTime().Date)
+            .OrderByDescending(g => g.Key)
+            .Select(g => new DayGroup(
+                DayText(g.Key),
+                EarningsCalculator.Format(g.Sum(x => x.Earned), s.Currency),
+                g.OrderByDescending(x => x.StartedAtUtc)
+                 .Select(x => new ShiftRow
+                 {
+                     TimeText = $"{x.StartedAtUtc.ToLocalTime():HH:mm} — {x.EndedAtUtc.ToLocalTime():HH:mm}",
+                     DetailText = $"{EarningsCalculator.FormatDuration(x.Duration)} · " +
+                                  $"{x.RatePerHour:0.##} {s.Currency}/год",
+                     AmountText = EarningsCalculator.Format(x.Earned, s.Currency)
+                 })))
             .ToList();
+    }
+
+    private static string DayText(DateTime day)
+    {
+        if (day == DateTime.Today) return "Сьогодні";
+        if (day == DateTime.Today.AddDays(-1)) return "Вчора";
+        return day.ToString("dd.MM.yyyy");
     }
 
     // Кома і крапка як роздільник — обидві приймаються.

@@ -16,22 +16,30 @@ public static class ShiftManager
 {
     public static ShiftState Current => ShiftStore.Load();
 
-    public static void StartShift()
+    public static void StartShift() => StartShiftAt(DateTime.UtcNow);
+
+    /// <summary>Почати зміну заднім числом — коли забув натиснути вчасно.</summary>
+    public static void StartShiftAt(DateTime startedAtUtc)
     {
         var s = ShiftStore.Load();
         if (s.IsRunning) return;
 
-        // Новий день — обнуляємо накопичене «раніше сьогодні».
-        if (s.TodayStamp.Date != DateTime.Today)
-        {
-            s.TodayStamp = DateTime.Today;
-            s.EarnedEarlierToday = 0m;
-        }
-
-        s.StartedAtUtc = DateTime.UtcNow;
+        s.StartedAtUtc = startedAtUtc;
         ShiftStore.Save(s);
 
         SyncSchedule();
+        PushWidget();
+    }
+
+    /// <summary>Пересунути час початку вже запущеної зміни.</summary>
+    public static void SetShiftStart(DateTime startedAtUtc)
+    {
+        var s = ShiftStore.Load();
+        if (!s.IsRunning) return;
+
+        s.StartedAtUtc = startedAtUtc;
+        ShiftStore.Save(s);
+
         PushWidget();
     }
 
@@ -46,8 +54,6 @@ public static class ShiftManager
         ShiftStore.AppendLog(new ShiftLogEntry(
             s.StartedAtUtc!.Value, now, s.RatePerHour, earned));
 
-        s.EarnedEarlierToday = EarningsCalculator.EarnedToday(s, now);
-        s.TodayStamp = DateTime.Today;
         s.StartedAtUtc = null;
         ShiftStore.Save(s);
 

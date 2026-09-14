@@ -36,10 +36,18 @@ public static class EarningsCalculator
              + overtimeSeconds * perSecond * s.OvertimeMultiplier;
     }
 
-    /// <summary>Загальна сума за сьогодні: попередні зміни + поточна.</summary>
-    public static decimal EarnedToday(ShiftState s, DateTime nowUtc)
+    /// <summary>
+    /// Загальна сума за сьогодні: завершені сьогодні зміни + поточна.
+    /// Рахується з журналу, а не з окремого лічильника — інакше та сама
+    /// сума жила б у двох місцях і розходилась на зміні через північ.
+    /// </summary>
+    public static decimal EarnedToday(ShiftState s, IEnumerable<ShiftLogEntry> log, DateTime nowUtc)
     {
-        var earlier = s.TodayStamp.Date == DateTime.Today ? s.EarnedEarlierToday : 0m;
+        var today = DateTime.Today;
+        var earlier = log
+            .Where(e => e.EndedAtUtc.ToLocalTime().Date == today)
+            .Sum(e => e.Earned);
+
         return earlier + EarnedThisShift(s, nowUtc);
     }
 

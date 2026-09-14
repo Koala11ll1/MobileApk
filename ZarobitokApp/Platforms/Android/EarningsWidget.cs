@@ -86,7 +86,8 @@ public class EarningsWidget : AppWidgetProvider
         var views = new RemoteViews(context.PackageName, Resource.Layout.widget_earnings);
 
         views.SetTextViewText(Resource.Id.widget_amount,
-            EarningsCalculator.Format(EarningsCalculator.EarnedToday(state, now), state.Currency));
+            EarningsCalculator.Format(
+                EarningsCalculator.EarnedToday(state, ShiftStore.LoadLog(), now), state.Currency));
 
         if (state.IsRunning)
         {
@@ -102,12 +103,6 @@ public class EarningsWidget : AppWidgetProvider
 
             views.SetViewVisibility(Resource.Id.widget_chrono, ViewStates.Visible);
             views.SetViewVisibility(Resource.Id.widget_idle, ViewStates.Gone);
-
-            views.SetTextViewText(Resource.Id.widget_rate,
-                $"{state.RatePerHour:0.##} {state.Currency}/год");
-
-            views.SetProgressBar(Resource.Id.widget_progress, 100,
-                (int)(EarningsCalculator.Progress(state, now) * 100), false);
         }
         else
         {
@@ -116,9 +111,6 @@ public class EarningsWidget : AppWidgetProvider
 
             views.SetViewVisibility(Resource.Id.widget_chrono, ViewStates.Gone);
             views.SetViewVisibility(Resource.Id.widget_idle, ViewStates.Visible);
-
-            views.SetTextViewText(Resource.Id.widget_rate, "Тап — почати");
-            views.SetProgressBar(Resource.Id.widget_progress, 100, 0, false);
         }
 
         // Тап по віджету — старт/стоп зміни.
@@ -127,15 +119,6 @@ public class EarningsWidget : AppWidgetProvider
         views.SetOnClickPendingIntent(Resource.Id.widget_root,
             PendingIntent.GetBroadcast(context, 0, toggleIntent,
                 PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable));
-
-        // Тап по ставці — відкрити апку.
-        var openIntent = context.PackageManager?.GetLaunchIntentForPackage(context.PackageName!);
-        if (openIntent is not null)
-        {
-            views.SetOnClickPendingIntent(Resource.Id.widget_rate,
-                PendingIntent.GetActivity(context, 1, openIntent,
-                    PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable));
-        }
 
         manager.UpdateAppWidget(widgetId, views);
     }

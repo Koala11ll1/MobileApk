@@ -118,7 +118,11 @@ public static class ShiftStore
         var prefs = Application.Context.GetSharedPreferences(PrefsName, FileCreationMode.Private);
         using var editor = prefs!.Edit();
         editor!.PutString(key, value);
-        editor.Apply();
+
+        // Commit, а не Apply: записів мало (старт/стоп/зміна налаштувань),
+        // зате журнал змін гарантовано на диску, навіть якщо систему
+        // зараз же вб'є процес.
+        editor.Commit();
 #else
         Preferences.Default.Set(key, value);
 #endif

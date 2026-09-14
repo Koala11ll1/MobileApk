@@ -27,12 +27,6 @@ public sealed class ShiftState
     /// <summary>Коефіцієнт понаднормових після планових годин (1.0 = без доплати).</summary>
     public decimal OvertimeMultiplier { get; set; } = 1.0m;
 
-    /// <summary>Сума, зароблена за попередні завершені зміни сьогодні.</summary>
-    public decimal EarnedEarlierToday { get; set; }
-
-    /// <summary>Дата (локальна), до якої належить EarnedEarlierToday.</summary>
-    public DateTime TodayStamp { get; set; } = DateTime.Today;
-
     [JsonIgnore]
     public bool IsRunning => StartedAtUtc.HasValue;
 }

@@ -54,6 +54,27 @@
                     TextColor="#06210F"
                     Clicked="OnToggleClicked" />
 
+            <!-- ПОЧАТОК ЗМІНИ -->
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Початок зміни" FontSize="13" TextColor="#9CA3AF" />
+                    <TimePicker x:Name="StartTimePicker"
+                                Format="HH:mm"
+                                FontSize="20"
+                                TextColor="White"
+                                BackgroundColor="#1C1C26"
+                                PropertyChanged="OnStartTimeChanged" />
+                    <Label x:Name="StartHintLabel"
+                           FontSize="12"
+                           TextColor="#6B7280" />
+                </VerticalStackLayout>
+            </Border>
+
             <!-- НАЛАШТУВАННЯ -->
             <Label Text="НАЛАШТУВАННЯ ЗМІНИ"
                    FontSize="12"
@@ -128,7 +149,7 @@
                    TextColor="#6B7280"
                    Margin="4,8,0,0" />
 
-            <CollectionView x:Name="HistoryView" HeightRequest="260">
+            <CollectionView x:Name="HistoryView" HeightRequest="320" IsGrouped="True">
                 <CollectionView.EmptyView>
                     <Label Text="Поки порожньо"
                            TextColor="#4B5563"
@@ -136,11 +157,27 @@
                            Margin="0,24" />
                 </CollectionView.EmptyView>
 
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate>
+                        <Grid Padding="14,14,14,6" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding DayText}"
+                                   TextColor="#9CA3AF"
+                                   FontSize="13"
+                                   FontAttributes="Bold" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding TotalText}"
+                                   TextColor="#4ADE80"
+                                   FontSize="13"
+                                   FontAttributes="Bold" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Padding="14,12" ColumnDefinitions="*,Auto">
+                        <Grid Padding="14,10" ColumnDefinitions="*,Auto">
                             <VerticalStackLayout Spacing="2">
-                                <Label Text="{Binding DateText}" TextColor="White" FontSize="15" />
+                                <Label Text="{Binding TimeText}" TextColor="White" FontSize="15" />
                                 <Label Text="{Binding DetailText}" TextColor="#6B7280" FontSize="12" />
                             </VerticalStackLayout>
                             <Label Grid.Column="1"
