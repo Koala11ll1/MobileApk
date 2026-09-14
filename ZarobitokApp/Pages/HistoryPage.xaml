@@ -5,14 +5,32 @@
              Title="Журнал"
              BackgroundColor="#0B0B12">
 
-    <Grid RowDefinitions="Auto,*" Padding="20,20,20,0" RowSpacing="10">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="20,20,20,0" RowSpacing="10">
 
-        <Label Grid.Row="0"
+        <Grid Grid.Row="0" ColumnDefinitions="*,*" ColumnSpacing="8">
+            <Button Grid.Column="0"
+                    x:Name="ListModeButton"
+                    Text="Список"
+                    Clicked="OnListModeClicked"
+                    CornerRadius="12"
+                    HeightRequest="42"
+                    FontAttributes="Bold" />
+            <Button Grid.Column="1"
+                    x:Name="CalendarModeButton"
+                    Text="Календар"
+                    Clicked="OnCalendarModeClicked"
+                    CornerRadius="12"
+                    HeightRequest="42"
+                    FontAttributes="Bold" />
+        </Grid>
+
+        <Label Grid.Row="1"
+               x:Name="HintLabel"
                Text="Тапни по зміні, щоб побачити деталі за день. Зміни зберігаються на телефоні, помилково створену можна видалити."
                FontSize="12"
                TextColor="#6B7280" />
 
-        <CollectionView Grid.Row="1" x:Name="HistoryView" IsGrouped="True">
+        <CollectionView Grid.Row="2" x:Name="HistoryView" IsGrouped="True">
             <CollectionView.EmptyView>
                 <Label Text="Поки порожньо"
                        TextColor="#4B5563"
@@ -71,6 +89,86 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+        <VerticalStackLayout Grid.Row="2" x:Name="CalendarContainer" IsVisible="False" Spacing="14">
+
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0"
+                        Text="‹"
+                        Clicked="OnPrevMonthClicked"
+                        BackgroundColor="#1C1C26"
+                        TextColor="White"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        Padding="0"
+                        CornerRadius="12"
+                        FontSize="18" />
+                <Label Grid.Column="1"
+                       x:Name="MonthLabel"
+                       HorizontalTextAlignment="Center"
+                       VerticalOptions="Center"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="White" />
+                <Button Grid.Column="2"
+                        Text="›"
+                        Clicked="OnNextMonthClicked"
+                        BackgroundColor="#1C1C26"
+                        TextColor="White"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        Padding="0"
+                        CornerRadius="12"
+                        FontSize="18" />
+            </Grid>
+
+            <Label x:Name="MonthTotalLabel"
+                   HorizontalOptions="Center"
+                   FontSize="15"
+                   FontAttributes="Bold"
+                   TextColor="#4ADE80" />
+
+            <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,4,0,0">
+                <Label Grid.Column="0" Text="Пн" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="1" Text="Вт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="2" Text="Ср" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="3" Text="Чт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="4" Text="Пт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="5" Text="Сб" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="6" Text="Нд" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+            </Grid>
+
+            <CollectionView x:Name="CalendarView">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                      Span="7"
+                                      HorizontalItemSpacing="4"
+                                      VerticalItemSpacing="4" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="{Binding BackgroundColor}"
+                                StrokeThickness="0"
+                                HeightRequest="42"
+                                Padding="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCalendarDayTapped" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding DayText}"
+                                   TextColor="{Binding TextColor}"
+                                   FontAttributes="{Binding FontAttributes}"
+                                   FontSize="14"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center" />
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
 
     </Grid>
 </ContentPage>
