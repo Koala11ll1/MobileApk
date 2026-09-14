@@ -30,4 +30,9 @@
     <MauiFont Include="Resources\Fonts\*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Потрібен для builder.Logging.AddDebug() у MauiProgram.cs (лише #if DEBUG) -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+  </ItemGroup>
+
 </Project>
