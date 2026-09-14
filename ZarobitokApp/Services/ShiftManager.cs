@@ -43,6 +43,26 @@ public static class ShiftManager
         PushWidget();
     }
 
+    /// <summary>
+    /// Якщо зміна триває довше за план — завершує її автоматично.
+    /// Повертає true, якщо саме зараз зупинила (щоб викликач міг
+    /// оновити свій кеш журналу). Викликається і з таймера в апці
+    /// (щосекунди, поки відкрита вкладка «Зміна»), і з оновлення
+    /// віджета (раз на хвилину, плюс при розблокуванні й відкритті
+    /// апки) — так спрацьовує і коли апка згорнута.
+    /// </summary>
+    public static bool CheckAutoStop()
+    {
+        var s = ShiftStore.Load();
+        if (!s.IsRunning || s.PlannedHours <= 0) return false;
+
+        if (EarningsCalculator.PaidElapsed(s, DateTime.UtcNow).TotalHours < s.PlannedHours)
+            return false;
+
+        StopShift();
+        return true;
+    }
+
     public static void StopShift()
     {
         var s = ShiftStore.Load();

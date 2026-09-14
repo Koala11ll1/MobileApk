@@ -47,6 +47,15 @@ public partial class ShiftPage : ContentPage
 
     private void Refresh()
     {
+        // Якщо план щойно вийшов — зміна автоматично зупиниться тут,
+        // і журнал (з новим записом) та пікер треба перечитати заново,
+        // інакше кеш лишиться застарілим до наступного відкриття сторінки.
+        if (ShiftManager.CheckAutoStop())
+        {
+            _log = ShiftStore.LoadLog();
+            LoadStartTimeIntoUi();
+        }
+
         var s = ShiftStore.Load();
         var now = DateTime.UtcNow;
         var today = DateTime.Today;
@@ -63,12 +72,12 @@ public partial class ShiftPage : ContentPage
         ThisShiftLabel.Text = EarningsCalculator.Format(thisShift, s.Currency);
         PaidTimeLabel.Text = EarningsCalculator.FormatDuration(paid);
 
+        // Поки зміна йде, paid < planned завжди: щойно вони зрівняються,
+        // CheckAutoStop() вище вже встиг зупинити зміну на цьому ж тику.
         var planned = TimeSpan.FromHours(s.PlannedHours);
-        RemainingLabel.Text = !s.IsRunning
-            ? "—"
-            : paid >= planned
-                ? "план виконано"
-                : EarningsCalculator.FormatDuration(planned - paid);
+        RemainingLabel.Text = s.IsRunning
+            ? EarningsCalculator.FormatDuration(planned - paid)
+            : "—";
 
         var todayEntries = _log.Where(e => e.EndedAtUtc.ToLocalTime().Date == today).ToList();
         TodayLabel.Text = EarningsCalculator.Format(

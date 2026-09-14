@@ -21,11 +21,12 @@ public sealed class ShiftState
     /// <summary>Неоплачувана перерва в хвилинах (віднімається від часу зміни).</summary>
     public int UnpaidBreakMinutes { get; set; }
 
-    /// <summary>Планова тривалість зміни в годинах — для прогрес-бару.</summary>
+    /// <summary>
+    /// Планова тривалість зміни в годинах. Використовується і для
+    /// прогрес-бару, і як момент автостопу — по досягненню цього часу
+    /// зміна завершується сама.
+    /// </summary>
     public double PlannedHours { get; set; } = 8;
-
-    /// <summary>Коефіцієнт понаднормових після планових годин (1.0 = без доплати).</summary>
-    public decimal OvertimeMultiplier { get; set; } = 1.0m;
 
     [JsonIgnore]
     public bool IsRunning => StartedAtUtc.HasValue;

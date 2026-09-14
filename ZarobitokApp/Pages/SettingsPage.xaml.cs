@@ -23,7 +23,6 @@ public partial class SettingsPage : ContentPage
         CurrencyEntry.Text = s.Currency;
         PlannedEntry.Text = s.PlannedHours.ToString(CultureInfo.InvariantCulture);
         BreakEntry.Text = s.UnpaidBreakMinutes.ToString(CultureInfo.InvariantCulture);
-        OvertimeEntry.Text = s.OvertimeMultiplier.ToString(CultureInfo.InvariantCulture);
 
         _loading = false;
     }
@@ -45,9 +44,6 @@ public partial class SettingsPage : ContentPage
 
             if (int.TryParse(BreakEntry.Text, out var brk) && brk >= 0)
                 s.UnpaidBreakMinutes = brk;
-
-            if (TryDecimal(OvertimeEntry.Text, out var mult) && mult >= 1)
-                s.OvertimeMultiplier = mult;
         });
     }
 

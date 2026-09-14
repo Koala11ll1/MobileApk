@@ -61,21 +61,10 @@
                                Unfocused="OnSettingsChanged" />
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="Коефіцієнт понаднормових" FontSize="13" TextColor="#9CA3AF" />
-                        <Entry x:Name="OvertimeEntry"
-                               Keyboard="Numeric"
-                               Placeholder="1.0 — без доплати"
-                               TextColor="White"
-                               BackgroundColor="#1C1C26"
-                               Completed="OnSettingsChanged"
-                               Unfocused="OnSettingsChanged" />
-                    </VerticalStackLayout>
-
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки."
+            <Label Text="Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки. По закінченню планової тривалості зміна завершується сама."
                    FontSize="12"
                    TextColor="#6B7280"
                    Margin="4,0,4,0" />

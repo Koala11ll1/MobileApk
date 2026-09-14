@@ -24,16 +24,7 @@ public static class EarningsCalculator
         var paid = PaidElapsed(s, nowUtc);
         if (paid <= TimeSpan.Zero) return 0m;
 
-        var perSecond = s.RatePerHour / 3600m;
-        var plannedSeconds = (decimal)(s.PlannedHours * 3600);
-        var totalSeconds = (decimal)paid.TotalSeconds;
-
-        if (totalSeconds <= plannedSeconds || s.OvertimeMultiplier == 1.0m)
-            return totalSeconds * perSecond;
-
-        var overtimeSeconds = totalSeconds - plannedSeconds;
-        return plannedSeconds * perSecond
-             + overtimeSeconds * perSecond * s.OvertimeMultiplier;
+        return (decimal)paid.TotalSeconds * (s.RatePerHour / 3600m);
     }
 
     /// <summary>

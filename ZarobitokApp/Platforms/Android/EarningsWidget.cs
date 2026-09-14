@@ -56,6 +56,11 @@ public class EarningsWidget : AppWidgetProvider
     /// <summary>Перемалювати всі екземпляри віджета.</summary>
     public static void RefreshAll(Context context)
     {
+        // Тут же й перевіряємо автостоп по плану — це охоплює і хвилинний
+        // будильник, і розблокування екрана, і відкриття апки (OnResume),
+        // і ребут (BootReceiver), бо всі вони зрештою ведуть сюди.
+        ShiftManager.CheckAutoStop();
+
         var manager = AppWidgetManager.GetInstance(context);
         if (manager is null) return;
 
