@@ -37,10 +37,12 @@ jobs:
       - name: Launch app on emulator, capture logcat + screenshot
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
-          target: google_apis
+          api-level: 30
+          target: default
           arch: x86_64
+          profile: pixel_2
           disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             APK=$(find ZarobitokApp/bin/Debug/net10.0-android -name "*-Signed.apk" | head -1)
             echo "APK: $APK"
