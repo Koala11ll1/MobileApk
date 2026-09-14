@@ -30,11 +30,6 @@ public partial class ShiftPage : ContentPage
         _ticks = ShiftStore.LoadExtraTicks();
         LoadStartTimeIntoUi();
 
-        _timer = Dispatcher.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(1);
-        _timer.Tick += (_, _) => Refresh();
-        _timer.Start();
-
         Refresh();
     }
 
@@ -43,6 +38,31 @@ public partial class ShiftPage : ContentPage
         _timer?.Stop();
         _timer = null;
         base.OnDisappearing();
+    }
+
+    /// <summary>
+    /// Секундний тікер потрібен лише поки зміна триває — цифра оновлюється
+    /// щосекунди тільки тоді. Коли зміна не активна, простій екран нічого
+    /// не показує, що б мінялось раз на секунду, тож таймер просто гаситься:
+    /// це прибирає фонову роботу (парсинг, LINQ) саме тоді, коли вона нікому
+    /// не потрібна, а конкурує за UI-потік зі свайпом між вкладками.
+    /// </summary>
+    private void SyncTicking(bool running)
+    {
+        if (running)
+        {
+            if (_timer is not null) return;
+
+            _timer = Dispatcher.CreateTimer();
+            _timer.Interval = TimeSpan.FromSeconds(1);
+            _timer.Tick += (_, _) => Refresh();
+            _timer.Start();
+        }
+        else
+        {
+            _timer?.Stop();
+            _timer = null;
+        }
     }
 
     private void Refresh()
@@ -63,8 +83,12 @@ public partial class ShiftPage : ContentPage
         var thisShift = EarningsCalculator.EarnedThisShiftWithExtras(s, _items, _ticks, now);
         var paid = EarningsCalculator.PaidElapsed(s, now);
 
-        AmountLabel.Text = EarningsCalculator.Format(
+        // Рахуємо один раз і на AmountLabel, і на TodayLabel — це та сама
+        // сума, а TicksTotal усередині неї небезкоштовна (LINQ + словник).
+        var todayTotalText = EarningsCalculator.Format(
             EarningsCalculator.EarnedToday(s, _log, _items, _ticks, now), s.Currency);
+
+        AmountLabel.Text = todayTotalText;
 
         PerSecondLabel.Text =
             $"+{EarningsCalculator.PerSecond(s):0.0000} {s.Currency}/сек";
@@ -80,8 +104,7 @@ public partial class ShiftPage : ContentPage
             : "—";
 
         var todayEntries = _log.Where(e => e.EndedAtUtc.ToLocalTime().Date == today).ToList();
-        TodayLabel.Text = EarningsCalculator.Format(
-            EarningsCalculator.EarnedToday(s, _log, _items, _ticks, now), s.Currency);
+        TodayLabel.Text = todayTotalText;
         TodayCountLabel.Text = todayEntries.Count.ToString();
 
         var todayWorked = todayEntries.Aggregate(TimeSpan.Zero, (sum, e) => sum + e.Duration) + paid;
@@ -111,6 +134,8 @@ public partial class ShiftPage : ContentPage
             ToggleButton.BackgroundColor = Color.FromArgb("#4ADE80");
             ToggleButton.TextColor = Color.FromArgb("#06210F");
         }
+
+        SyncTicking(s.IsRunning);
     }
 
     private void OnToggleClicked(object? sender, EventArgs e)

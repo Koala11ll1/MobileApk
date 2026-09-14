@@ -25,13 +25,7 @@ public partial class ExtrasPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
         Refresh();
-
-        _timer = Dispatcher.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(2);
-        _timer.Tick += (_, _) => Refresh();
-        _timer.Start();
     }
 
     protected override void OnDisappearing()
@@ -39,6 +33,30 @@ public partial class ExtrasPage : ContentPage
         _timer?.Stop();
         _timer = null;
         base.OnDisappearing();
+    }
+
+    /// <summary>
+    /// Поки зміна не активна, тут нічого не тікає (лічильники завжди 0),
+    /// тож фоновий таймер тільки б марно ганяв JSON і перебудову списку —
+    /// саме це заважало плавному свайпу між вкладками. Вмикаємо його лише
+    /// на час активної зміни, щоб зловити її можливий автостоп по плану.
+    /// </summary>
+    private void SyncTicking(bool running)
+    {
+        if (running)
+        {
+            if (_timer is not null) return;
+
+            _timer = Dispatcher.CreateTimer();
+            _timer.Interval = TimeSpan.FromSeconds(3);
+            _timer.Tick += (_, _) => Refresh();
+            _timer.Start();
+        }
+        else
+        {
+            _timer?.Stop();
+            _timer = null;
+        }
     }
 
     private void Refresh()
@@ -74,6 +92,8 @@ public partial class ExtrasPage : ContentPage
 
         var total = canEdit ? EarningsCalculator.TicksTotal(items, ticks, from, now) : 0m;
         ShiftExtrasTotalLabel.Text = EarningsCalculator.Format(total, s.Currency);
+
+        SyncTicking(canEdit);
     }
 
     private void OnAddClicked(object? sender, EventArgs e)
