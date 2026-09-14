@@ -107,39 +107,53 @@ public static class ShiftStore
         WriteKey(KeyLog, JsonSerializer.Serialize(log, JsonOpts));
     }
 
-    // ---- Допзаробітки (одноразові суми під час зміни) ----
+    // ---- Каталог типів допзаробітку (живе постійно, не прив'язаний до зміни) ----
 
-    private const string KeyExtras = "extra_earnings_json";
+    private const string KeyExtraItems = "extra_items_json";
 
-    public static List<ExtraEarning> LoadExtras()
+    public static List<ExtraItem> LoadExtraItems()
     {
-        var raw = ReadKey(KeyExtras);
-        if (string.IsNullOrWhiteSpace(raw)) return new List<ExtraEarning>();
+        var raw = ReadKey(KeyExtraItems);
+        if (string.IsNullOrWhiteSpace(raw)) return new List<ExtraItem>();
 
         try
         {
-            return JsonSerializer.Deserialize<List<ExtraEarning>>(raw, JsonOpts)
-                   ?? new List<ExtraEarning>();
+            return JsonSerializer.Deserialize<List<ExtraItem>>(raw, JsonOpts) ?? new List<ExtraItem>();
         }
         catch (JsonException)
         {
-            return new List<ExtraEarning>();
+            return new List<ExtraItem>();
         }
     }
 
-    public static void AddExtra(ExtraEarning extra)
+    public static void SaveExtraItems(List<ExtraItem> items)
+        => WriteKey(KeyExtraItems, JsonSerializer.Serialize(items, JsonOpts));
+
+    // ---- Тіки (+1/-1 по типу допзаробітку, з міткою часу) ----
+
+    private const string KeyExtraTicks = "extra_ticks_json";
+
+    public static List<ExtraTick> LoadExtraTicks()
     {
-        var extras = LoadExtras();
-        extras.Insert(0, extra);
-        if (extras.Count > 500) extras.RemoveRange(500, extras.Count - 500);
-        WriteKey(KeyExtras, JsonSerializer.Serialize(extras, JsonOpts));
+        var raw = ReadKey(KeyExtraTicks);
+        if (string.IsNullOrWhiteSpace(raw)) return new List<ExtraTick>();
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<ExtraTick>>(raw, JsonOpts) ?? new List<ExtraTick>();
+        }
+        catch (JsonException)
+        {
+            return new List<ExtraTick>();
+        }
     }
 
-    public static void RemoveExtra(Guid id)
+    public static void AddExtraTick(ExtraTick tick)
     {
-        var extras = LoadExtras();
-        extras.RemoveAll(x => x.Id == id);
-        WriteKey(KeyExtras, JsonSerializer.Serialize(extras, JsonOpts));
+        var ticks = LoadExtraTicks();
+        ticks.Insert(0, tick);
+        if (ticks.Count > 2000) ticks.RemoveRange(2000, ticks.Count - 2000);
+        WriteKey(KeyExtraTicks, JsonSerializer.Serialize(ticks, JsonOpts));
     }
 
     // ---- Платформозалежна частина ----

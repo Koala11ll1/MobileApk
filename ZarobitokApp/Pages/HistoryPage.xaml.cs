@@ -1,3 +1,4 @@
+using ZarobitokApp.Models;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Pages;
@@ -42,6 +43,14 @@ public partial class HistoryPage : ContentPage
     {
         var s = ShiftStore.Load();
         var log = ShiftStore.LoadLog();
+        var items = ShiftStore.LoadExtraItems();
+        var ticks = ShiftStore.LoadExtraTicks();
+
+        // Сума за зміну = час-заробіток (Earned) + допзаробіток по її
+        // діапазону, порахований наживо з тіків — це і дає можливість
+        // редагувати кількість тіків для вже завершеної зміни заднім числом.
+        decimal Total(ShiftLogEntry e)
+            => e.Earned + EarningsCalculator.TicksTotal(items, ticks, e.StartedAtUtc, e.EndedAtUtc);
 
         // Групуємо за днем ЗАВЕРШЕННЯ зміни — так само, як EarnedToday
         // рахує "сьогодні". Інакше зміна через північ показувалась би
@@ -52,7 +61,7 @@ public partial class HistoryPage : ContentPage
             .OrderByDescending(g => g.Key)
             .Select(g => new DayGroup(
                 DayText(g.Key),
-                EarningsCalculator.Format(g.Sum(x => x.entry.Earned), s.Currency),
+                EarningsCalculator.Format(g.Sum(x => Total(x.entry)), s.Currency),
                 g.OrderByDescending(x => x.entry.StartedAtUtc)
                  .Select(x => new ShiftRow
                  {
@@ -61,7 +70,7 @@ public partial class HistoryPage : ContentPage
                      TimeText = $"{x.entry.StartedAtUtc.ToLocalTime():HH:mm} — {x.entry.EndedAtUtc.ToLocalTime():HH:mm}",
                      DetailText = $"{EarningsCalculator.FormatDuration(x.entry.Duration)} · " +
                                   $"{x.entry.RatePerHour:0.##} {s.Currency}/год",
-                     AmountText = EarningsCalculator.Format(x.entry.Earned, s.Currency)
+                     AmountText = EarningsCalculator.Format(Total(x.entry), s.Currency)
                  })))
             .ToList();
     }
@@ -76,11 +85,10 @@ public partial class HistoryPage : ContentPage
         var dayEntries = ShiftStore.LoadLog()
             .Where(x => x.EndedAtUtc.ToLocalTime().Date == day)
             .ToList();
-        var dayExtras = ShiftStore.LoadExtras()
-            .Where(x => x.AtUtc.ToLocalTime().Date == day)
-            .ToList();
+        var items = ShiftStore.LoadExtraItems();
+        var ticks = ShiftStore.LoadExtraTicks();
 
-        await Navigation.PushModalAsync(new DayDetailPage(day, s.Currency, dayEntries, dayExtras));
+        await Navigation.PushModalAsync(new DayDetailPage(day, s.Currency, dayEntries, items, ticks));
     }
 
     private async void OnDeleteClicked(object? sender, EventArgs e)

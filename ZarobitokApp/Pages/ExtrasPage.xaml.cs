@@ -1,15 +1,16 @@
 using System.Globalization;
-using ZarobitokApp.Models;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Pages;
 
-public sealed class ExtraRow
+public sealed class ExtraItemRow
 {
     public required Guid Id { get; init; }
     public required string Label { get; init; }
-    public required string TimeText { get; init; }
-    public required string AmountText { get; init; }
+    public required string PriceText { get; init; }
+    public required int Count { get; init; }
+    public required bool CanIncrement { get; init; }
+    public required bool CanDecrement { get; init; }
 }
 
 public partial class ExtrasPage : ContentPage
@@ -27,8 +28,6 @@ public partial class ExtrasPage : ContentPage
 
         Refresh();
 
-        // Секундного цокання тут не треба — досить оновлюватись, коли
-        // хтось інший (наприклад, стоп зміни з віджета) міг змінити стан.
         _timer = Dispatcher.CreateTimer();
         _timer.Interval = TimeSpan.FromSeconds(2);
         _timer.Tick += (_, _) => Refresh();
@@ -45,27 +44,36 @@ public partial class ExtrasPage : ContentPage
     private void Refresh()
     {
         var s = ShiftStore.Load();
+        var items = ShiftStore.LoadExtraItems();
+        var ticks = ShiftStore.LoadExtraTicks();
 
-        FormCard.IsVisible = s.IsRunning;
         NoShiftLabel.IsVisible = !s.IsRunning;
 
-        var shiftExtras = s.IsRunning
-            ? ShiftStore.LoadExtras()
-                .Where(x => x.AtUtc >= s.StartedAtUtc!.Value)
-                .OrderByDescending(x => x.AtUtc)
-                .ToList()
-            : new List<ExtraEarning>();
+        var canEdit = s.IsRunning;
+        var from = canEdit ? s.StartedAtUtc!.Value : DateTime.MinValue;
+        var now = DateTime.UtcNow;
 
-        ShiftExtrasTotalLabel.Text = EarningsCalculator.Format(
-            shiftExtras.Sum(x => x.Amount), s.Currency);
-
-        ExtrasView.ItemsSource = shiftExtras.Select(x => new ExtraRow
+        ItemsView.ItemsSource = items.Select(item =>
         {
-            Id = x.Id,
-            Label = x.Label,
-            TimeText = x.AtUtc.ToLocalTime().ToString("HH:mm"),
-            AmountText = EarningsCalculator.Format(x.Amount, s.Currency)
+            var count = canEdit
+                ? Math.Max(0, ticks
+                    .Where(t => t.ItemId == item.Id && t.AtUtc >= from && t.AtUtc <= now)
+                    .Sum(t => t.Delta))
+                : 0;
+
+            return new ExtraItemRow
+            {
+                Id = item.Id,
+                Label = item.Label,
+                PriceText = $"{item.UnitPrice:0.##} {s.Currency}/шт",
+                Count = count,
+                CanIncrement = canEdit,
+                CanDecrement = canEdit && count > 0
+            };
         }).ToList();
+
+        var total = canEdit ? EarningsCalculator.TicksTotal(items, ticks, from, now) : 0m;
+        ShiftExtrasTotalLabel.Text = EarningsCalculator.Format(total, s.Currency);
     }
 
     private void OnAddClicked(object? sender, EventArgs e)
@@ -74,33 +82,31 @@ public partial class ExtrasPage : ContentPage
         if (string.IsNullOrWhiteSpace(label)) return;
 
         if (!decimal.TryParse(
-                (AmountEntry.Text ?? string.Empty).Replace(',', '.'),
-                NumberStyles.Any, CultureInfo.InvariantCulture, out var amount)
-            || amount <= 0)
+                (PriceEntry.Text ?? string.Empty).Replace(',', '.'),
+                NumberStyles.Any, CultureInfo.InvariantCulture, out var price)
+            || price <= 0)
         {
             return;
         }
 
-        ShiftManager.AddExtra(label, amount);
+        ShiftManager.AddOrGetExtraItem(label, price);
 
         LabelEntry.Text = string.Empty;
-        AmountEntry.Text = string.Empty;
+        PriceEntry.Text = string.Empty;
         Refresh();
     }
 
-    private async void OnDeleteClicked(object? sender, EventArgs e)
+    private void OnPlusClicked(object? sender, EventArgs e)
     {
-        if (sender is not Button { CommandParameter: ExtraRow row }) return;
+        if (sender is not Button { CommandParameter: ExtraItemRow row }) return;
+        ShiftManager.Tick(row.Id, +1);
+        Refresh();
+    }
 
-        var confirmed = await DisplayAlert(
-            "Видалити допзаробіток?",
-            $"{row.Label} · {row.AmountText}",
-            "Видалити",
-            "Скасувати");
-
-        if (!confirmed) return;
-
-        ShiftManager.RemoveExtra(row.Id);
+    private void OnMinusClicked(object? sender, EventArgs e)
+    {
+        if (sender is not Button { CommandParameter: ExtraItemRow row } || row.Count <= 0) return;
+        ShiftManager.Tick(row.Id, -1);
         Refresh();
     }
 }

@@ -36,32 +36,47 @@ public static class EarningsCalculator
              + overtimeSeconds * perSecond * s.OvertimeMultiplier;
     }
 
-    /// <summary>Сума допзаробітків у проміжку [fromUtc, toUtc].</summary>
-    public static decimal ExtrasTotal(IEnumerable<ExtraEarning> extras, DateTime fromUtc, DateTime toUtc)
-        => extras.Where(x => x.AtUtc >= fromUtc && x.AtUtc <= toUtc).Sum(x => x.Amount);
+    /// <summary>
+    /// Сума тіків допзаробітку в проміжку [fromUtc, toUtc], за поточними
+    /// цінами типів. Ціна типу не має власної історії — якщо колись
+    /// знадобиться редагувати ціну заднім числом, це вплине на всі тіки.
+    /// </summary>
+    public static decimal TicksTotal(
+        IEnumerable<ExtraItem> items, IEnumerable<ExtraTick> ticks, DateTime fromUtc, DateTime toUtc)
+    {
+        var priceById = items.ToDictionary(i => i.Id, i => i.UnitPrice);
+        return ticks
+            .Where(t => t.AtUtc >= fromUtc && t.AtUtc <= toUtc)
+            .Sum(t => t.Delta * priceById.GetValueOrDefault(t.ItemId, 0m));
+    }
 
     /// <summary>Скільки набігло за поточну зміну разом із допзаробітками.</summary>
-    public static decimal EarnedThisShiftWithExtras(ShiftState s, IEnumerable<ExtraEarning> extras, DateTime nowUtc)
+    public static decimal EarnedThisShiftWithExtras(
+        ShiftState s, IEnumerable<ExtraItem> items, IEnumerable<ExtraTick> ticks, DateTime nowUtc)
     {
         if (s.StartedAtUtc is null) return 0m;
-        return EarnedThisShift(s, nowUtc) + ExtrasTotal(extras, s.StartedAtUtc.Value, nowUtc);
+        return EarnedThisShift(s, nowUtc) + TicksTotal(items, ticks, s.StartedAtUtc.Value, nowUtc);
     }
 
     /// <summary>
-    /// Загальна сума за сьогодні: завершені сьогодні зміни (вже разом з їхніми
-    /// допзаробітками — вони враховані в Earned при завершенні зміни) + поточна.
+    /// Загальна сума за сьогодні: завершені сьогодні зміни (час-заробіток +
+    /// їхні тіки, порахувані по діапазону кожної зміни) + поточна.
     /// Рахується з журналу, а не з окремого лічильника — інакше та сама
     /// сума жила б у двох місцях і розходилась на зміні через північ.
     /// </summary>
     public static decimal EarnedToday(
-        ShiftState s, IEnumerable<ShiftLogEntry> log, IEnumerable<ExtraEarning> extras, DateTime nowUtc)
+        ShiftState s,
+        IEnumerable<ShiftLogEntry> log,
+        IEnumerable<ExtraItem> items,
+        IEnumerable<ExtraTick> ticks,
+        DateTime nowUtc)
     {
         var today = DateTime.Today;
         var earlier = log
             .Where(e => e.EndedAtUtc.ToLocalTime().Date == today)
-            .Sum(e => e.Earned);
+            .Sum(e => e.Earned + TicksTotal(items, ticks, e.StartedAtUtc, e.EndedAtUtc));
 
-        return earlier + EarnedThisShiftWithExtras(s, extras, nowUtc);
+        return earlier + EarnedThisShiftWithExtras(s, items, ticks, nowUtc);
     }
 
     /// <summary>Скільки капає за секунду — для підпису у віджеті.</summary>

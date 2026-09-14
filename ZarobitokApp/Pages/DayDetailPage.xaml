@@ -73,7 +73,44 @@
             </CollectionView>
 
             <Label Text="ДОПЗАРОБІТОК ЗА ДЕНЬ, ПО ВИДАХ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
-            <CollectionView x:Name="ExtrasBreakdownView">
+
+            <Label x:Name="MultiShiftHintLabel"
+                   Text="За день кілька змін — редагування кількості недоступне, щоб не було неоднозначно, до якої зміни віднести правку."
+                   FontSize="12"
+                   TextColor="#6B7280"
+                   IsVisible="False" />
+
+            <!-- Один шифт за день: можна редагувати кількість +/- -->
+            <CollectionView x:Name="EditableExtrasView" IsVisible="False">
+                <CollectionView.EmptyView>
+                    <Label Text="Ще немає жодного типу" TextColor="#4B5563" HorizontalOptions="Center" Margin="0,12" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="0,10" ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding Label}" TextColor="White" FontSize="15" />
+                                <Label Text="{Binding PriceText}" TextColor="#6B7280" FontSize="12" />
+                            </VerticalStackLayout>
+
+                            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                <Button Text="−" FontSize="18" WidthRequest="40" HeightRequest="40" Padding="0"
+                                        CornerRadius="10" BackgroundColor="#1C1C26" TextColor="#F87171"
+                                        IsEnabled="{Binding CanDecrement}"
+                                        CommandParameter="{Binding .}" Clicked="OnMinusClicked" />
+                                <Label Text="{Binding Count}" TextColor="White" FontSize="17" FontAttributes="Bold"
+                                       WidthRequest="26" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                <Button Text="+" FontSize="18" WidthRequest="40" HeightRequest="40" Padding="0"
+                                        CornerRadius="10" BackgroundColor="#1C1C26" TextColor="#4ADE80"
+                                        CommandParameter="{Binding .}" Clicked="OnPlusClicked" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Кілька змін за день: лише перегляд -->
+            <CollectionView x:Name="ExtrasBreakdownView" IsVisible="False">
                 <CollectionView.EmptyView>
                     <Label Text="Не було" TextColor="#4B5563" HorizontalOptions="Center" Margin="0,12" />
                 </CollectionView.EmptyView>

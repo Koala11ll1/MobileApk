@@ -49,7 +49,12 @@ public static class ShiftManager
         if (!s.IsRunning) return;
 
         var now = DateTime.UtcNow;
-        var earned = EarningsCalculator.EarnedThisShiftWithExtras(s, ShiftStore.LoadExtras(), now);
+
+        // Earned — лише час-заробіток, БЕЗ допзаробітку. Допзаробіток
+        // завжди рахується наживо з тіків по діапазону [StartedAtUtc, EndedAtUtc]
+        // цього запису — так лишається можливість редагувати кількість тіків
+        // для вже завершеної зміни заднім числом (з журналу).
+        var earned = EarningsCalculator.EarnedThisShift(s, now);
 
         ShiftStore.AppendLog(new ShiftLogEntry(
             s.StartedAtUtc!.Value, now, s.RatePerHour, earned));
@@ -61,19 +66,33 @@ public static class ShiftManager
         PushWidget();
     }
 
-    /// <summary>Додати одноразовий допзаробіток до поточної зміни.</summary>
-    public static void AddExtra(string label, decimal amount)
+    /// <summary>Створити новий тип допзаробітку, або повернути вже існуючий з такою назвою.</summary>
+    public static ExtraItem AddOrGetExtraItem(string label, decimal unitPrice)
+    {
+        var items = ShiftStore.LoadExtraItems();
+        var existing = items.FirstOrDefault(i => string.Equals(i.Label, label, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null) return existing;
+
+        var item = new ExtraItem(Guid.NewGuid(), label, unitPrice);
+        items.Insert(0, item);
+        ShiftStore.SaveExtraItems(items);
+        return item;
+    }
+
+    /// <summary>+1/-1 по типу допзаробітку в ПОТОЧНІЙ зміні.</summary>
+    public static void Tick(Guid itemId, int delta)
     {
         var s = ShiftStore.Load();
         if (!s.IsRunning) return;
 
-        ShiftStore.AddExtra(new ExtraEarning(Guid.NewGuid(), DateTime.UtcNow, label, amount));
+        ShiftStore.AddExtraTick(new ExtraTick(Guid.NewGuid(), itemId, DateTime.UtcNow, delta));
         PushWidget();
     }
 
-    public static void RemoveExtra(Guid id)
+    /// <summary>+1/-1 по типу допзаробітку заднім числом, для вже завершеної зміни.</summary>
+    public static void TickAt(Guid itemId, int delta, DateTime atUtc)
     {
-        ShiftStore.RemoveExtra(id);
+        ShiftStore.AddExtraTick(new ExtraTick(Guid.NewGuid(), itemId, atUtc, delta));
         PushWidget();
     }
 

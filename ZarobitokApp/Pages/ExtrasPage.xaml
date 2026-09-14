@@ -5,10 +5,9 @@
              Title="Допзаробіток"
              BackgroundColor="#0B0B12">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="20,20,20,0" RowSpacing="14">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="20,20,20,0" RowSpacing="14">
 
         <Border Grid.Row="0"
-                x:Name="FormCard"
                 BackgroundColor="#12121A"
                 StrokeThickness="1"
                 Stroke="#22FFFFFF"
@@ -18,18 +17,19 @@
             </Border.StrokeShape>
 
             <VerticalStackLayout Spacing="10">
+                <Label Text="Новий тип" FontSize="12" TextColor="#6B7280" />
                 <Entry x:Name="LabelEntry"
                        Placeholder="Наприклад: продав ред бул"
                        PlaceholderColor="#6B7280"
                        TextColor="White"
                        BackgroundColor="#1C1C26" />
-                <Entry x:Name="AmountEntry"
-                       Placeholder="Сума"
+                <Entry x:Name="PriceEntry"
+                       Placeholder="Ціна за одиницю"
                        Keyboard="Numeric"
                        PlaceholderColor="#6B7280"
                        TextColor="White"
                        BackgroundColor="#1C1C26" />
-                <Button Text="Додати"
+                <Button Text="Додати тип"
                         Clicked="OnAddClicked"
                         BackgroundColor="#4ADE80"
                         TextColor="#06210F"
@@ -39,24 +39,24 @@
             </VerticalStackLayout>
         </Border>
 
-        <Label Grid.Row="0"
+        <Label Grid.Row="1"
                x:Name="NoShiftLabel"
-               Text="Спочатку почніть зміну на вкладці «Зміна» — допзаробіток прив'язується до поточної зміни."
-               FontSize="14"
+               Text="Лічильники активні тільки під час зміни — типи можна створювати завжди, а +/- запрацює після старту."
+               FontSize="13"
                TextColor="#9CA3AF"
                IsVisible="False" />
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="4,0">
-            <Label Text="ДОПЗАРОБІТОК ЦІЄЇ ЗМІНИ" FontSize="12" TextColor="#6B7280" />
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="4,0">
+            <Label Text="ЦЯ ЗМІНА" FontSize="12" TextColor="#6B7280" />
             <Label Grid.Column="1" x:Name="ShiftExtrasTotalLabel"
                    FontSize="12" TextColor="#4ADE80" FontAttributes="Bold" />
         </Grid>
 
-        <BoxView Grid.Row="2" HeightRequest="1" Color="#22FFFFFF" Margin="4,0" />
+        <BoxView Grid.Row="3" HeightRequest="1" Color="#22FFFFFF" Margin="4,0" />
 
-        <CollectionView Grid.Row="3" x:Name="ExtrasView">
+        <CollectionView Grid.Row="4" x:Name="ItemsView">
             <CollectionView.EmptyView>
-                <Label Text="Ще нічого не додано"
+                <Label Text="Ще немає жодного типу"
                        TextColor="#4B5563"
                        HorizontalOptions="Center"
                        Margin="0,24" />
@@ -64,31 +64,43 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                    <Grid Padding="0,10" ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{Binding Label}" TextColor="White" FontSize="15" />
-                            <Label Text="{Binding TimeText}" TextColor="#6B7280" FontSize="12" />
+                            <Label Text="{Binding PriceText}" TextColor="#6B7280" FontSize="12" />
                         </VerticalStackLayout>
 
-                        <Label Grid.Column="1"
-                               Text="{Binding AmountText}"
-                               TextColor="#4ADE80"
-                               FontAttributes="Bold"
-                               FontSize="16"
-                               VerticalOptions="Center" />
-
-                        <Button Grid.Column="2"
-                                Text="✕"
-                                FontSize="16"
-                                WidthRequest="44"
-                                HeightRequest="44"
-                                Padding="0"
-                                CornerRadius="12"
-                                BackgroundColor="#1C1C26"
-                                TextColor="#F87171"
-                                VerticalOptions="Center"
-                                CommandParameter="{Binding .}"
-                                Clicked="OnDeleteClicked" />
+                        <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                            <Button Text="−"
+                                    FontSize="18"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    Padding="0"
+                                    CornerRadius="10"
+                                    BackgroundColor="#1C1C26"
+                                    TextColor="#F87171"
+                                    IsEnabled="{Binding CanDecrement}"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnMinusClicked" />
+                            <Label Text="{Binding Count}"
+                                   TextColor="White"
+                                   FontSize="17"
+                                   FontAttributes="Bold"
+                                   WidthRequest="26"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalOptions="Center" />
+                            <Button Text="+"
+                                    FontSize="18"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    Padding="0"
+                                    CornerRadius="10"
+                                    BackgroundColor="#1C1C26"
+                                    TextColor="#4ADE80"
+                                    IsEnabled="{Binding CanIncrement}"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnPlusClicked" />
+                        </HorizontalStackLayout>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
