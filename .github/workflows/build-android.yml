@@ -19,6 +19,21 @@ jobs:
       - name: Install MAUI Android workload
         run: dotnet workload install maui-android
 
+      - name: Restore stable signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 secret is not set — falling back to the auto-generated debug keystore."
+            echo "Its signature changes every run, so each new build will require uninstalling the previous one first."
+            echo "SIGNING_ARGS=" >> "$GITHUB_ENV"
+          else
+            KEYSTORE_PATH="$RUNNER_TEMP/zarobitok.keystore"
+            echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+            echo "SIGNING_ARGS=-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$KEYSTORE_PATH -p:AndroidSigningKeyAlias=zarobitok -p:AndroidSigningKeyPass=$KEYSTORE_PASSWORD -p:AndroidSigningStorePass=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          fi
+
       - name: Build debug APK (sideload-signed)
         run: >
           dotnet build ZarobitokApp/ZarobitokApp.csproj
@@ -28,6 +43,7 @@ jobs:
           -p:EmbedAssembliesIntoApk=true
           -p:RuntimeIdentifiers=android-arm64
           -p:AndroidIncludeDebugSymbols=false
+          $SIGNING_ARGS
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
