@@ -23,12 +23,12 @@ public class MainActivity : MauiAppCompatActivity
         var crash = ShiftStore.TakeLastCrash();
         if (crash is not null)
         {
-            new AlertDialog.Builder(this)
-                .SetTitle("Останній збій застосунку")
-                .SetMessage(crash)
-                .SetCancelable(false)
-                .SetPositiveButton("OK", (s, e) => { })
-                .Show();
+            var dialog = new AlertDialog.Builder(this);
+            dialog.SetTitle("Останній збій застосунку");
+            dialog.SetMessage(crash);
+            dialog.SetCancelable(false);
+            dialog.SetPositiveButton("OK", (_, _) => { });
+            dialog.Show();
         }
 
         base.OnCreate(savedInstanceState);

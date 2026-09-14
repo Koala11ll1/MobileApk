@@ -126,9 +126,9 @@ public partial class MainPage : ContentPage
     /// Пікер дає лише час доби. Якщо він сьогодні ще не настав —
     /// значить зміна почалась учора: так працює нічна зміна.
     /// </summary>
-    private static DateTime ToUtcStart(TimeSpan timeOfDay)
+    private static DateTime ToUtcStart(TimeSpan? timeOfDay)
     {
-        var local = DateTime.Today + timeOfDay;
+        var local = DateTime.Today + (timeOfDay ?? DateTime.Now.TimeOfDay);
         if (local > DateTime.Now) local = local.AddDays(-1);
         return local.ToUniversalTime();
     }
