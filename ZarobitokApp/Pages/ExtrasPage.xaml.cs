@@ -96,7 +96,7 @@ public partial class ExtrasPage : ContentPage
         SyncTicking(canEdit);
     }
 
-    private void OnAddClicked(object? sender, EventArgs e)
+    private async void OnAddClicked(object? sender, EventArgs e)
     {
         var label = LabelEntry.Text?.Trim();
         if (string.IsNullOrWhiteSpace(label)) return;
@@ -106,6 +106,16 @@ public partial class ExtrasPage : ContentPage
                 NumberStyles.Any, CultureInfo.InvariantCulture, out var price)
             || price <= 0)
         {
+            return;
+        }
+
+        var existing = ShiftStore.LoadExtraItems()
+            .FirstOrDefault(i => string.Equals(i.Label, label, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            // Ціну існуючого типу не міняємо: вона діє на всі минулі тіки.
+            await DisplayAlert("Вже є",
+                $"«{existing.Label}» уже в списку за {existing.UnitPrice:0.##}. Нову ціну не застосовано.", "OK");
             return;
         }
 
