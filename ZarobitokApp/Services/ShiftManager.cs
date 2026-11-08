@@ -59,16 +59,21 @@ public static class ShiftManager
         if (EarningsCalculator.PaidElapsed(s, DateTime.UtcNow).TotalHours < s.PlannedHours)
             return false;
 
-        StopShift();
+        // Кінець — момент, коли план вичерпано, а не "зараз": якщо телефон
+        // спав, перевірка могла спрацювати години після плану.
+        var plannedEnd = s.StartedAtUtc!.Value
+            + TimeSpan.FromMinutes(s.UnpaidBreakMinutes)
+            + TimeSpan.FromHours(s.PlannedHours);
+        StopShift(plannedEnd);
         return true;
     }
 
-    public static void StopShift()
+    public static void StopShift(DateTime? endedAtUtc = null)
     {
         var s = ShiftStore.Load();
         if (!s.IsRunning) return;
 
-        var now = DateTime.UtcNow;
+        var now = endedAtUtc ?? DateTime.UtcNow;
 
         // Earned — лише час-заробіток, БЕЗ допзаробітку. Допзаробіток
         // завжди рахується наживо з тіків по діапазону [StartedAtUtc, EndedAtUtc]
