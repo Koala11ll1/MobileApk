@@ -11,6 +11,9 @@
     <!-- Лише чиста математика без MAUI/Android — компілюємо її напряму. -->
     <Compile Include="..\ZarobitokApp\Models\ShiftState.cs" />
     <Compile Include="..\ZarobitokApp\Services\EarningsCalculator.cs" />
+    <Compile Include="..\ZarobitokApp\Services\RateSchedule.cs" />
+    <Compile Include="..\ZarobitokApp\Services\StatsCalculator.cs" />
+    <Compile Include="..\ZarobitokApp\Services\DataExport.cs" />
   </ItemGroup>
 
   <ItemGroup>

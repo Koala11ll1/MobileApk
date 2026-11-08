@@ -7,9 +7,6 @@ public partial class SettingsPage : ContentPage
 {
     // Межі потрібні, бо NumberStyles.Any пропускає хоч 1e9 годин —
     // TimeSpan.FromHours тоді кидає OverflowException на кожному запуску.
-    private const decimal MaxRate = 1_000_000m;
-    private const double MaxPlannedHours = 48;
-    private const int MaxBreakMinutes = 24 * 60;
 
     private bool _loading;
 
@@ -39,16 +36,16 @@ public partial class SettingsPage : ContentPage
 
         ShiftManager.UpdateSettings(s =>
         {
-            if (TryDecimal(RateEntry.Text, out var rate) && rate is >= 0 and <= MaxRate)
+            if (TryDecimal(RateEntry.Text, out var rate) && rate is >= 0 and <= Limits.MaxRate)
                 s.RatePerHour = rate;
 
             if (!string.IsNullOrWhiteSpace(CurrencyEntry.Text))
                 s.Currency = CurrencyEntry.Text.Trim();
 
-            if (TryDouble(PlannedEntry.Text, out var planned) && planned is > 0 and <= MaxPlannedHours)
+            if (TryDouble(PlannedEntry.Text, out var planned) && planned is > 0 and <= Limits.MaxPlannedHours)
                 s.PlannedHours = planned;
 
-            if (int.TryParse(BreakEntry.Text, out var brk) && brk is >= 0 and <= MaxBreakMinutes)
+            if (int.TryParse(BreakEntry.Text, out var brk) && brk is >= 0 and <= Limits.MaxBreakMinutes)
                 s.UnpaidBreakMinutes = brk;
         });
     }

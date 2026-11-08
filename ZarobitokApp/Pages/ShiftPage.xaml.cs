@@ -91,7 +91,7 @@ public partial class ShiftPage : ContentPage
         AmountLabel.Text = todayTotalText;
 
         PerSecondLabel.Text =
-            $"+{EarningsCalculator.PerSecond(s):0.0000} {s.Currency}/сек";
+            $"+{EarningsCalculator.PerSecond(s, now):0.0000} {s.Currency}/сек";
 
         ThisShiftLabel.Text = EarningsCalculator.Format(thisShift, s.Currency);
         PaidTimeLabel.Text = EarningsCalculator.FormatDuration(paid);
