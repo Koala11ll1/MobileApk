@@ -231,3 +231,130 @@ public class DataExportTests
         Assert.Equal(8, csv.TrimEnd().Split(';').Length);
     }
 }
+
+public class ShiftEditingTests
+{
+    private static DateTime T(int h, int day = 5) => new(2026, 1, day, h, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime Now = T(23, 20);
+
+    private static ShiftLogEntry Entry(int h1, int h2) => new(T(h1), T(h2), 100m, 100m * (h2 - h1));
+
+    [Fact]
+    public void Valid_range_has_no_error()
+        => Assert.Null(ShiftEditing.Validate(new[] { Entry(9, 12) }, T(13), T(17), Now, null));
+
+    [Theory]
+    [InlineData(10, 10)]
+    [InlineData(10, 9)]
+    public void End_must_be_after_start(int h1, int h2)
+        => Assert.NotNull(ShiftEditing.Validate(Array.Empty<ShiftLogEntry>(), T(h1), T(h2), Now, null));
+
+    [Fact]
+    public void Future_end_and_over_48_hours_are_rejected()
+    {
+        Assert.NotNull(ShiftEditing.Validate(Array.Empty<ShiftLogEntry>(), T(9), Now.AddHours(1), Now, null));
+        Assert.NotNull(ShiftEditing.Validate(Array.Empty<ShiftLogEntry>(), T(9, 1), T(11, 4), Now, null));
+    }
+
+    [Fact]
+    public void Overlap_with_log_or_running_shift_is_rejected_but_touching_is_fine()
+    {
+        var log = new[] { Entry(9, 12) };
+        Assert.NotNull(ShiftEditing.Validate(log, T(11), T(14), Now, null));
+        Assert.Null(ShiftEditing.Validate(log, T(12), T(14), Now, null));
+        Assert.NotNull(ShiftEditing.Validate(Array.Empty<ShiftLogEntry>(), T(14), T(20), Now, T(18)));
+        Assert.Null(ShiftEditing.Validate(Array.Empty<ShiftLogEntry>(), T(14), T(18), Now, T(18)));
+    }
+
+    [Fact]
+    public void Narrowing_a_shift_pulls_outside_ticks_to_the_new_edge_and_leaves_others_alone()
+    {
+        var id = Guid.NewGuid();
+        var inside = new ExtraTick(Guid.NewGuid(), id, T(10), 1);
+        var late = new ExtraTick(Guid.NewGuid(), id, T(16), 1);
+        var other = new ExtraTick(Guid.NewGuid(), id, T(20), 1); // чужа зміна
+
+        var moved = ShiftEditing.MoveTicks(new[] { inside, late, other }, T(9), T(17), T(9), T(14));
+
+        Assert.Equal(T(10), moved[0].AtUtc);
+        Assert.Equal(T(14), moved[1].AtUtc);
+        Assert.Equal(T(20), moved[2].AtUtc);
+    }
+
+    [Fact]
+    public void BreakOf_prefers_the_stored_value_and_derives_it_for_legacy_entries()
+    {
+        Assert.Equal(45, ShiftEditing.BreakOf(Entry(9, 17) with { BreakMinutes = 45 }));
+        // 8 год, оплачено 7,5 год → перерва 30 хв
+        Assert.Equal(30, ShiftEditing.BreakOf(new ShiftLogEntry(T(9), T(17), 100m, 750m)));
+        Assert.Equal(0, ShiftEditing.BreakOf(new ShiftLogEntry(T(9), T(17), 0m, 0m)));
+    }
+
+    [Fact]
+    public void Edited_shift_is_repriced_with_its_own_rate_and_break()
+    {
+        var rates = ShiftEditing.RatesFor(new ShiftState { RatePerHour = 999m, NightRate = 200m }, 100m);
+        Assert.Equal(100m, rates.RatePerHour);
+        Assert.Equal(200m, rates.NightRate);
+        // 9:00–17:00 з перервою 60 хв → 7 год × 100
+        Assert.Equal(700m, EarningsCalculator.EarnedForRange(rates, T(9), T(17), 60));
+    }
+}
+
+public class ResolveRangeTests
+{
+    [Fact]
+    public void Same_day_range_keeps_the_date()
+    {
+        var (s, e) = ShiftEditing.ResolveRange(new DateTime(2026, 1, 5), TimeSpan.FromHours(9), TimeSpan.FromHours(17));
+        Assert.Equal(TimeSpan.FromHours(8), e - s);
+    }
+
+    [Fact]
+    public void End_not_after_start_means_the_next_day()
+    {
+        var (s, e) = ShiftEditing.ResolveRange(new DateTime(2026, 1, 5), TimeSpan.FromHours(22), TimeSpan.FromHours(6));
+        Assert.Equal(TimeSpan.FromHours(8), e - s);
+        var (s2, e2) = ShiftEditing.ResolveRange(new DateTime(2026, 1, 5), TimeSpan.FromHours(9), TimeSpan.FromHours(9));
+        Assert.Equal(TimeSpan.FromHours(24), e2 - s2);
+    }
+}
+
+public class InputTests
+{
+    [Theory]
+    [InlineData("12,5", 12.5)]
+    [InlineData(" 12.5 ", 12.5)]
+    [InlineData("100", 100)]
+    public void Decimal_accepts_comma_and_dot(string text, double expected)
+    {
+        Assert.True(Input.TryDecimal(text, out var v));
+        Assert.Equal((decimal)expected, v);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("abc")]
+    [InlineData("1e5")]
+    public void Decimal_rejects_garbage_and_exponents(string text)
+        => Assert.False(Input.TryDecimal(text, out _));
+
+    [Theory]
+    [InlineData("09:30", 9, 30)]
+    [InlineData("9:05", 9, 5)]
+    [InlineData("9.05", 9, 5)]
+    [InlineData("23:59", 23, 59)]
+    public void Time_parses_common_forms(string text, int h, int m)
+    {
+        Assert.True(Input.TryTimeOfDay(text, out var t));
+        Assert.Equal(new TimeSpan(h, m, 0), t);
+    }
+
+    [Theory]
+    [InlineData("24:00")]
+    [InlineData("9:60")]
+    [InlineData("nine")]
+    [InlineData("")]
+    public void Time_rejects_invalid(string text)
+        => Assert.False(Input.TryTimeOfDay(text, out _));
+}

@@ -110,6 +110,12 @@
                                FontSize="14" FontAttributes="Bold" TextColor="#4ADE80" />
                     </Grid>
 
+                    <Grid x:Name="TodayNetRow" ColumnDefinitions="*,Auto" IsVisible="False">
+                        <Label Text="Сьогодні після податку" FontSize="14" TextColor="#9CA3AF" />
+                        <Label x:Name="TodayNetLabel" Grid.Column="1"
+                               FontSize="14" TextColor="White" />
+                    </Grid>
+
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Text="Завершених змін сьогодні" FontSize="14" TextColor="#9CA3AF" />
                         <Label x:Name="TodayCountLabel" Grid.Column="1"

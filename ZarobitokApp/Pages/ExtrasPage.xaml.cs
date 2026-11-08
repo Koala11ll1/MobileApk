@@ -1,4 +1,3 @@
-using System.Globalization;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Pages;
@@ -7,6 +6,7 @@ public sealed class ExtraItemRow
 {
     public required Guid Id { get; init; }
     public required string Label { get; init; }
+    public required decimal Price { get; init; }
     public required string PriceText { get; init; }
     public required int Count { get; init; }
     public required bool CanIncrement { get; init; }
@@ -71,7 +71,7 @@ public partial class ExtrasPage : ContentPage
         var from = canEdit ? s.StartedAtUtc!.Value : DateTime.MinValue;
         var now = DateTime.UtcNow;
 
-        ItemsView.ItemsSource = items.Select(item =>
+        ItemsView.ItemsSource = items.Where(i => !i.Archived).Select(item =>
         {
             var count = canEdit
                 ? Math.Max(0, ticks
@@ -83,6 +83,7 @@ public partial class ExtrasPage : ContentPage
             {
                 Id = item.Id,
                 Label = item.Label,
+                Price = item.UnitPrice,
                 PriceText = $"{item.UnitPrice:0.##} {s.Currency}/шт",
                 Count = count,
                 CanIncrement = canEdit,
@@ -101,28 +102,79 @@ public partial class ExtrasPage : ContentPage
         var label = LabelEntry.Text?.Trim();
         if (string.IsNullOrWhiteSpace(label)) return;
 
-        if (!decimal.TryParse(
-                (PriceEntry.Text ?? string.Empty).Replace(',', '.'),
-                NumberStyles.Any, CultureInfo.InvariantCulture, out var price)
-            || price <= 0)
-        {
-            return;
-        }
+        if (!Input.TryDecimal(PriceEntry.Text, out var price) || price <= 0) return;
 
         var existing = ShiftStore.LoadExtraItems()
             .FirstOrDefault(i => string.Equals(i.Label, label, StringComparison.OrdinalIgnoreCase));
-        if (existing is not null)
+
+        if (existing is { Archived: false })
         {
-            // Ціну існуючого типу не міняємо: вона діє на всі минулі тіки.
+            // Ціну активного типу тут не міняємо — для цього є меню «⋯» біля нього.
             await DisplayAlert("Вже є",
-                $"«{existing.Label}» уже в списку за {existing.UnitPrice:0.##}. Нову ціну не застосовано.", "OK");
+                $"«{existing.Label}» уже в списку за {existing.UnitPrice:0.##}. Щоб змінити ціну, натисни «⋯» біля нього.", "OK");
             return;
         }
 
-        ShiftManager.AddOrGetExtraItem(label, price);
+        if (existing is not null)
+            ShiftManager.RestoreExtraItem(existing.Id, price);   // був прибраний — повертаємо з новою ціною
+        else
+            ShiftManager.AddOrGetExtraItem(label, price);
 
         LabelEntry.Text = string.Empty;
         PriceEntry.Text = string.Empty;
+        Refresh();
+    }
+
+    private async void OnMenuClicked(object? sender, EventArgs e)
+    {
+        if (sender is not Button { CommandParameter: ExtraItemRow row }) return;
+
+        const string changePrice = "Змінити ціну";
+        const string rename = "Перейменувати";
+        const string remove = "Прибрати зі списку";
+
+        var action = await DisplayActionSheet(row.Label, "Скасувати", null, changePrice, rename, remove);
+
+        switch (action)
+        {
+            case changePrice:
+            {
+                var text = await DisplayPromptAsync(
+                    row.Label, "Нова ціна за одиницю. Минулі підрахунки не зміняться.",
+                    "Зберегти", "Скасувати", keyboard: Keyboard.Numeric, initialValue: row.Price.ToString("0.##"));
+                if (!Input.TryDecimal(text, out var price) || price <= 0) return;
+                ShiftManager.UpdateExtraItem(row.Id, row.Label, price);
+                break;
+            }
+            case rename:
+            {
+                var name = (await DisplayPromptAsync(
+                    "Нова назва", row.Label, "Зберегти", "Скасувати", initialValue: row.Label))?.Trim();
+                if (string.IsNullOrWhiteSpace(name)) return;
+
+                var clash = ShiftStore.LoadExtraItems().Any(i => i.Id != row.Id
+                    && string.Equals(i.Label, name, StringComparison.OrdinalIgnoreCase));
+                if (clash)
+                {
+                    await DisplayAlert("Назва зайнята", $"Тип «{name}» уже існує.", "OK");
+                    return;
+                }
+                ShiftManager.UpdateExtraItem(row.Id, name, row.Price);
+                break;
+            }
+            case remove:
+            {
+                var ok = await DisplayAlert("Прибрати зі списку?",
+                    $"«{row.Label}» зникне зі списку, але минулі підрахунки в журналі збережуться.",
+                    "Прибрати", "Скасувати");
+                if (!ok) return;
+                ShiftManager.ArchiveExtraItem(row.Id);
+                break;
+            }
+            default:
+                return;
+        }
+
         Refresh();
     }
 

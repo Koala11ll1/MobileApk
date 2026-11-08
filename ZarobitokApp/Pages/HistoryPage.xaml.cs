@@ -51,7 +51,19 @@ public partial class HistoryPage : ContentPage
     {
         InitializeComponent();
         SetMode(showCalendar: false);
+
+        // Зміна могла прийти ззовні (автостоп, ярлик, правка в деталях дня).
+        ShiftManager.Changed += () => Dispatcher.Dispatch(Reload);
     }
+
+    private void Reload()
+    {
+        LoadHistory();
+        if (_showCalendar) RenderCalendar();
+    }
+
+    private static string Time(DateTime utc, ShiftState s)
+        => EarningsCalculator.FormatTime(utc.ToLocalTime(), s.Use12Hour);
 
     protected override void OnAppearing()
     {
@@ -87,7 +99,7 @@ public partial class HistoryPage : ContentPage
                  {
                      Entry = e,
                      Day = g.Key,
-                     TimeText = $"{e.StartedAtUtc.ToLocalTime():HH:mm} — {e.EndedAtUtc.ToLocalTime():HH:mm}",
+                     TimeText = $"{Time(e.StartedAtUtc, s)} — {Time(e.EndedAtUtc, s)}",
                      DetailText = $"{EarningsCalculator.FormatDuration(e.Duration)} · " +
                                   $"{e.RatePerHour:0.##} {s.Currency}/год",
                      AmountText = EarningsCalculator.Format(Total(e), s.Currency)
@@ -118,18 +130,21 @@ public partial class HistoryPage : ContentPage
 
         MonthLabel.Text = $"{MonthNames[_visibleMonth.Month - 1]} {_visibleMonth.Year}";
         MonthTotalLabel.Text = $"Заробіток за місяць: {EarningsCalculator.Format(monthTotal, s.Currency)}";
+        if (s.TaxPercent > 0)
+            MonthTotalLabel.Text += $"\nпісля податку: {EarningsCalculator.Format(StatsCalculator.Net(monthTotal, s.TaxPercent), s.Currency)}";
 
-        CalendarView.ItemsSource = BuildCalendarCells(_visibleMonth, shiftDays);
+        SetWeekdayHeaders(s.WeekStartsOnSunday);
+        CalendarView.ItemsSource = BuildCalendarCells(_visibleMonth, shiftDays, s.WeekStartsOnSunday);
     }
 
-    private static List<CalendarDayCell> BuildCalendarCells(DateTime month, HashSet<DateTime> shiftDays)
+    private static List<CalendarDayCell> BuildCalendarCells(DateTime month, HashSet<DateTime> shiftDays, bool sundayFirst)
     {
         var today = DateTime.Today;
         var daysInMonth = DateTime.DaysInMonth(month.Year, month.Month);
 
-        // Тиждень починається з понеділка: DayOfWeek у .NET рахує з неділі (0),
-        // цей зсув переводить понеділок у 0.
-        var leadingBlanks = ((int)month.DayOfWeek + 6) % 7;
+        // DayOfWeek у .NET рахує з неділі (0). Для тижня з понеділка зсуваємо
+        // так, щоб понеділок став 0; для тижня з неділі беремо як є.
+        var leadingBlanks = sundayFirst ? (int)month.DayOfWeek : ((int)month.DayOfWeek + 6) % 7;
 
         var cells = new List<CalendarDayCell>();
         for (var i = 0; i < leadingBlanks; i++)
@@ -158,6 +173,45 @@ public partial class HistoryPage : ContentPage
             cells.Add(new CalendarDayCell());
 
         return cells;
+    }
+
+    private void SetWeekdayHeaders(bool sundayFirst)
+    {
+        string[] names = sundayFirst
+            ? new[] { "Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" }
+            : new[] { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд" };
+        var labels = new[] { Wd0, Wd1, Wd2, Wd3, Wd4, Wd5, Wd6 };
+        for (var i = 0; i < 7; i++) labels[i].Text = names[i];
+    }
+
+    private async void OnAddShiftClicked(object? sender, EventArgs e)
+    {
+        var dateText = await DisplayPromptAsync(
+            "Додати зміну", "Дата початку (дд.мм.рррр)", "Далі", "Скасувати",
+            initialValue: DateTime.Today.ToString("dd.MM.yyyy"));
+        if (dateText is null) return;
+
+        var startText = await DisplayPromptAsync(
+            "Початок зміни", "Година:хвилина (наприклад 09:00)", "Далі", "Скасувати");
+        if (startText is null) return;
+
+        var endText = await DisplayPromptAsync(
+            "Кінець зміни", "Година:хвилина. Якщо раніше за початок — це наступна доба.", "Додати", "Скасувати");
+        if (endText is null) return;
+
+        if (!DateTime.TryParseExact(dateText.Trim(), "dd.MM.yyyy",
+                System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var date)
+            || !Input.TryTimeOfDay(startText, out var startTod)
+            || !Input.TryTimeOfDay(endText, out var endTod))
+        {
+            await DisplayAlert("Невірні дані", "Дата має бути дд.мм.рррр, а час — ГГ:ХХ.", "OK");
+            return;
+        }
+
+        var (startUtc, endUtc) = ShiftEditing.ResolveRange(date, startTod, endTod);
+        var error = ShiftManager.AddManualShift(startUtc, endUtc);
+        if (error is not null)
+            await DisplayAlert("Не додано", error, "OK");
     }
 
     private void OnListModeClicked(object? sender, EventArgs e) => SetMode(showCalendar: false);
@@ -218,7 +272,7 @@ public partial class HistoryPage : ContentPage
         var items = ShiftStore.LoadExtraItems();
         var ticks = ShiftStore.LoadExtraTicks();
 
-        await Navigation.PushModalAsync(new DayDetailPage(day, s.Currency, dayEntries, items, ticks));
+        await Navigation.PushModalAsync(new DayDetailPage(day, s.Currency, s.Use12Hour, dayEntries, items, ticks));
     }
 
     private async void OnDeleteClicked(object? sender, EventArgs e)

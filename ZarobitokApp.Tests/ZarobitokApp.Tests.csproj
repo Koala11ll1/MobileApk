@@ -14,6 +14,8 @@
     <Compile Include="..\ZarobitokApp\Services\RateSchedule.cs" />
     <Compile Include="..\ZarobitokApp\Services\StatsCalculator.cs" />
     <Compile Include="..\ZarobitokApp\Services\DataExport.cs" />
+    <Compile Include="..\ZarobitokApp\Services\ShiftEditing.cs" />
+    <Compile Include="..\ZarobitokApp\Services\Input.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,14 +16,33 @@ public partial class ShiftPage : ContentPage
     private List<ExtraItem> _items = new();
     private List<ExtraTick> _ticks = new();
 
+    private bool _visible;
+
     public ShiftPage()
     {
         InitializeComponent();
+
+        // Зміну могли почати/завершити ззовні (ярлик, автостоп, правка журналу) —
+        // кеш має це підхопити. Екран перемальовуємо лише коли він на виду,
+        // щоб не оживляти таймер на прихованій вкладці.
+        ShiftManager.Changed += () => Dispatcher.Dispatch(OnDataChanged);
+    }
+
+    private void OnDataChanged()
+    {
+        _log = ShiftStore.LoadLog();
+        _items = ShiftStore.LoadExtraItems();
+        _ticks = ShiftStore.LoadExtraTicks();
+
+        if (!_visible) return;
+        LoadStartTimeIntoUi();
+        Refresh();
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        _visible = true;
 
         _log = ShiftStore.LoadLog();
         _items = ShiftStore.LoadExtraItems();
@@ -35,6 +54,7 @@ public partial class ShiftPage : ContentPage
 
     protected override void OnDisappearing()
     {
+        _visible = false;
         _timer?.Stop();
         _timer = null;
         base.OnDisappearing();
@@ -110,7 +130,14 @@ public partial class ShiftPage : ContentPage
         var todayWorked = todayEntries.Aggregate(TimeSpan.Zero, (sum, e) => sum + e.Duration) + paid;
         TodayHoursLabel.Text = EarningsCalculator.FormatDuration(todayWorked);
 
-        RateLabel.Text = $"{s.RatePerHour:0.##} {s.Currency}/год";
+        RateLabel.Text = s.HasRateSchedule
+            ? $"{RateSchedule.RateAt(s, now):0.##} {s.Currency}/год (зараз)"
+            : $"{s.RatePerHour:0.##} {s.Currency}/год";
+
+        TodayNetRow.IsVisible = s.TaxPercent > 0;
+        if (s.TaxPercent > 0)
+            TodayNetLabel.Text = EarningsCalculator.Format(
+                StatsCalculator.Net(EarningsCalculator.EarnedToday(s, _log, _items, _ticks, now), s.TaxPercent), s.Currency);
 
         if (s.IsRunning)
         {
@@ -176,6 +203,7 @@ public partial class ShiftPage : ContentPage
     {
         _loading = true;
         var s = ShiftStore.Load();
+        StartTimePicker.Format = s.Use12Hour ? "h:mm tt" : "HH:mm";
 
         StartTimePicker.Time = s.IsRunning
             ? s.StartedAtUtc!.Value.ToLocalTime().TimeOfDay

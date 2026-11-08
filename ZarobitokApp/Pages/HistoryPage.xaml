@@ -7,7 +7,7 @@
 
     <Grid RowDefinitions="Auto,Auto,*" Padding="20,20,20,0" RowSpacing="10">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,*" ColumnSpacing="8">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
             <Button Grid.Column="0"
                     x:Name="ListModeButton"
                     Text="Список"
@@ -22,11 +22,19 @@
                     CornerRadius="12"
                     HeightRequest="42"
                     FontAttributes="Bold" />
+            <Button Grid.Column="2"
+                    Text="＋ Зміна"
+                    Clicked="OnAddShiftClicked"
+                    BackgroundColor="#1C1C26"
+                    TextColor="#4ADE80"
+                    CornerRadius="12"
+                    HeightRequest="42"
+                    FontAttributes="Bold" />
         </Grid>
 
         <Label Grid.Row="1"
                x:Name="HintLabel"
-               Text="Тапни по зміні, щоб побачити деталі за день. Зміни зберігаються на телефоні, помилково створену можна видалити."
+               Text="Тапни по зміні, щоб побачити деталі за день і виправити час. «＋ Зміна» додає пропущену зміну вручну. Помилкову можна видалити."
                FontSize="12"
                TextColor="#6B7280" />
 
@@ -129,13 +137,13 @@
                    TextColor="#4ADE80" />
 
             <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,4,0,0">
-                <Label Grid.Column="0" Text="Пн" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
-                <Label Grid.Column="1" Text="Вт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
-                <Label Grid.Column="2" Text="Ср" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
-                <Label Grid.Column="3" Text="Чт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
-                <Label Grid.Column="4" Text="Пт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
-                <Label Grid.Column="5" Text="Сб" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
-                <Label Grid.Column="6" Text="Нд" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="0" x:Name="Wd0" Text="Пн" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="1" x:Name="Wd1" Text="Вт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="2" x:Name="Wd2" Text="Ср" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="3" x:Name="Wd3" Text="Чт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="4" x:Name="Wd4" Text="Пт" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="5" x:Name="Wd5" Text="Сб" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
+                <Label Grid.Column="6" x:Name="Wd6" Text="Нд" HorizontalTextAlignment="Center" FontSize="11" TextColor="#6B7280" />
             </Grid>
 
             <CollectionView x:Name="CalendarView">

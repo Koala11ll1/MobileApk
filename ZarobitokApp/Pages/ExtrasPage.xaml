@@ -64,7 +64,7 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="0,10" ColumnDefinitions="*,Auto">
+                    <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{Binding Label}" TextColor="White" FontSize="15" />
                             <Label Text="{Binding PriceText}" TextColor="#6B7280" FontSize="12" />
@@ -101,6 +101,19 @@
                                     CommandParameter="{Binding .}"
                                     Clicked="OnPlusClicked" />
                         </HorizontalStackLayout>
+
+                        <Button Grid.Column="2"
+                                Text="⋯"
+                                FontSize="18"
+                                WidthRequest="40"
+                                HeightRequest="40"
+                                Padding="0"
+                                CornerRadius="10"
+                                BackgroundColor="#1C1C26"
+                                TextColor="#9CA3AF"
+                                VerticalOptions="Center"
+                                CommandParameter="{Binding .}"
+                                Clicked="OnMenuClicked" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

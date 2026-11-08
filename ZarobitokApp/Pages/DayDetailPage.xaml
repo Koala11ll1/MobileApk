@@ -56,7 +56,7 @@
             <CollectionView x:Name="ShiftsView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Padding="14,10" ColumnDefinitions="*,Auto">
+                        <Grid Padding="14,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                             <VerticalStackLayout Spacing="2">
                                 <Label Text="{Binding TimeText}" TextColor="White" FontSize="15" />
                                 <Label Text="{Binding DetailText}" TextColor="#6B7280" FontSize="12" />
@@ -67,6 +67,18 @@
                                    FontAttributes="Bold"
                                    FontSize="16"
                                    VerticalOptions="Center" />
+                            <Button Grid.Column="2"
+                                    Text="✎"
+                                    FontSize="16"
+                                    WidthRequest="44"
+                                    HeightRequest="44"
+                                    Padding="0"
+                                    CornerRadius="12"
+                                    BackgroundColor="#1C1C26"
+                                    TextColor="#9CA3AF"
+                                    VerticalOptions="Center"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnEditShiftClicked" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

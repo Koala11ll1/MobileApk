@@ -150,6 +150,12 @@ public static class ShiftStore
         }
     }
 
+    public static void SaveLog(List<ShiftLogEntry> log)
+        => WriteKey(KeyLog, JsonSerializer.Serialize(log, JsonOpts));
+
+    public static void SaveExtraTicks(List<ExtraTick> ticks)
+        => WriteKey(KeyExtraTicks, JsonSerializer.Serialize(ticks, JsonOpts));
+
     public static void AddExtraTick(ExtraTick tick)
     {
         var ticks = LoadExtraTicks();
