@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Єдиний потрібний дозвіл: відновити розклад після перезавантаження.
-         Ні FOREGROUND_SERVICE, ні POST_NOTIFICATIONS, ні SCHEDULE_EXACT_ALARM
-         цій версії не потрібні. -->
+    <!-- RECEIVE_BOOT_COMPLETED: відновити розклад після перезавантаження.
+         POST_NOTIFICATIONS: лише для сповіщень (кінець зміни, нагадування) —
+         просимо в момент, коли користувач їх вмикає. Ні FOREGROUND_SERVICE,
+         ні SCHEDULE_EXACT_ALARM не потрібні. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"

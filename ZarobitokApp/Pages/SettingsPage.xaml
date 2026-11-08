@@ -8,10 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <Label Text="НАЛАШТУВАННЯ ЗМІНИ"
-                   FontSize="12"
-                   TextColor="#6B7280"
-                   Margin="4,8,0,0" />
+            <Label Text="НАЛАШТУВАННЯ ЗМІНИ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
 
             <Border BackgroundColor="#12121A" StrokeThickness="1"
                     Stroke="#22FFFFFF" Padding="16">
@@ -34,6 +31,7 @@
                     <VerticalStackLayout Spacing="4">
                         <Label Text="Валюта" FontSize="13" TextColor="#9CA3AF" />
                         <Entry x:Name="CurrencyEntry"
+                               Keyboard="Default"
                                MaxLength="4"
                                TextColor="White"
                                BackgroundColor="#1C1C26"
@@ -64,10 +62,190 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки. По закінченню планової тривалості зміна завершується сама."
+            <Label Text="РОЗКЛАД СТАВОК" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Ставка у вихідні (сб, нд)" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="WeekendRateEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                        <Label Text="Порожньо — така сама, як звичайна." FontSize="11" TextColor="#6B7280" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Нічна ставка" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="NightRateEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                        <Label Text="Порожньо — не використовується. Нічна перекриває вихідну." FontSize="11" TextColor="#6B7280" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Ніч починається о (година 0–23)" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="NightStartEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Ніч закінчується о (година 0–23)" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="NightEndEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="ЦІЛЬ І ПОДАТКИ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Ціль на місяць" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="GoalEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                        <Label Text="0 або порожньо — без цілі." FontSize="11" TextColor="#6B7280" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Податок / відрахування, %" FontSize="13" TextColor="#9CA3AF" />
+                        <Entry x:Name="TaxEntry"
+                               Keyboard="Numeric"
+                               TextColor="White"
+                               BackgroundColor="#1C1C26"
+                               Completed="OnSettingsChanged"
+                               Unfocused="OnSettingsChanged" />
+                        <Label Text="Показується «чиста» сума поруч із повною." FontSize="11" TextColor="#6B7280" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="СПОВІЩЕННЯ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="Сповістити, коли зміна завершилась" FontSize="14" TextColor="White" />
+                            <Label Text="По закінченню планової тривалості." FontSize="11" TextColor="#6B7280" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="NotifyEndSwitch" Grid.Column="1" OnColor="#4ADE80" Toggled="OnToggled" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="Щоденне нагадування почати зміну" FontSize="14" TextColor="White" />
+                            <Label Text="Не показується, якщо зміна вже йде." FontSize="11" TextColor="#6B7280" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="ReminderSwitch" Grid.Column="1" OnColor="#4ADE80" Toggled="OnToggled" />
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Час нагадування" FontSize="13" TextColor="#9CA3AF" />
+                        <TimePicker x:Name="ReminderPicker"
+                                    Format="HH:mm"
+                                    TextColor="White"
+                                    BackgroundColor="#1C1C26"
+                                    PropertyChanged="OnReminderTimeChanged" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="ФОРМАТИ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="Тиждень починається з неділі" FontSize="14" TextColor="White" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="WeekSundaySwitch" Grid.Column="1" OnColor="#4ADE80" Toggled="OnToggled" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="12-годинний формат часу" FontSize="14" TextColor="White" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="Hour12Switch" Grid.Column="1" OnColor="#4ADE80" Toggled="OnToggled" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="ДАНІ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="#12121A" StrokeThickness="1"
+                    Stroke="#22FFFFFF" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <Button Text="Експорт у CSV (Excel)" Clicked="OnExportCsvClicked"
+                            BackgroundColor="#1C1C26" TextColor="White"
+                            CornerRadius="12" HeightRequest="46" />
+
+                    <Button Text="Зберегти резервну копію" Clicked="OnBackupClicked"
+                            BackgroundColor="#1C1C26" TextColor="White"
+                            CornerRadius="12" HeightRequest="46" />
+
+                    <Button Text="Відновити з копії" Clicked="OnRestoreClicked"
+                            BackgroundColor="#1C1C26" TextColor="#F87171"
+                            CornerRadius="12" HeightRequest="46" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки. По закінченню планової тривалості зміна завершується сама. Нічна ставка діє між зазначеними годинами за місцевим часом; зміна, що перетинає межу, рахується частинами."
                    FontSize="12"
                    TextColor="#6B7280"
-                   Margin="4,0,4,0" />
+                   Margin="4,0,4,20" />
 
         </VerticalStackLayout>
     </ScrollView>

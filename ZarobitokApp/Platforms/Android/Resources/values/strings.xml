@@ -2,4 +2,8 @@
 <resources>
     <string name="app_name">Заробіток</string>
     <string name="widget_description">Показує суму, що набігає під час зміни</string>
+    <string name="shortcut_start_short">Почати зміну</string>
+    <string name="shortcut_start_long">Почати зміну зараз</string>
+    <string name="shortcut_stop_short">Завершити</string>
+    <string name="shortcut_stop_long">Завершити зміну</string>
 </resources>

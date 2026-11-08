@@ -15,6 +15,7 @@ public class AppTabs : TabbedPage
         Children.Add(new ShiftPage());
         Children.Add(new ExtrasPage());
         Children.Add(new HistoryPage());
+        Children.Add(new StatsPage());
         Children.Add(new SettingsPage());
     }
 }

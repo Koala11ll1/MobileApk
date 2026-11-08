@@ -48,6 +48,10 @@ public static class WidgetScheduler
     {
         if (ShiftStore.Load().IsRunning) Start(context);
         else Stop(context);
+
+        // Усі місця, що міняють розклад (старт/стоп, налаштування, ребут, відкриття
+        // апки), вже викликають саме цей метод — тож сповіщення чіпляємо тут.
+        NotificationScheduler.Sync(context);
     }
 
     private static PendingIntent BuildPendingIntent(Context context)

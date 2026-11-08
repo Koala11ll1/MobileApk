@@ -17,6 +17,15 @@ public class MainApplication : MauiApplication
         AppDomain.CurrentDomain.UnhandledException += (_, e) => RecordCrash(e.ExceptionObject as Exception);
     }
 
+    public override void OnCreate()
+    {
+        base.OnCreate();
+
+        // ACTION_USER_PRESENT не доставляється приймачам із маніфесту (Android 8+),
+        // тільки зареєстрованим у коді — доки живий процес апки.
+        RegisterReceiver(new UnlockReceiver(), new IntentFilter(Intent.ActionUserPresent));
+    }
+
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 
     private void RecordCrash(Exception? ex)
@@ -33,6 +42,15 @@ public class MainApplication : MauiApplication
         catch
         {
             // Процес вже помирає — це найкраще, що можемо тут зробити.
+        }
+    }
+
+    /// <summary>Розблокування екрана → одразу освіжити віджет (і перевірити автостоп).</summary>
+    public sealed class UnlockReceiver : BroadcastReceiver
+    {
+        public override void OnReceive(Context? context, Intent? intent)
+        {
+            if (context is not null) EarningsWidget.RefreshAll(context);
         }
     }
 }

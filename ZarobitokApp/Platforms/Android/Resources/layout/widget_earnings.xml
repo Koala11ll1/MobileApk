@@ -20,16 +20,41 @@
         android:ellipsize="end"
         android:fontFamily="sans-serif-medium" />
 
-    <!-- Єдиний елемент, який тікає САМ у процесі лаунчера.
-         Наш код для цього не виконується взагалі. -->
-    <Chronometer
-        android:id="@+id/widget_chrono"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:textSize="16sp"
-        android:textColor="#FF4ADE80"
-        android:format="%s" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Єдиний елемент, який тікає САМ у процесі лаунчера.
+             Наш код для цього не виконується взагалі. -->
+        <Chronometer
+            android:id="@+id/widget_chrono"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textColor="#FF4ADE80"
+            android:format="%s" />
+
+        <!-- Швидке "+1" для останнього використаного допзаробітку. -->
+        <TextView
+            android:id="@+id/widget_extra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="130dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@drawable/widget_button_bg"
+            android:textSize="13sp"
+            android:textColor="#FF4ADE80"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <!-- Показуємо замість хронометра, коли зміна не активна -->
     <TextView

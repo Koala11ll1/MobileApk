@@ -358,3 +358,18 @@ public class InputTests
     public void Time_rejects_invalid(string text)
         => Assert.False(Input.TryTimeOfDay(text, out _));
 }
+
+public class NextReminderTests
+{
+    [Fact]
+    public void Later_today_when_the_time_has_not_come_yet()
+        => Assert.Equal(new DateTime(2026, 1, 5, 9, 0, 0),
+            ShiftEditing.NextReminder(new DateTime(2026, 1, 5, 7, 30, 0), 9 * 60));
+
+    [Theory]
+    [InlineData(9, 0)]    // рівно в цей момент — вже минуло, тож завтра
+    [InlineData(18, 45)]
+    public void Tomorrow_when_the_time_has_passed(int h, int m)
+        => Assert.Equal(new DateTime(2026, 1, 6, 9, 0, 0),
+            ShiftEditing.NextReminder(new DateTime(2026, 1, 5, h, m, 0), 9 * 60));
+}

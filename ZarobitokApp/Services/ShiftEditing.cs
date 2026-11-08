@@ -76,4 +76,14 @@ public static class ShiftEditing
         NightStartHour = current.NightStartHour,
         NightEndHour = current.NightEndHour
     };
+
+    /// <summary>
+    /// Найближчий момент нагадування (місцевий час): сьогодні о заданий час,
+    /// якщо він ще попереду, інакше завтра.
+    /// </summary>
+    public static DateTime NextReminder(DateTime localNow, int minutesFromMidnight)
+    {
+        var today = localNow.Date.AddMinutes(minutesFromMidnight);
+        return today > localNow ? today : today.AddDays(1);
+    }
 }
