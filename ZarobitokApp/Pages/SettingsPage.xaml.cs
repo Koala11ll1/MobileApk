@@ -101,7 +101,7 @@ public partial class SettingsPage : ContentPage
 
             s.NotifyShiftEnd = NotifyEndSwitch.IsToggled;
             s.ReminderEnabled = ReminderSwitch.IsToggled;
-            s.ReminderMinutes = (int)ReminderPicker.Time.TotalMinutes;
+            s.ReminderMinutes = (int)(ReminderPicker.Time ?? TimeSpan.Zero).TotalMinutes;
             s.WeekStartsOnSunday = WeekSundaySwitch.IsToggled;
             s.Use12Hour = Hour12Switch.IsToggled;
         });
