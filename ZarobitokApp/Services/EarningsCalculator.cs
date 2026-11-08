@@ -18,13 +18,19 @@ public static class EarningsCalculator
         return paid < TimeSpan.Zero ? TimeSpan.Zero : paid;
     }
 
+    /// <summary>Момент, коли оплачуваний час зміни досягає запланованих годин.</summary>
+    public static DateTime PlannedEnd(ShiftState s)
+        => s.StartedAtUtc!.Value
+           + TimeSpan.FromMinutes(s.UnpaidBreakMinutes)
+           + TimeSpan.FromHours(s.PlannedHours);
+
     /// <summary>Скільки набігло за поточну зміну.</summary>
     public static decimal EarnedThisShift(ShiftState s, DateTime nowUtc)
     {
         var paid = PaidElapsed(s, nowUtc);
         if (paid <= TimeSpan.Zero) return 0m;
 
-        return (decimal)paid.TotalSeconds * (s.RatePerHour / 3600m);
+        return s.RatePerHour * (decimal)paid.TotalSeconds / 3600m;
     }
 
     /// <summary>

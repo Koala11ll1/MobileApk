@@ -16,6 +16,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Run unit tests
+        run: dotnet test ZarobitokApp.Tests/ZarobitokApp.Tests.csproj
+
       - name: Install MAUI Android workload
         run: dotnet workload install maui-android
 

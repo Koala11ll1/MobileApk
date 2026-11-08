@@ -61,10 +61,7 @@ public static class ShiftManager
 
         // Кінець — момент, коли план вичерпано, а не "зараз": якщо телефон
         // спав, перевірка могла спрацювати години після плану.
-        var plannedEnd = s.StartedAtUtc!.Value
-            + TimeSpan.FromMinutes(s.UnpaidBreakMinutes)
-            + TimeSpan.FromHours(s.PlannedHours);
-        StopShift(plannedEnd);
+        StopShift(EarningsCalculator.PlannedEnd(s));
         return true;
     }
 
