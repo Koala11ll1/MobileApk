@@ -89,13 +89,16 @@ public static class ShiftStore
         }
     }
 
-    /// <summary>Викинути помилково створену зміну з журналу.</summary>
-    public static void RemoveLogAt(int index)
+    /// <summary>
+    /// Викинути помилково створену зміну з журналу. Шукаємо за часом, а не за
+    /// номером: автостоп може вставити новий запис і зсунути всі номери.
+    /// </summary>
+    public static void RemoveLog(ShiftLogEntry entry)
     {
         var log = LoadLog();
-        if (index < 0 || index >= log.Count) return;
+        if (log.RemoveAll(e => e.StartedAtUtc == entry.StartedAtUtc && e.EndedAtUtc == entry.EndedAtUtc) == 0)
+            return;
 
-        log.RemoveAt(index);
         WriteKey(KeyLog, JsonSerializer.Serialize(log, JsonOpts));
     }
 
@@ -103,7 +106,6 @@ public static class ShiftStore
     {
         var log = LoadLog();
         log.Insert(0, entry);
-        if (log.Count > 200) log.RemoveRange(200, log.Count - 200);
         WriteKey(KeyLog, JsonSerializer.Serialize(log, JsonOpts));
     }
 
@@ -152,7 +154,6 @@ public static class ShiftStore
     {
         var ticks = LoadExtraTicks();
         ticks.Insert(0, tick);
-        if (ticks.Count > 2000) ticks.RemoveRange(2000, ticks.Count - 2000);
         WriteKey(KeyExtraTicks, JsonSerializer.Serialize(ticks, JsonOpts));
     }
 

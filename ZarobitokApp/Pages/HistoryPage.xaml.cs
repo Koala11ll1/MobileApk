@@ -3,10 +3,10 @@ using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Pages;
 
-/// <summary>Рядок журналу. Index — позиція у збереженому списку, за нею і видаляємо.</summary>
+/// <summary>Рядок журналу. Entry — сам запис, за ним і видаляємо.</summary>
 public sealed class ShiftRow
 {
-    public required int Index { get; init; }
+    public required ShiftLogEntry Entry { get; init; }
     public required DateTime Day { get; init; }
     public required string TimeText { get; init; }
     public required string DetailText { get; init; }
@@ -77,21 +77,20 @@ public partial class HistoryPage : ContentPage
         // рахує "сьогодні". Інакше зміна через північ показувалась би
         // під іншим днем тут, ніж на вкладці «Зміна» й у віджеті.
         HistoryView.ItemsSource = log
-            .Select((entry, index) => (entry, index))
-            .GroupBy(x => x.entry.EndedAtUtc.ToLocalTime().Date)
+            .GroupBy(e => e.EndedAtUtc.ToLocalTime().Date)
             .OrderByDescending(g => g.Key)
             .Select(g => new DayGroup(
                 DayText(g.Key),
-                EarningsCalculator.Format(g.Sum(x => Total(x.entry)), s.Currency),
-                g.OrderByDescending(x => x.entry.StartedAtUtc)
-                 .Select(x => new ShiftRow
+                EarningsCalculator.Format(g.Sum(e => Total(e)), s.Currency),
+                g.OrderByDescending(e => e.StartedAtUtc)
+                 .Select(e => new ShiftRow
                  {
-                     Index = x.index,
+                     Entry = e,
                      Day = g.Key,
-                     TimeText = $"{x.entry.StartedAtUtc.ToLocalTime():HH:mm} — {x.entry.EndedAtUtc.ToLocalTime():HH:mm}",
-                     DetailText = $"{EarningsCalculator.FormatDuration(x.entry.Duration)} · " +
-                                  $"{x.entry.RatePerHour:0.##} {s.Currency}/год",
-                     AmountText = EarningsCalculator.Format(Total(x.entry), s.Currency)
+                     TimeText = $"{e.StartedAtUtc.ToLocalTime():HH:mm} — {e.EndedAtUtc.ToLocalTime():HH:mm}",
+                     DetailText = $"{EarningsCalculator.FormatDuration(e.Duration)} · " +
+                                  $"{e.RatePerHour:0.##} {s.Currency}/год",
+                     AmountText = EarningsCalculator.Format(Total(e), s.Currency)
                  })))
             .ToList();
     }
@@ -234,7 +233,7 @@ public partial class HistoryPage : ContentPage
 
         if (!confirmed) return;
 
-        ShiftStore.RemoveLogAt(row.Index);
+        ShiftStore.RemoveLog(row.Entry);
         ShiftManager.PushWidget();
         LoadHistory();
     }
