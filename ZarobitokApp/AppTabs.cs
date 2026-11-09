@@ -24,6 +24,12 @@ public class AppTabs : TabbedPage
         Children.Add(new HistoryPage());
         Children.Add(new StatsPage());
         Children.Add(new SettingsPage());
+
+        if (OpenSettingsOnLaunch)
+        {
+            OpenSettingsOnLaunch = false;
+            CurrentPage = Children[^1];   // до підключення до вікна — це просто властивість, платформа не чіпається
+        }
     }
 
     private void ApplyColors()
@@ -36,28 +42,25 @@ public class AppTabs : TabbedPage
         UnselectedTabColor = ThemeManager.Get("TextMuted");
     }
 
-    /// <summary>Створює інтерфейс заново (потрібно після зміни мови) і лишає користувача в налаштуваннях.</summary>
+    /// <summary>Після перезапуску активності (зміна мови) лишаємо користувача в налаштуваннях.</summary>
+    public static bool OpenSettingsOnLaunch { get; set; }
+
+    /// <summary>
+    /// Зміна мови: тексти беруться під час створення сторінок, тож потрібен новий екземпляр інтерфейсу.
+    /// Підміна Window.Page на запущеному вікні в MAUI на Android не відмальовується, тому
+    /// перезапускаємо саму активність — вікно й вкладки створюються заново з новою мовою.
+    /// </summary>
     public static void Rebuild()
     {
-        Generation++;
+        Generation++;           // старі сторінки лишаються підписаними на події — вони мовчать
+        OpenSettingsOnLaunch = true;
 
-        // Пікер мови ще закриває своє діалогове вікно — підміняти сторінку одразу, поки його
-        // обробник ще працює, не можна (платформне вікно вже відчіплюється). Даємо йому завершитись.
+#if ANDROID
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await Task.Delay(400);
-
-            var window = Application.Current?.Windows.FirstOrDefault();
-            if (window is null) return;
-
-            var tabs = new AppTabs();
-            window.Page = tabs;
-            window.Title = L.T("Заробіток");
-
-            // Лишаємо користувача в налаштуваннях, але лише коли нова сторінка вже підключена.
-            await Task.Delay(500);
-            try { tabs.CurrentPage = tabs.Children[^1]; }
-            catch (InvalidOperationException) { /* лишаємось на першій вкладці */ }
+            await Task.Delay(400);   // дати пікеру мови закрити своє діалогове вікно
+            Microsoft.Maui.ApplicationModel.Platform.CurrentActivity?.Recreate();
         });
+#endif
     }
 }

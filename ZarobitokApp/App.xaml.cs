@@ -20,16 +20,27 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // Із замком користувач бачить лише екран PIN: застосунок із даними не створюється,
-        // поки не введено правильний PIN.
-        Page root = AppLock.Current.IsEnabled && !AppLock.Current.IsUnlocked
-            ? new LockPage(LockMode.Unlock, ok =>
-            {
-                if (ok && Windows.FirstOrDefault() is { } w) w.Page = new AppTabs();
-            })
-            : new AppTabs();
+        var tabs = new AppTabs();
 
-        var window = new Window(root) { Title = L.T("Заробіток") };
+        // Із замком застосунок створюється, але лишається невидимим, поки не введено правильний PIN;
+        // сам екран PIN — модальний поверх нього. Підміна кореневої сторінки на запущеному вікні в MAUI
+        // на Android не відмальовується, тож корінь не міняємо ніколи.
+        if (AppLock.Current.IsEnabled && !AppLock.Current.IsUnlocked)
+        {
+            tabs.IsVisible = false;
+
+            var shown = false;
+            tabs.Loaded += async (_, _) =>
+            {
+                if (shown) return;
+                shown = true;
+
+                await tabs.Navigation.PushModalAsync(
+                    new LockPage(LockMode.Unlock, ok => { if (ok) tabs.IsVisible = true; }, asModal: true), false);
+            };
+        }
+
+        var window = new Window(tabs) { Title = L.T("Заробіток") };
 
         // Stopped — апка справді згорнута (а не просто діалог зверху): запам'ятовуємо час.
         window.Stopped += (_, _) => AppLock.Current.MarkBackgrounded(DateTime.UtcNow);

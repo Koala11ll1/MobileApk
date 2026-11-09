@@ -28,6 +28,7 @@ if pin:
     print('  <string name="lock_pin_salt">%s</string>' % base64.b64encode(salt).decode())
     print('  <string name="lock_pin_hash">%s</string>' % base64.b64encode(h).decode())
     print('  <string name="lock_pin_len">%d</string>' % len(pin))
+    print('  <string name="lock_grace_min">0</string>')   # блокувати одразу після повернення з фону
 print("</map>")
 PY
   adb shell am force-stop $PKG
@@ -92,6 +93,9 @@ has "Невірний PIN" && pass "wrong PIN rejected" || fail "wrong PIN rejec
 has "Допзаробіток" && fail "unlocked with a wrong PIN" || pass "still locked after wrong PIN"
 for d in 1 2 3 4; do tap "$d"; done
 wait_has "Допзаробіток" && pass "right PIN unlocks the app" || fail "right PIN unlocks the app"
+adb shell input keyevent KEYCODE_HOME; sleep 3
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+wait_has "Введіть PIN" && pass "locks again after returning from background" || fail "locks again after returning from background"
 crashed && fail "crash in scenario 3" || pass "no crash"
 
 echo "=== 4. PIN lock (English) ==="
@@ -104,7 +108,7 @@ tap "Налаштування"
 for i in 1 2 3 4 5 6 7; do has "Українська" && break; adb shell input swipe 540 1800 540 700 300; sleep 1; done
 tap "Українська" && tap "English"
 sleep 4
-wait_has "Settings" && pass "UI rebuilt in English and stayed on Settings" || fail "UI rebuilt in English and stayed on Settings"
+wait_has "SHIFT SETTINGS" && pass "UI recreated in English and opened on Settings" || fail "UI recreated in English and opened on Settings"
 has "Налаштування" && fail "Ukrainian title remained after switching language" || pass "no Ukrainian title"
 for i in 1 2 3 4 5 6 7; do has "Dark" && break; adb shell input swipe 540 1800 540 700 300; sleep 1; done
 tap "Dark" && tap "Light"
