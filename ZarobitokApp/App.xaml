@@ -4,9 +4,20 @@
              x:Class="ZarobitokApp.App">
     <Application.Resources>
         <ResourceDictionary>
+            <!-- Значення за замовчуванням (темна тема). Під час роботи їх підміняє ThemeManager. -->
             <Color x:Key="Bg">#0B0B12</Color>
             <Color x:Key="Card">#12121A</Color>
+            <Color x:Key="Surface">#1C1C26</Color>
+            <Color x:Key="Hairline">#22FFFFFF</Color>
+            <Color x:Key="TextPrimary">#FFFFFF</Color>
+            <Color x:Key="TextSecondary">#9CA3AF</Color>
+            <Color x:Key="TextMuted">#6B7280</Color>
+            <Color x:Key="TextFaint">#4B5563</Color>
             <Color x:Key="Accent">#4ADE80</Color>
+            <Color x:Key="AccentOn">#06210F</Color>
+            <Color x:Key="Danger">#F87171</Color>
+            <Color x:Key="DangerOn">#2A0A0A</Color>
+            <SolidColorBrush x:Key="HairlineBrush" Color="#22FFFFFF" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -7,15 +7,21 @@ public class AppTabs : TabbedPage
     public AppTabs()
     {
         Title = "Заробіток";
-        BackgroundColor = Color.FromArgb("#0B0B12");
-        BarBackgroundColor = Color.FromArgb("#12121A");
-        SelectedTabColor = Color.FromArgb("#4ADE80");
-        UnselectedTabColor = Color.FromArgb("#6B7280");
+        ApplyColors();
+        ThemeManager.Changed += ApplyColors;
 
         Children.Add(new ShiftPage());
         Children.Add(new ExtrasPage());
         Children.Add(new HistoryPage());
         Children.Add(new StatsPage());
         Children.Add(new SettingsPage());
+    }
+
+    private void ApplyColors()
+    {
+        BackgroundColor = ThemeManager.Get("Bg");
+        BarBackgroundColor = ThemeManager.Get("Card");
+        SelectedTabColor = ThemeManager.Get("Accent");
+        UnselectedTabColor = ThemeManager.Get("TextMuted");
     }
 }

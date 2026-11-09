@@ -2,68 +2,68 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ZarobitokApp.Pages.DayDetailPage"
-             BackgroundColor="#0B0B12">
+             BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <Border BackgroundColor="#12121A" StrokeThickness="1"
-                    Stroke="#22FFFFFF" Padding="16">
+            <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
+                    Stroke="{DynamicResource HairlineBrush}" Padding="16">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="18" />
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="12">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Зароблено за день" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Text="Зароблено за день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="TotalLabel"
-                               FontSize="17" FontAttributes="Bold" TextColor="#4ADE80" />
+                               FontSize="17" FontAttributes="Bold" TextColor="{DynamicResource Accent}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Відпрацьовано" FontSize="14" TextColor="#9CA3AF" />
-                        <Label Grid.Column="1" x:Name="HoursLabel" FontSize="14" TextColor="White" />
+                        <Label Text="Відпрацьовано" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Grid.Column="1" x:Name="HoursLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Змін за день" FontSize="14" TextColor="#9CA3AF" />
-                        <Label Grid.Column="1" x:Name="ShiftCountLabel" FontSize="14" TextColor="White" />
+                        <Label Text="Змін за день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Grid.Column="1" x:Name="ShiftCountLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
-                    <BoxView HeightRequest="1" Color="#22FFFFFF" />
+                    <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середня ₴/год по ставці" FontSize="14" TextColor="#9CA3AF" />
-                        <Label Grid.Column="1" x:Name="AvgRateLabel" FontSize="14" TextColor="White" />
+                        <Label Text="Середня ₴/год по ставці" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Grid.Column="1" x:Name="AvgRateLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середня ₴/год з допзаробітком" FontSize="14" TextColor="#9CA3AF" />
+                        <Label Text="Середня ₴/год з допзаробітком" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="AvgEffectiveLabel"
-                               FontSize="14" FontAttributes="Bold" TextColor="#4ADE80" />
+                               FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Accent}" />
                     </Grid>
 
-                    <BoxView HeightRequest="1" Color="#22FFFFFF" />
+                    <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Допзаробіток за день" FontSize="14" TextColor="#9CA3AF" />
-                        <Label Grid.Column="1" x:Name="ExtrasTotalLabel" FontSize="14" TextColor="White" />
+                        <Label Text="Допзаробіток за день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Grid.Column="1" x:Name="ExtrasTotalLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ЗМІНИ ЦЬОГО ДНЯ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+            <Label Text="ЗМІНИ ЦЬОГО ДНЯ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
             <CollectionView x:Name="ShiftsView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="14,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                             <VerticalStackLayout Spacing="2">
-                                <Label Text="{Binding TimeText}" TextColor="White" FontSize="15" />
-                                <Label Text="{Binding DetailText}" TextColor="#6B7280" FontSize="12" />
+                                <Label Text="{Binding TimeText}" TextColor="{DynamicResource TextPrimary}" FontSize="15" />
+                                <Label Text="{Binding DetailText}" TextColor="{DynamicResource TextMuted}" FontSize="12" />
                             </VerticalStackLayout>
                             <Label Grid.Column="1"
                                    Text="{Binding AmountText}"
-                                   TextColor="#4ADE80"
+                                   TextColor="{DynamicResource Accent}"
                                    FontAttributes="Bold"
                                    FontSize="16"
                                    VerticalOptions="Center" />
@@ -74,8 +74,8 @@
                                     HeightRequest="44"
                                     Padding="0"
                                     CornerRadius="12"
-                                    BackgroundColor="#1C1C26"
-                                    TextColor="#9CA3AF"
+                                    BackgroundColor="{DynamicResource Surface}"
+                                    TextColor="{DynamicResource TextSecondary}"
                                     VerticalOptions="Center"
                                     CommandParameter="{Binding .}"
                                     Clicked="OnEditShiftClicked" />
@@ -84,36 +84,36 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Label Text="ДОПЗАРОБІТОК ЗА ДЕНЬ, ПО ВИДАХ" FontSize="12" TextColor="#6B7280" Margin="4,8,0,0" />
+            <Label Text="ДОПЗАРОБІТОК ЗА ДЕНЬ, ПО ВИДАХ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Label x:Name="MultiShiftHintLabel"
                    Text="За день кілька змін — редагування кількості недоступне, щоб не було неоднозначно, до якої зміни віднести правку."
                    FontSize="12"
-                   TextColor="#6B7280"
+                   TextColor="{DynamicResource TextMuted}"
                    IsVisible="False" />
 
             <!-- Один шифт за день: можна редагувати кількість +/- -->
             <CollectionView x:Name="EditableExtrasView" IsVisible="False">
                 <CollectionView.EmptyView>
-                    <Label Text="Ще немає жодного типу" TextColor="#4B5563" HorizontalOptions="Center" Margin="0,12" />
+                    <Label Text="Ще немає жодного типу" TextColor="{DynamicResource TextFaint}" HorizontalOptions="Center" Margin="0,12" />
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="0,10" ColumnDefinitions="*,Auto">
                             <VerticalStackLayout Spacing="2">
-                                <Label Text="{Binding Label}" TextColor="White" FontSize="15" />
-                                <Label Text="{Binding PriceText}" TextColor="#6B7280" FontSize="12" />
+                                <Label Text="{Binding Label}" TextColor="{DynamicResource TextPrimary}" FontSize="15" />
+                                <Label Text="{Binding PriceText}" TextColor="{DynamicResource TextMuted}" FontSize="12" />
                             </VerticalStackLayout>
 
                             <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
                                 <Button Text="−" FontSize="18" WidthRequest="40" HeightRequest="40" Padding="0"
-                                        CornerRadius="10" BackgroundColor="#1C1C26" TextColor="#F87171"
+                                        CornerRadius="10" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource Danger}"
                                         IsEnabled="{Binding CanDecrement}"
                                         CommandParameter="{Binding .}" Clicked="OnMinusClicked" />
-                                <Label Text="{Binding Count}" TextColor="White" FontSize="17" FontAttributes="Bold"
+                                <Label Text="{Binding Count}" TextColor="{DynamicResource TextPrimary}" FontSize="17" FontAttributes="Bold"
                                        WidthRequest="26" HorizontalTextAlignment="Center" VerticalOptions="Center" />
                                 <Button Text="+" FontSize="18" WidthRequest="40" HeightRequest="40" Padding="0"
-                                        CornerRadius="10" BackgroundColor="#1C1C26" TextColor="#4ADE80"
+                                        CornerRadius="10" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource Accent}"
                                         CommandParameter="{Binding .}" Clicked="OnPlusClicked" />
                             </HorizontalStackLayout>
                         </Grid>
@@ -124,15 +124,15 @@
             <!-- Кілька змін за день: лише перегляд -->
             <CollectionView x:Name="ExtrasBreakdownView" IsVisible="False">
                 <CollectionView.EmptyView>
-                    <Label Text="Не було" TextColor="#4B5563" HorizontalOptions="Center" Margin="0,12" />
+                    <Label Text="Не було" TextColor="{DynamicResource TextFaint}" HorizontalOptions="Center" Margin="0,12" />
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="14,8" ColumnDefinitions="*,Auto">
-                            <Label Text="{Binding LabelText}" TextColor="White" FontSize="14" />
+                            <Label Text="{Binding LabelText}" TextColor="{DynamicResource TextPrimary}" FontSize="14" />
                             <Label Grid.Column="1"
                                    Text="{Binding AmountText}"
-                                   TextColor="#4ADE80"
+                                   TextColor="{DynamicResource Accent}"
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    VerticalOptions="Center" />
@@ -143,8 +143,8 @@
 
             <Button Text="Закрити"
                     Clicked="OnCloseClicked"
-                    BackgroundColor="#1C1C26"
-                    TextColor="#9CA3AF"
+                    BackgroundColor="{DynamicResource Surface}"
+                    TextColor="{DynamicResource TextSecondary}"
                     CornerRadius="14"
                     HeightRequest="48"
                     Margin="0,8,0,20" />

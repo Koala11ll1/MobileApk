@@ -65,6 +65,14 @@ public partial class HistoryPage : ContentPage
 
         // Заздалегідь, поки користувач на першому екрані, а не під час першого свайпу.
         UiTiming.RunLater(TimeSpan.FromSeconds(2), () => { if (IsStale()) Reload(); });
+
+        // Кольори кнопок режиму й клітинок календаря задаються в коді — при зміні теми оновлюємо.
+        ThemeManager.Changed += () =>
+        {
+            SetMode(_showCalendar);
+            _shownVersion = -1;
+            if (_visible) Reload();
+        };
     }
 
     private bool IsStale() => _shownVersion != ShiftManager.Version || _shownDay != DateTime.Today;
@@ -185,10 +193,10 @@ public partial class HistoryPage : ContentPage
             {
                 Date = date,
                 DayText = day.ToString(),
-                BackgroundColor = hasShift ? Color.FromArgb("#1C1C26") : Colors.Transparent,
+                BackgroundColor = hasShift ? ThemeManager.Get("Surface") : Colors.Transparent,
                 TextColor = hasShift
-                    ? Color.FromArgb("#4ADE80")
-                    : isToday ? Colors.White : Color.FromArgb("#4B5563"),
+                    ? ThemeManager.Get("Accent")
+                    : isToday ? ThemeManager.Get("TextPrimary") : ThemeManager.Get("TextFaint"),
                 FontAttributes = hasShift || isToday ? FontAttributes.Bold : FontAttributes.None
             });
         }
@@ -251,10 +259,10 @@ public partial class HistoryPage : ContentPage
         HintLabel.IsVisible = !showCalendar;
         CalendarContainer.IsVisible = showCalendar;
 
-        ListModeButton.BackgroundColor = Color.FromArgb(showCalendar ? "#1C1C26" : "#4ADE80");
-        ListModeButton.TextColor = Color.FromArgb(showCalendar ? "#9CA3AF" : "#06210F");
-        CalendarModeButton.BackgroundColor = Color.FromArgb(showCalendar ? "#4ADE80" : "#1C1C26");
-        CalendarModeButton.TextColor = Color.FromArgb(showCalendar ? "#06210F" : "#9CA3AF");
+        ListModeButton.BackgroundColor = ThemeManager.Get(showCalendar ? "Surface" : "Accent");
+        ListModeButton.TextColor = ThemeManager.Get(showCalendar ? "TextSecondary" : "AccentOn");
+        CalendarModeButton.BackgroundColor = ThemeManager.Get(showCalendar ? "Accent" : "Surface");
+        CalendarModeButton.TextColor = ThemeManager.Get(showCalendar ? "AccentOn" : "TextSecondary");
 
         if (showCalendar) RenderCalendar();
     }

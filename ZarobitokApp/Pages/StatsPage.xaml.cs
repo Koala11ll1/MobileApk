@@ -25,6 +25,13 @@ public partial class StatsPage : ContentPage
 
         // Заздалегідь, поки користувач на першому екрані, а не під час першого свайпу.
         UiTiming.RunLater(TimeSpan.FromSeconds(3), () => { if (IsStale()) Refresh(); });
+
+        // Колір стовпчиків графіка задається в коді.
+        ThemeManager.Changed += () =>
+        {
+            _shownVersion = -1;
+            if (_visible) Refresh();
+        };
     }
 
     private bool IsStale() => _shownVersion != ShiftManager.Version || _shownDay != DateTime.Today;
@@ -121,14 +128,14 @@ public partial class StatsPage : ContentPage
             {
                 Text = total > 0 ? total.ToString("0") : "",
                 FontSize = 10,
-                TextColor = Color.FromArgb("#9CA3AF"),
+                TextColor = ThemeManager.Get("TextSecondary"),
                 HorizontalTextAlignment = TextAlignment.Center
             });
             column.Add(new BoxView
             {
                 HeightRequest = height,
                 CornerRadius = 4,
-                Color = Color.FromArgb(total > 0 ? "#4ADE80" : "#1C1C26"),
+                Color = ThemeManager.Get(total > 0 ? "Accent" : "Surface"),
                 HorizontalOptions = LayoutOptions.Fill
             });
             column.Add(new Label
@@ -136,7 +143,7 @@ public partial class StatsPage : ContentPage
                 Text = DayNames[(int)day.DayOfWeek],
                 FontSize = 11,
                 FontAttributes = day == today ? FontAttributes.Bold : FontAttributes.None,
-                TextColor = day == today ? Colors.White : Color.FromArgb("#6B7280"),
+                TextColor = ThemeManager.Get(day == today ? "TextPrimary" : "TextMuted"),
                 HorizontalTextAlignment = TextAlignment.Center
             });
 

@@ -67,6 +67,12 @@ public sealed class ShiftState
 
     public bool Use12Hour { get; set; }
 
+    /// <summary>Тема: "dark" (за замовчуванням), "light" або "system".</summary>
+    public string Theme { get; set; } = "dark";
+
+    /// <summary>Мова інтерфейсу: "uk" (за замовчуванням), "en" або "system".</summary>
+    public string Language { get; set; } = "uk";
+
     [JsonIgnore]
     public bool IsRunning => StartedAtUtc.HasValue;
 

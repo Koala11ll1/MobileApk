@@ -9,9 +9,15 @@ public partial class SettingsPage : ContentPage
 {
     private bool _loading;
 
+    // Порядок збігається з пунктами списку в пікері.
+    private static readonly string[] ThemeCodes = { ThemeManager.Dark, ThemeManager.Light, ThemeManager.System };
+
+    private string _appliedTheme = ThemeManager.Dark;
+
     public SettingsPage()
     {
         InitializeComponent();
+        ThemePicker.ItemsSource = new[] { "Темна", "Світла", "Як у системи" };
     }
 
     private int _shownVersion = -1;
@@ -46,6 +52,9 @@ public partial class SettingsPage : ContentPage
         ReminderSwitch.IsToggled = s.ReminderEnabled;
         ReminderPicker.Time = TimeSpan.FromMinutes(s.ReminderMinutes);
 
+        _appliedTheme = ThemeManager.Normalize(s.Theme);
+        ThemePicker.SelectedIndex = Math.Max(0, Array.IndexOf(ThemeCodes, _appliedTheme));
+
         WeekSundaySwitch.IsToggled = s.WeekStartsOnSunday;
         Hour12Switch.IsToggled = s.Use12Hour;
         ReminderPicker.Format = s.Use12Hour ? "h:mm tt" : "HH:mm";
@@ -67,6 +76,8 @@ public partial class SettingsPage : ContentPage
         Save();
         ReminderPicker.Format = Hour12Switch.IsToggled ? "h:mm tt" : "HH:mm";
     }
+
+    private void OnAppearanceChanged(object? sender, EventArgs e) => Save();
 
     private void OnReminderTimeChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -112,7 +123,17 @@ public partial class SettingsPage : ContentPage
             s.ReminderMinutes = (int)(ReminderPicker.Time ?? TimeSpan.Zero).TotalMinutes;
             s.WeekStartsOnSunday = WeekSundaySwitch.IsToggled;
             s.Use12Hour = Hour12Switch.IsToggled;
+
+            if (ThemePicker.SelectedIndex >= 0) s.Theme = ThemeCodes[ThemePicker.SelectedIndex];
         });
+
+        // Тему застосовуємо лише коли вона справді змінилась — це перемальовує екрани.
+        var theme = ThemeManager.Normalize(ShiftStore.Load().Theme);
+        if (theme != _appliedTheme)
+        {
+            _appliedTheme = theme;
+            ThemeManager.Apply(theme);
+        }
 
         // UpdateSettings підняв версію даних, але поля вже відповідають збереженому.
         _shownVersion = ShiftManager.Version;

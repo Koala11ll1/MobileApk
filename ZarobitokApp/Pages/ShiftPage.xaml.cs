@@ -155,8 +155,8 @@ public partial class ShiftPage : ContentPage
             StartHintLabel.Text = "Можна пересунути, якщо натиснув не вчасно";
 
             ToggleButton.Text = "Завершити зміну";
-            ToggleButton.BackgroundColor = Color.FromArgb("#F87171");
-            ToggleButton.TextColor = Color.FromArgb("#2A0A0A");
+            ToggleButton.BackgroundColor = ThemeManager.Get("Danger");
+            ToggleButton.TextColor = ThemeManager.Get("DangerOn");
         }
         else
         {
@@ -166,8 +166,8 @@ public partial class ShiftPage : ContentPage
             StartHintLabel.Text = "Зміна почнеться з цього часу";
 
             ToggleButton.Text = "Почати зміну";
-            ToggleButton.BackgroundColor = Color.FromArgb("#4ADE80");
-            ToggleButton.TextColor = Color.FromArgb("#06210F");
+            ToggleButton.BackgroundColor = ThemeManager.Get("Accent");
+            ToggleButton.TextColor = ThemeManager.Get("AccentOn");
         }
 
         SyncTicking(s.IsRunning);
