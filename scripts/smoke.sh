@@ -21,7 +21,7 @@ ITEM=11111111-1111-1111-1111-111111111111
 cat > /tmp/store.xml <<XML
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-  <string name="shift_state_json">{"RatePerHour":120,"Currency":"₴","StartedAtUtc":"$RUN_START","UnpaidBreakMinutes":30,"PlannedHours":8}</string>
+  <string name="shift_state_json">{"RatePerHour":120,"Currency":"₴","UnpaidBreakMinutes":30,"PlannedHours":8}</string>
   <string name="shift_log_json">[{"StartedAtUtc":"$Y_S","EndedAtUtc":"$Y_E","RatePerHour":120,"Earned":960},{"StartedAtUtc":"$T_S","EndedAtUtc":"$T_E","RatePerHour":100,"Earned":800}]</string>
   <string name="extra_items_json">[{"Id":"$ITEM","Label":"Red Bull","UnitPrice":60}]</string>
   <string name="extra_ticks_json">[{"Id":"22222222-2222-2222-2222-222222222222","ItemId":"$ITEM","AtUtc":"$(iso $((now - 1800)))","Delta":2},{"Id":"33333333-3333-3333-3333-333333333333","ItemId":"$ITEM","AtUtc":"$(iso $((now - 86400 - 3600)))","Delta":1}]</string>
@@ -81,12 +81,12 @@ done
 tap_text "Журнал"; tap_text "Календар"; adb shell pidof $PKG >/dev/null || { echo "APP DIED in calendar"; FAILED=1; }
 crash_dialog && FAILED=1
 
-# Ярлики: зупинити (зміна йде) і знову почати
+# Ярлики: почати зміну (екран тікає щосекунди, тож uiautomator далі не використовуємо), потім завершити
+adb shell am start -a com.zarobitok.action.START_SHIFT -n $PKG/$PKG.MainActivity
+sleep 8
+adb shell pidof $PKG >/dev/null || { echo "APP DIED with a running shift"; FAILED=1; }
 adb shell am start -a com.zarobitok.action.STOP_SHIFT -n $PKG/$PKG.MainActivity
 sleep 4
-adb shell am start -a com.zarobitok.action.START_SHIFT -n $PKG/$PKG.MainActivity
-sleep 4
-crash_dialog && FAILED=1
 
 echo "=== PID ==="
 adb shell pidof $PKG || { echo "APP NOT RUNNING"; FAILED=1; }
