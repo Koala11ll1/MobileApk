@@ -5,7 +5,15 @@ PKG=com.zarobitok.app
 APK=$(ls ZarobitokApp/bin/Debug/net10.0-android/*.apk | head -1)
 FAILED=0
 pass() { echo "PASS: $1"; }
-fail() { echo "FAIL: $1"; FAILED=1; }
+diag() {
+  echo "  --- diag: pid=$(adb shell pidof $PKG | tr -d '\r') top=$(adb shell dumpsys activity activities | grep -m1 'topResumedActivity' | cut -c1-140)"
+  dump
+  echo "  --- visible texts: $(python3 -c "
+import re;t=open('/tmp/ui.xml',encoding='utf-8').read()
+v=re.findall(r'(?:text|content-desc)=\"([^\"]{2,40})\"',t); print(' | '.join(dict.fromkeys(v))[:600])")"
+  adb logcat -d | grep -E "ANR in|FATAL EXCEPTION|am_anr|Force finishing|zarobitok.*(Exception|died)" | tail -5
+}
+fail() { echo "FAIL: $1"; FAILED=1; diag; }
 
 adb install -r "$APK" >/dev/null || { echo "INSTALL FAILED"; exit 1; }
 pip install -q pillow >/dev/null 2>&1
