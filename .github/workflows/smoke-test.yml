@@ -4,6 +4,8 @@ name: Smoke test (emulator)
 # й показує збої з logcat. Окремо від основної збірки, бо довший.
 on:
   workflow_dispatch: {}
+  push:
+    branches: [ccr-80f77d4d-5ur704]
 
 jobs:
   smoke:
