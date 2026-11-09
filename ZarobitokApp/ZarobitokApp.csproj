@@ -16,8 +16,15 @@
 
     <ApplicationTitle>Заробіток</ApplicationTitle>
     <ApplicationId>com.zarobitok.app</ApplicationId>
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <!-- Для збірок у CI обидва значення перекриваються: ApplicationVersion — монотонний номер
+         (хвилини від 2026-01-01), ApplicationDisplayVersion — версія з тега випуску. -->
+    <ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
+
+    <!-- Release обрізає (trim) невикористаний код. "partial" не чіпає наш власний код,
+         а JSON-серіалізація (записи з параметрами конструктора) лишається на рефлексії. -->
+    <TrimMode>partial</TrimMode>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>

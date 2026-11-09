@@ -1,0 +1,120 @@
+name: Release
+
+# Підписаний Release-випуск: APK для встановлення вручну й AAB для магазину.
+#  - Тег v1.2.0 (git tag v1.2.0 && git push --tags) → збірка і GitHub Release автоматично.
+#  - Вручну (Actions → Release → Run workflow): вкажіть версію; "publish" створює GitHub Release,
+#    без нього файли лише з'являються як артефакти запуску.
+# Потрібні секрети ANDROID_KEYSTORE_BASE64 та ANDROID_KEYSTORE_PASSWORD (той самий ключ, що й у debug-збірок,
+# тому випуск ставиться поверх уже встановленого застосунку).
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Версія, наприклад 1.2.0 (без "v")'
+        required: true
+      publish:
+        description: 'Створити GitHub Release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then VERSION="${GITHUB_REF_NAME#v}"; else VERSION="$INPUT_VERSION"; fi
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+(\.[0-9]+){1,3}$'; then
+            echo "::error::Версія '$VERSION' має виглядати як 1.2 або 1.2.3"; exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$(( ($(date +%s) - 1767225600) / 60 ))" >> "$GITHUB_ENV"
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run unit tests
+        run: dotnet test ZarobitokApp.Tests/ZarobitokApp.Tests.csproj
+
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android
+
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Release потребує секретів ANDROID_KEYSTORE_BASE64 і ANDROID_KEYSTORE_PASSWORD (стабільний ключ підпису)."
+            exit 1
+          fi
+          KEYSTORE_PATH="$RUNNER_TEMP/zarobitok.keystore"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "SIGNING_ARGS=-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$KEYSTORE_PATH -p:AndroidSigningKeyAlias=zarobitok -p:AndroidSigningKeyPass=$KEYSTORE_PASSWORD -p:AndroidSigningStorePass=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+
+      # APK — для встановлення вручну (лише arm64: майже всі сучасні телефони).
+      - name: Build signed APK
+        run: >
+          dotnet publish ZarobitokApp/ZarobitokApp.csproj
+          -f net10.0-android -c Release
+          -p:AndroidPackageFormat=apk
+          -p:RuntimeIdentifier=android-arm64
+          -p:ApplicationDisplayVersion=$VERSION
+          -p:ApplicationVersion=$VERSION_CODE
+          $SIGNING_ARGS
+
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          APK=$(find ZarobitokApp/bin/Release -name '*-Signed.apk' | head -1)
+          [ -n "$APK" ] || { echo "::error::Підписаний APK не знайдено"; exit 1; }
+          cp "$APK" "dist/Zarobitok-$VERSION.apk"
+          rm -rf ZarobitokApp/bin/Release ZarobitokApp/obj
+
+      # AAB — для магазину: кілька архітектур в одному пакеті.
+      - name: Build signed AAB
+        run: >
+          dotnet publish ZarobitokApp/ZarobitokApp.csproj
+          -f net10.0-android -c Release
+          -p:AndroidPackageFormat=aab
+          "-p:RuntimeIdentifiers=android-arm64;android-arm;android-x64"
+          -p:ApplicationDisplayVersion=$VERSION
+          -p:ApplicationVersion=$VERSION_CODE
+          $SIGNING_ARGS
+
+      - name: Collect AAB
+        run: |
+          AAB=$(find ZarobitokApp/bin/Release -name '*-Signed.aab' | head -1)
+          [ -n "$AAB" ] || { echo "::error::Підписаний AAB не знайдено"; exit 1; }
+          cp "$AAB" "dist/Zarobitok-$VERSION.aab"
+          ls -la dist
+
+      - name: Upload release files
+        uses: actions/upload-artifact@v4
+        with:
+          name: Zarobitok-${{ env.VERSION }}
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: github.ref_type == 'tag' || inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$VERSION" dist/* \
+            --title "Заробіток $VERSION" \
+            --generate-notes \
+            --target "$GITHUB_SHA"

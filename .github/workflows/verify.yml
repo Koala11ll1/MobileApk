@@ -1,0 +1,81 @@
+name: Verify release (temporary)
+
+# Тимчасова перевірка Release-збірки: емулятор (PDF, збої, PIN, мова) і збірка AAB.
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ccr-80f77d4d-5ur704]
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet workload install maui-android
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          KEYSTORE_PATH="$RUNNER_TEMP/zarobitok.keystore"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "SIGNING_ARGS=-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$KEYSTORE_PATH -p:AndroidSigningKeyAlias=zarobitok -p:AndroidSigningKeyPass=$KEYSTORE_PASSWORD -p:AndroidSigningStorePass=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$(( ($(date +%s) - 1767225600) / 60 ))" >> "$GITHUB_ENV"
+      - name: Build signed arm64 APK (as release.yml does)
+        run: >
+          dotnet publish ZarobitokApp/ZarobitokApp.csproj -f net10.0-android -c Release
+          -p:AndroidPackageFormat=apk -p:RuntimeIdentifier=android-arm64
+          -p:ApplicationDisplayVersion=9.9.9 -p:ApplicationVersion=$VERSION_CODE $SIGNING_ARGS
+      - run: |
+          APK=$(find ZarobitokApp/bin/Release -name '*-Signed.apk' | head -1); echo "APK: $APK"; ls -la "$APK"
+          [ -n "$APK" ]
+          rm -rf ZarobitokApp/bin/Release ZarobitokApp/obj
+      - name: Build signed AAB (as release.yml does)
+        run: >
+          dotnet publish ZarobitokApp/ZarobitokApp.csproj -f net10.0-android -c Release
+          -p:AndroidPackageFormat=aab "-p:RuntimeIdentifiers=android-arm64;android-arm;android-x64"
+          -p:ApplicationDisplayVersion=9.9.9 -p:ApplicationVersion=$VERSION_CODE $SIGNING_ARGS
+      - run: |
+          AAB=$(find ZarobitokApp/bin/Release -name '*-Signed.aab' | head -1); echo "AAB: $AAB"; ls -la "$AAB"
+          [ -n "$AAB" ]
+
+  emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet workload install maui-android
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          KEYSTORE_PATH="$RUNNER_TEMP/zarobitok.keystore"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "SIGNING_ARGS=-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$KEYSTORE_PATH -p:AndroidSigningKeyAlias=zarobitok -p:AndroidSigningKeyPass=$KEYSTORE_PASSWORD -p:AndroidSigningStorePass=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "VERSION_CODE=$(( ($(date +%s) - 1767225600) / 60 ))" >> "$GITHUB_ENV"
+      - name: Build signed Release APK for the emulator (x64)
+        run: >
+          dotnet publish ZarobitokApp/ZarobitokApp.csproj -f net10.0-android -c Release
+          -p:AndroidPackageFormat=apk -p:RuntimeIdentifier=android-x64
+          -p:ApplicationDisplayVersion=9.9.9 -p:ApplicationVersion=$VERSION_CODE $SIGNING_ARGS
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_5
+          target: google_apis
+          disable-animations: true
+          script: bash ./scripts/verify.sh

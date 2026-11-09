@@ -37,6 +37,11 @@ jobs:
             echo "SIGNING_ARGS=-p:AndroidKeyStore=true -p:AndroidSigningKeyStore=$KEYSTORE_PATH -p:AndroidSigningKeyAlias=zarobitok -p:AndroidSigningKeyPass=$KEYSTORE_PASSWORD -p:AndroidSigningStorePass=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           fi
 
+      # Android не дає поставити APK із меншим versionCode поверх більшого. Тому код — це хвилини від
+      # 2026-01-01: він зростає з часом і однаково діє для debug-збірок і для випусків.
+      - name: Compute version code
+        run: echo "VERSION_CODE=$(( ($(date +%s) - 1767225600) / 60 ))" >> "$GITHUB_ENV"
+
       - name: Build debug APK (sideload-signed)
         run: >
           dotnet build ZarobitokApp/ZarobitokApp.csproj
@@ -46,6 +51,7 @@ jobs:
           -p:EmbedAssembliesIntoApk=true
           -p:RuntimeIdentifiers=android-arm64
           -p:AndroidIncludeDebugSymbols=false
+          -p:ApplicationVersion=$VERSION_CODE
           $SIGNING_ARGS
 
       - name: Upload APK artifact
