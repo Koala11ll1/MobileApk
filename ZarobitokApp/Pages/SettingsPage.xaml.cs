@@ -15,6 +15,10 @@ public partial class SettingsPage : ContentPage
 
     private static readonly string[] LanguageCodes = { L.Ukrainian, L.EnglishCode, L.SystemCode };
 
+    private static readonly int[] GraceMinutes = { 0, 1, 5 };
+
+    private bool _lockBusy;
+
     private string _appliedTheme = ThemeManager.Dark;
     private string _appliedLanguage = L.Ukrainian;
 
@@ -24,6 +28,7 @@ public partial class SettingsPage : ContentPage
         ThemePicker.ItemsSource = new[] { L.T("Темна"), L.T("Світла"), L.T("Як у системи") };
         // Назви мов — рідною мовою, щоб їх можна було знайти, навіть якщо інтерфейс не зрозумілий.
         LanguagePicker.ItemsSource = new[] { "Українська", "English", L.T("Як у системи") };
+        GracePicker.ItemsSource = new[] { L.T("Одразу"), L.T("Через 1 хвилину"), L.T("Через 5 хвилин") };
     }
 
     private int _shownVersion = -1;
@@ -64,12 +69,103 @@ public partial class SettingsPage : ContentPage
         _appliedLanguage = L.Normalize(s.Language);
         LanguagePicker.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, _appliedLanguage));
 
+        HideWidgetSwitch.IsToggled = s.HideWidgetAmount;
         WeekSundaySwitch.IsToggled = s.WeekStartsOnSunday;
         Hour12Switch.IsToggled = s.Use12Hour;
         ReminderPicker.Format = s.Use12Hour ? "h:mm tt" : "HH:mm";
 
         _loading = false;
         _shownVersion = ShiftManager.Version;
+
+        RefreshSecurityUi();
+    }
+
+    // ---- Захист ----
+
+    /// <summary>Показує/ховає елементи замка за поточним станом і виставляє перемикачі без побічних ефектів.</summary>
+    private void RefreshSecurityUi()
+    {
+        var lockState = AppLock.Current;
+        var wasLoading = _loading;
+        _loading = true;
+
+        PinSwitch.IsToggled = lockState.IsEnabled;
+        ChangePinButton.IsVisible = lockState.IsEnabled;
+        GraceBox.IsVisible = lockState.IsEnabled;
+        GracePicker.SelectedIndex = Math.Max(0, Array.IndexOf(GraceMinutes, lockState.GraceMinutes));
+
+        BiometricRow.IsVisible = lockState.IsEnabled && Biometric.IsAvailable;
+        BiometricSwitch.IsToggled = lockState.BiometricEnabled;
+
+        _loading = wasLoading;
+        ScreenSecurity.Apply();
+    }
+
+    /// <summary>Відкриває екран PIN модально й чекає результат.</summary>
+    private async Task<bool> RunLockAsync(LockMode mode)
+    {
+        var result = new TaskCompletionSource<bool>();
+        await Navigation.PushModalAsync(new LockPage(mode, ok => result.TrySetResult(ok), asModal: true), true);
+        return await result.Task;
+    }
+
+    private async void OnPinToggled(object? sender, ToggledEventArgs e)
+    {
+        if (_loading || _lockBusy) return;
+        _lockBusy = true;
+
+        try
+        {
+            if (e.Value)
+            {
+                await RunLockAsync(LockMode.Create);
+            }
+            else if (await RunLockAsync(LockMode.Verify))
+            {
+                AppLock.Current.Disable();
+            }
+        }
+        finally
+        {
+            RefreshSecurityUi();   // якщо скасували — перемикач повертається у справжній стан
+            _lockBusy = false;
+        }
+    }
+
+    private async void OnChangePinClicked(object? sender, EventArgs e)
+    {
+        if (_lockBusy) return;
+        _lockBusy = true;
+
+        try
+        {
+            if (await RunLockAsync(LockMode.Verify)) await RunLockAsync(LockMode.Create);
+        }
+        finally
+        {
+            _lockBusy = false;
+        }
+    }
+
+    private void OnGraceChanged(object? sender, EventArgs e)
+    {
+        if (_loading || GracePicker.SelectedIndex < 0) return;
+        AppLock.Current.GraceMinutes = GraceMinutes[GracePicker.SelectedIndex];
+    }
+
+    private async void OnBiometricToggled(object? sender, ToggledEventArgs e)
+    {
+        if (_loading) return;
+
+        // Вмикаємо лише після того, як користувач справді пройшов перевірку відбитком/обличчям.
+        if (e.Value && !await Biometric.AuthenticateAsync(L.T("Підтвердіть відбиток або обличчя"), L.T("Скасувати")))
+        {
+            RefreshSecurityUi();
+            return;
+        }
+
+        AppLock.Current.BiometricEnabled = e.Value;
+        RefreshSecurityUi();
     }
 
     private void OnSettingsChanged(object? sender, EventArgs e) => Save();
@@ -132,6 +228,7 @@ public partial class SettingsPage : ContentPage
             s.ReminderMinutes = (int)(ReminderPicker.Time ?? TimeSpan.Zero).TotalMinutes;
             s.WeekStartsOnSunday = WeekSundaySwitch.IsToggled;
             s.Use12Hour = Hour12Switch.IsToggled;
+            s.HideWidgetAmount = HideWidgetSwitch.IsToggled;
 
             if (ThemePicker.SelectedIndex >= 0) s.Theme = ThemeCodes[ThemePicker.SelectedIndex];
             if (LanguagePicker.SelectedIndex >= 0) s.Language = LanguageCodes[LanguagePicker.SelectedIndex];

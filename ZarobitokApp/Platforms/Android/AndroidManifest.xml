@@ -7,6 +7,8 @@
          ні SCHEDULE_EXACT_ALARM не потрібні. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- USE_BIOMETRIC: відбиток/обличчя для розблокування застосунку (за бажанням користувача). -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
         android:allowBackup="true"

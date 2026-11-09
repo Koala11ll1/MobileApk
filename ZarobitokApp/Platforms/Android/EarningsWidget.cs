@@ -88,9 +88,11 @@ public class EarningsWidget : AppWidgetProvider
         var ticks = ShiftStore.LoadExtraTicks();
 
         views.SetTextViewText(Resource.Id.widget_amount,
-            EarningsCalculator.Format(
-                EarningsCalculator.EarnedToday(state, ShiftStore.LoadLog(), items, ticks, now),
-                state.Currency));
+            state.HideWidgetAmount
+                ? $"•••• {state.Currency}"
+                : EarningsCalculator.Format(
+                    EarningsCalculator.EarnedToday(state, ShiftStore.LoadLog(), items, ticks, now),
+                    state.Currency));
 
         if (state.IsRunning)
         {

@@ -74,6 +74,9 @@ public class MainActivity : MauiAppCompatActivity
     {
         base.OnResume();
 
+        // Поки замок увімкнено — без скриншотів і без суми в списку недавніх.
+        ScreenSecurity.Apply();
+
         // Автостоп міг спрацювати, поки апка була згорнута, а розклад — збитись
         // (ребут, force-stop): при поверненні синхронізуємо стан і розклад.
         WidgetScheduler.Sync(this);

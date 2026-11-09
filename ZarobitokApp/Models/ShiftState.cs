@@ -67,6 +67,9 @@ public sealed class ShiftState
 
     public bool Use12Hour { get; set; }
 
+    /// <summary>Показувати у віджеті "••••" замість суми (щоб її не видно було на головному екрані).</summary>
+    public bool HideWidgetAmount { get; set; }
+
     /// <summary>Тема: "dark" (за замовчуванням), "light" або "system".</summary>
     public string Theme { get; set; } = "dark";
 

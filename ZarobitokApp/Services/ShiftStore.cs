@@ -163,6 +163,16 @@ public static class ShiftStore
         WriteKey(KeyExtraTicks, JsonSerializer.Serialize(ticks, JsonOpts));
     }
 
+    // ---- Довільні рядкові налаштування (замок застосунку) ----
+
+    public static string? GetString(string key) => ReadKey(key);
+
+    public static void SetString(string key, string? value)
+    {
+        if (value is null) RemoveKey(key);
+        else WriteKey(key, value);
+    }
+
     // ---- Платформозалежна частина ----
 
     private static string? ReadRaw() => ReadKey(KeyState);
@@ -175,6 +185,18 @@ public static class ShiftStore
         return prefs?.GetString(key, null);
 #else
         return Preferences.Default.Get<string?>(key, null);
+#endif
+    }
+
+    private static void RemoveKey(string key)
+    {
+#if ANDROID
+        var prefs = Application.Context.GetSharedPreferences(PrefsName, FileCreationMode.Private);
+        using var editor = prefs!.Edit();
+        editor!.Remove(key);
+        editor.Commit();
+#else
+        Preferences.Default.Remove(key);
 #endif
     }
 

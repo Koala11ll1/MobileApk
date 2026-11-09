@@ -247,6 +247,58 @@
                 </VerticalStackLayout>
             </Border>
 
+            <Label Text="{loc:T &quot;ЗАХИСТ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
+                    Stroke="{DynamicResource HairlineBrush}" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{loc:T &quot;PIN-код при вході&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{loc:T &quot;Також ховає суму зі скриншотів і зі списку недавніх застосунків.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="PinSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnPinToggled" />
+                    </Grid>
+
+                    <Button x:Name="ChangePinButton"
+                            Text="{loc:T &quot;Змінити PIN&quot;}"
+                            Clicked="OnChangePinClicked"
+                            BackgroundColor="{DynamicResource Surface}"
+                            TextColor="{DynamicResource TextPrimary}"
+                            CornerRadius="12" HeightRequest="46" />
+
+                    <VerticalStackLayout x:Name="GraceBox" Spacing="4">
+                        <Label Text="{loc:T &quot;Блокувати знову&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Picker x:Name="GracePicker"
+                                TextColor="{DynamicResource TextPrimary}"
+                                BackgroundColor="{DynamicResource Surface}"
+                                SelectedIndexChanged="OnGraceChanged" />
+                    </VerticalStackLayout>
+
+                    <Grid x:Name="BiometricRow" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <Label Text="{loc:T &quot;Відбиток або обличчя&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" VerticalOptions="Center" />
+                        <Switch x:Name="BiometricSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnBiometricToggled" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{loc:T &quot;Ховати суму у віджеті&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{loc:T &quot;На головному екрані замість суми буде «••••».&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="HideWidgetSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
+                    </Grid>
+
+                    <Label Text="{loc:T &quot;Якщо забудете PIN, доступ можна відновити лише перевстановленням застосунку — дані зникнуть. Зробіть резервну копію. Сам PIN у копію не потрапляє.&quot;}"
+                           FontSize="11" TextColor="{DynamicResource TextMuted}" />
+
+                </VerticalStackLayout>
+            </Border>
+
             <Label Text="{loc:T &quot;ДАНІ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"

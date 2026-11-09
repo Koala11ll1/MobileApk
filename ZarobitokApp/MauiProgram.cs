@@ -1,3 +1,4 @@
+using ZarobitokApp.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ZarobitokApp;
@@ -6,6 +7,9 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        // Замок застосунку читає свої налаштування з тих самих SharedPreferences, що й решта даних.
+        AppLock.Current = new AppLockState(new ShiftStoreLockStore());
+
         var builder = MauiApp.CreateBuilder();
 
         builder

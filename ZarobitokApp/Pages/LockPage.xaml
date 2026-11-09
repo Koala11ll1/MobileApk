@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ZarobitokApp.Pages.LockPage"
+             BackgroundColor="{DynamicResource Bg}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="28,56,28,28" RowSpacing="18">
+
+        <Label Grid.Row="0" x:Name="TitleLabel"
+               FontSize="22" FontAttributes="Bold"
+               TextColor="{DynamicResource TextPrimary}"
+               HorizontalTextAlignment="Center" />
+
+        <HorizontalStackLayout Grid.Row="1" x:Name="DotsRow"
+                               Spacing="14" HorizontalOptions="Center" />
+
+        <Label Grid.Row="2" x:Name="MessageLabel"
+               FontSize="13" HeightRequest="36"
+               TextColor="{DynamicResource Danger}"
+               HorizontalTextAlignment="Center" />
+
+        <Grid Grid.Row="3" x:Name="Keypad"
+              HorizontalOptions="Center" VerticalOptions="Center"
+              RowSpacing="14" ColumnSpacing="22" />
+
+        <Button Grid.Row="4" x:Name="ActionButton"
+                IsVisible="False"
+                BackgroundColor="{DynamicResource Accent}"
+                TextColor="{DynamicResource AccentOn}"
+                FontAttributes="Bold" CornerRadius="14" HeightRequest="52"
+                Clicked="OnActionClicked" />
+
+    </Grid>
+</ContentPage>
