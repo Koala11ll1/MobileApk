@@ -33,6 +33,8 @@ UID_APP=$(adb shell stat -c %u /data/data/$PKG | tr -d '\r')
 adb push /tmp/store.xml /data/local/tmp/store.xml >/dev/null
 adb shell "mkdir -p /data/data/$PKG/shared_prefs && cp /data/local/tmp/store.xml /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml && chown -R $UID_APP:$UID_APP /data/data/$PKG/shared_prefs && chmod 660 /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml && restorecon -R /data/data/$PKG/shared_prefs"
 echo "seeded:"; adb shell ls -la /data/data/$PKG/shared_prefs
+# uiautomator під root не працює — далі звичайний shell
+adb unroot >/dev/null; sleep 3; adb wait-for-device
 
 adb logcat -c
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1
@@ -52,7 +54,7 @@ print(' | '.join(re.findall(r'text=\"([^\"]{3,})\"',t))[:3000])"
 }
 
 tap_text() {
-  adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1
+  adb shell uiautomator dump /sdcard/ui.xml 2>&1 | head -3
   adb pull /sdcard/ui.xml /tmp/ui.xml >/dev/null 2>&1
   XY=$(python3 -c "
 import sys,re,xml.etree.ElementTree as ET
@@ -94,6 +96,7 @@ adb shell pidof $PKG || { echo "APP NOT RUNNING"; FAILED=1; }
 echo "=== logcat: .NET / Java exceptions ==="
 adb logcat -d | grep -E "FATAL EXCEPTION|Unhandled|XamlParse|System\.[A-Za-z.]+Exception|Java\.Lang\.[A-Za-z]+Exception|E AndroidRuntime|Process: $PKG|DOTNET|monodroid" | head -80
 
+adb root >/dev/null; sleep 3; adb wait-for-device
 echo "=== stored crash ==="
 adb shell cat /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml 2>/dev/null | grep -A12 'name="last_crash"' | head -40
 echo '--- state after run:'; adb shell cat /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml | cut -c1-400 | head -12
