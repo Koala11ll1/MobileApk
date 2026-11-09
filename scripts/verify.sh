@@ -139,9 +139,9 @@ CODE=$(echo "$dumpsys_out" | grep -oE "versionCode=[0-9]+" | head -1 | cut -d= -
 [ "${CODE:-0}" -gt 100000 ] && pass "versionCode is the monotonic build number ($CODE)" || fail "versionCode is the monotonic build number ($CODE)"
 wait_has "Налаштування"
 tap "Налаштування"
-for i in 1 2 3 4 5 6 7 8 9 10; do dump; grep -q "9.9.9" /tmp/ui.xml && break; adb shell input swipe 540 1800 540 600 300; sleep 1; done
-grep -q "9.9.9" /tmp/ui.xml && pass "About card shows the version" || fail "About card shows the version"
+for i in 1 2 3 4 5 6 7 8 9 10 11 12; do has "Збоїв не було" && break; adb shell input swipe 540 1800 540 600 300; sleep 1; done
 has "Збоїв не було" && pass "no crashes recorded on a clean install" || fail "no crashes recorded on a clean install"
+dump; grep -qF "9.9.9 (" /tmp/ui.xml && pass "About card shows the version" || fail "About card shows the version"
 
 echo "=== 7. Crash log dialog and Settings ==="
 seed dark uk "" crash; launch
