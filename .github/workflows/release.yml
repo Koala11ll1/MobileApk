@@ -84,13 +84,13 @@ jobs:
           cp "$APK" "dist/Zarobitok-$VERSION.apk"
           rm -rf ZarobitokApp/bin/Release ZarobitokApp/obj
 
-      # AAB — для магазину: кілька архітектур в одному пакеті.
+      # AAB — для магазину. RuntimeIdentifiers не задаємо: воркload Android сам збирає Release-AAB для всіх
+      # архітектур (arm, arm64, x86, x64); спроба перелічити їх через -p: ламається на ';' у MSBuild.
       - name: Build signed AAB
         run: >
           dotnet publish ZarobitokApp/ZarobitokApp.csproj
           -f net10.0-android -c Release
           -p:AndroidPackageFormat=aab
-          -p:RuntimeIdentifiers=android-arm64%3Bandroid-arm%3Bandroid-x64
           -p:ApplicationDisplayVersion=$VERSION
           -p:ApplicationVersion=$VERSION_CODE
           $SIGNING_ARGS
