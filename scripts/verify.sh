@@ -42,7 +42,8 @@ PY
 launch() { adb logcat -c; adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1; sleep 14; }
 
 dump() { adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml /tmp/ui.xml >/dev/null 2>&1; }
-has() { dump; grep -qF "text=\"$1\"" /tmp/ui.xml; }
+# Заголовки вкладок Android віддає як content-desc, решту — як text.
+has() { dump; grep -qF "text=\"$1\"" /tmp/ui.xml || grep -qF "content-desc=\"$1\"" /tmp/ui.xml; }
 
 # Чекаємо, поки текст з'явиться (Debug-збірка на емуляторі стартує повільно): до ~45 с.
 wait_has() { for _ in $(seq 1 15); do has "$1" && return 0; sleep 3; done; return 1; }
