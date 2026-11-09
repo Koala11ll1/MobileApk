@@ -43,6 +43,9 @@ launch() { adb logcat -c; adb shell monkey -p $PKG -c android.intent.category.LA
 dump() { adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; adb pull /sdcard/ui.xml /tmp/ui.xml >/dev/null 2>&1; }
 has() { dump; grep -qF "text=\"$1\"" /tmp/ui.xml; }
 
+# Чекаємо, поки текст з'явиться (Debug-збірка на емуляторі стартує повільно): до ~45 с.
+wait_has() { for _ in $(seq 1 15); do has "$1" && return 0; sleep 3; done; return 1; }
+
 tap() {  # tap <text>
   dump
   XY=$(python3 -c "
@@ -67,13 +70,13 @@ crashed() { adb logcat -d | grep -q "FATAL EXCEPTION" || has "Останній �
 
 echo "=== 1. Default: Ukrainian + dark ==="
 seed dark uk; launch
-has "Допзаробіток" && pass "Ukrainian tab titles" || fail "Ukrainian tab titles"
+wait_has "Допзаробіток" && pass "Ukrainian tab titles" || fail "Ukrainian tab titles"
 L=$(bg_luma); echo "luma=$L"; [ "$L" -lt 60 ] && pass "dark background" || fail "dark background (luma=$L)"
 crashed && fail "crash in scenario 1" || pass "no crash"
 
 echo "=== 2. Light + English from saved settings ==="
 seed light en; launch
-has "Journal" && pass "English tab titles" || fail "English tab titles"
+wait_has "Journal" && pass "English tab titles" || fail "English tab titles"
 has "Журнал" && fail "Ukrainian text leaked into English UI" || pass "no Ukrainian tab titles"
 L=$(bg_luma); echo "luma=$L"; [ "$L" -gt 200 ] && pass "light background" || fail "light background (luma=$L)"
 tap "Statistics"; has "LAST 7 DAYS" && pass "Stats page in English" || fail "Stats page in English"
@@ -88,8 +91,7 @@ for d in 0 0 0 0; do tap "$d"; done
 has "Невірний PIN" && pass "wrong PIN rejected" || fail "wrong PIN rejected"
 has "Допзаробіток" && fail "unlocked with a wrong PIN" || pass "still locked after wrong PIN"
 for d in 1 2 3 4; do tap "$d"; done
-sleep 3
-has "Допзаробіток" && pass "right PIN unlocks the app" || fail "right PIN unlocks the app"
+wait_has "Допзаробіток" && pass "right PIN unlocks the app" || fail "right PIN unlocks the app"
 crashed && fail "crash in scenario 3" || pass "no crash"
 
 echo "=== 4. PIN lock (English) ==="
@@ -102,7 +104,7 @@ tap "Налаштування"
 for i in 1 2 3 4 5 6 7; do has "Українська" && break; adb shell input swipe 540 1800 540 700 300; sleep 1; done
 tap "Українська" && tap "English"
 sleep 4
-has "Settings" && pass "UI rebuilt in English and stayed on Settings" || fail "UI rebuilt in English and stayed on Settings"
+wait_has "Settings" && pass "UI rebuilt in English and stayed on Settings" || fail "UI rebuilt in English and stayed on Settings"
 has "Налаштування" && fail "Ukrainian title remained after switching language" || pass "no Ukrainian title"
 for i in 1 2 3 4 5 6 7; do has "Dark" && break; adb shell input swipe 540 1800 540 700 300; sleep 1; done
 tap "Dark" && tap "Light"
@@ -110,7 +112,8 @@ sleep 3
 L=$(bg_luma); echo "luma=$L"; [ "$L" -gt 200 ] && pass "theme switched to light live" || fail "theme switched to light live (luma=$L)"
 crashed && fail "crash in scenario 5" || pass "no crash"
 
-echo "=== logcat exceptions ==="
-adb logcat -d | grep -E "FATAL EXCEPTION|XamlParse|Unhandled|System\.[A-Za-z.]+Exception|Java\.Lang\.[A-Za-z]+Exception" | head -30
+echo "=== logcat exceptions (with stack) ==="
+adb logcat -d | grep -A45 "FATAL EXCEPTION" | head -120
+adb logcat -d | grep -E "XamlParse|Unhandled" | head -10
 
 [ "$FAILED" = 0 ] && echo "VERIFY OK" || { echo "VERIFY FAILED"; exit 1; }

@@ -41,15 +41,23 @@ public class AppTabs : TabbedPage
     {
         Generation++;
 
-        MainThread.BeginInvokeOnMainThread(() =>
+        // Пікер мови ще закриває своє діалогове вікно — підміняти сторінку одразу, поки його
+        // обробник ще працює, не можна (платформне вікно вже відчіплюється). Даємо йому завершитись.
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
+            await Task.Delay(400);
+
             var window = Application.Current?.Windows.FirstOrDefault();
             if (window is null) return;
 
             var tabs = new AppTabs();
             window.Page = tabs;
             window.Title = L.T("Заробіток");
-            tabs.CurrentPage = tabs.Children[^1];
+
+            // Лишаємо користувача в налаштуваннях, але лише коли нова сторінка вже підключена.
+            await Task.Delay(500);
+            try { tabs.CurrentPage = tabs.Children[^1]; }
+            catch (InvalidOperationException) { /* лишаємось на першій вкладці */ }
         });
     }
 }
