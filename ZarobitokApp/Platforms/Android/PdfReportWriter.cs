@@ -1,5 +1,9 @@
 using Android.Graphics;
 using Android.Graphics.Pdf;
+// MAUI підключає й Microsoft.Maui.Graphics, де є свої Paint і Color — вказуємо, які саме потрібні.
+using Canvas = global::Android.Graphics.Canvas;
+using Color = global::Android.Graphics.Color;
+using Paint = global::Android.Graphics.Paint;
 using ZarobitokApp.Localization;
 using ZarobitokApp.Services;
 
