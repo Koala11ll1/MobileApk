@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using System.ComponentModel;
 using ZarobitokApp.Models;
 using ZarobitokApp.Services;
@@ -17,6 +18,7 @@ public partial class ShiftPage : ContentPage
     private List<ExtraTick> _ticks = new();
 
     private bool _visible;
+    private readonly int _generation = AppTabs.Generation;
 
     public ShiftPage()
     {
@@ -42,7 +44,7 @@ public partial class ShiftPage : ContentPage
     {
         // Прихований екран нічого не перечитує — це б вкрало кадри в того, що зараз на виду.
         // Кеш застаріє за версією, і OnAppearing його оновить.
-        if (!_visible) return;
+        if (!_visible || _generation != AppTabs.Generation) return;
 
         ReloadCaches();
         LoadStartTimeIntoUi();
@@ -83,7 +85,11 @@ public partial class ShiftPage : ContentPage
 
             _timer = Dispatcher.CreateTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
-            _timer.Tick += (_, _) => Refresh();
+            _timer.Tick += (_, _) =>
+            {
+                if (_generation != AppTabs.Generation) { _timer?.Stop(); _timer = null; return; }
+                Refresh();
+            };
             _timer.Start();
         }
         else
@@ -119,7 +125,7 @@ public partial class ShiftPage : ContentPage
         AmountLabel.Text = todayTotalText;
 
         PerSecondLabel.Text =
-            $"+{EarningsCalculator.PerSecond(s, now):0.0000} {s.Currency}/сек";
+            $"+{EarningsCalculator.PerSecond(s, now):0.0000} {s.Currency}/{L.T("сек")}";
 
         ThisShiftLabel.Text = EarningsCalculator.Format(thisShift, s.Currency);
         PaidTimeLabel.Text = EarningsCalculator.FormatDuration(paid);
@@ -139,8 +145,8 @@ public partial class ShiftPage : ContentPage
         TodayHoursLabel.Text = EarningsCalculator.FormatDuration(todayWorked);
 
         RateLabel.Text = s.HasRateSchedule
-            ? $"{RateSchedule.RateAt(s, now):0.##} {s.Currency}/год (зараз)"
-            : $"{s.RatePerHour:0.##} {s.Currency}/год";
+            ? L.F("{0:0.##} {1}/год (зараз)", RateSchedule.RateAt(s, now), s.Currency)
+            : $"{s.RatePerHour:0.##} {s.Currency}/{L.T("год")}";
 
         TodayNetRow.IsVisible = s.TaxPercent > 0;
         if (s.TaxPercent > 0)
@@ -149,23 +155,23 @@ public partial class ShiftPage : ContentPage
 
         if (s.IsRunning)
         {
-            ElapsedLabel.Text = $"Зміна триває {EarningsCalculator.FormatDuration(paid)}";
+            ElapsedLabel.Text = L.F("Зміна триває {0}", EarningsCalculator.FormatDuration(paid));
             ShiftProgress.Progress = EarningsCalculator.Progress(s, now);
 
-            StartHintLabel.Text = "Можна пересунути, якщо натиснув не вчасно";
+            StartHintLabel.Text = L.T("Можна пересунути, якщо натиснув не вчасно");
 
-            ToggleButton.Text = "Завершити зміну";
+            ToggleButton.Text = L.T("Завершити зміну");
             ToggleButton.BackgroundColor = ThemeManager.Get("Danger");
             ToggleButton.TextColor = ThemeManager.Get("DangerOn");
         }
         else
         {
-            ElapsedLabel.Text = "Зміна не активна";
+            ElapsedLabel.Text = L.T("Зміна не активна");
             ShiftProgress.Progress = 0;
 
-            StartHintLabel.Text = "Зміна почнеться з цього часу";
+            StartHintLabel.Text = L.T("Зміна почнеться з цього часу");
 
-            ToggleButton.Text = "Почати зміну";
+            ToggleButton.Text = L.T("Почати зміну");
             ToggleButton.BackgroundColor = ThemeManager.Get("Accent");
             ToggleButton.TextColor = ThemeManager.Get("AccentOn");
         }

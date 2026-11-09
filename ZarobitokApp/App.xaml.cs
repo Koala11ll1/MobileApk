@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp;
@@ -8,7 +9,9 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        ThemeManager.Apply(ShiftStore.Load().Theme);
+        var settings = ShiftStore.Load();
+        L.Use(settings.Language);
+        ThemeManager.Apply(settings.Theme);
 
         // Режим "як у системи": тема телефона змінилась, поки апка відкрита.
         RequestedThemeChanged += (_, _) => ThemeManager.Refresh();
@@ -17,6 +20,6 @@ public partial class App : Application
     protected override Window CreateWindow(IActivationState? activationState)
         => new(new AppTabs())
         {
-            Title = "Заробіток"
+            Title = L.T("Заробіток")
         };
 }

@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using Android.App;
 using Android.Content;
 using ZarobitokApp.Services;
@@ -24,6 +25,9 @@ public class AppActionReceiver : BroadcastReceiver
     {
         if (context is null || intent is null) return;
 
+        // Процес міг стартувати з нуля (будильник) — мову беремо зі збережених налаштувань.
+        L.Use(ShiftStore.Load().Language);
+
         switch (intent.Action)
         {
             case ActionShiftEnd:
@@ -33,16 +37,16 @@ public class AppActionReceiver : BroadcastReceiver
                     var s = ShiftStore.Load();
                     var today = EarningsCalculator.EarnedToday(
                         s, ShiftStore.LoadLog(), ShiftStore.LoadExtraItems(), ShiftStore.LoadExtraTicks(), DateTime.UtcNow);
-                    NotificationHelper.Show(context, EndNotificationId, "Зміну завершено",
-                        $"Сьогодні зароблено {EarningsCalculator.Format(today, s.Currency)}");
+                    NotificationHelper.Show(context, EndNotificationId, L.T("Зміну завершено"),
+                        L.F("Сьогодні зароблено {0}", EarningsCalculator.Format(today, s.Currency)));
                 }
                 break;
 
             case ActionReminder:
                 var st = ShiftStore.Load();
                 if (st.ReminderEnabled && !st.IsRunning)
-                    NotificationHelper.Show(context, ReminderNotificationId, "Час почати зміну",
-                        "Відкрий «Заробіток», щоб запустити лічильник");
+                    NotificationHelper.Show(context, ReminderNotificationId, L.T("Час почати зміну"),
+                        L.T("Відкрий «Заробіток», щоб запустити лічильник"));
 
                 NotificationScheduler.Sync(context);   // виставити наступне
                 break;

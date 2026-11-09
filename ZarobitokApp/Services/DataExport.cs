@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -67,7 +68,7 @@ public static class DataExport
         var inv = CultureInfo.InvariantCulture;
 
         var sb = new StringBuilder();
-        sb.AppendLine($"Дата;Початок;Кінець;Годин;Ставка ({Clean(currency)}/год);За час;Допзаробіток;Разом");
+        sb.AppendLine(L.F("Дата;Початок;Кінець;Годин;Ставка ({0}/год);За час;Допзаробіток;Разом", Clean(currency)));
 
         foreach (var e in log.OrderBy(x => x.StartedAtUtc))
         {

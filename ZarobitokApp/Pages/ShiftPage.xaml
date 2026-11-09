@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.ShiftPage"
-             Title="Зміна"
+             Title="{loc:T &quot;Зміна&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
@@ -57,7 +58,7 @@
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Початок зміни" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                    <Label Text="{loc:T &quot;Початок зміни&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                     <TimePicker x:Name="StartTimePicker"
                                 Format="HH:mm"
                                 FontSize="20"
@@ -71,7 +72,7 @@
             </Border>
 
             <!-- ДЕТАЛІ -->
-            <Label Text="ДЕТАЛІ"
+            <Label Text="{loc:T &quot;ДЕТАЛІ&quot;}"
                    FontSize="12"
                    TextColor="{DynamicResource TextMuted}"
                    Margin="4,8,0,0" />
@@ -85,19 +86,19 @@
                 <VerticalStackLayout Spacing="12">
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Зароблено за цю зміну" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Зароблено за цю зміну&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="ThisShiftLabel" Grid.Column="1"
                                FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Оплачуваний час" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Оплачуваний час&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="PaidTimeLabel" Grid.Column="1"
                                FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="До плану лишилось" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;До плану лишилось&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="RemainingLabel" Grid.Column="1"
                                FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
@@ -105,25 +106,25 @@
                     <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Зароблено сьогодні" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Зароблено сьогодні&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="TodayLabel" Grid.Column="1"
                                FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Accent}" />
                     </Grid>
 
                     <Grid x:Name="TodayNetRow" ColumnDefinitions="*,Auto" IsVisible="False">
-                        <Label Text="Сьогодні після податку" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Сьогодні після податку&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="TodayNetLabel" Grid.Column="1"
                                FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Завершених змін сьогодні" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Завершених змін сьогодні&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="TodayCountLabel" Grid.Column="1"
                                FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Відпрацьовано сьогодні" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Відпрацьовано сьогодні&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="TodayHoursLabel" Grid.Column="1"
                                FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
@@ -131,7 +132,7 @@
                     <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Ставка" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Ставка&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="RateLabel" Grid.Column="1"
                                FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>

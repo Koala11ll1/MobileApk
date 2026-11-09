@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Pages;
@@ -16,6 +17,7 @@ public sealed class ExtraItemRow
 public partial class ExtrasPage : ContentPage
 {
     private IDispatcherTimer? _timer;
+    private readonly int _generation = AppTabs.Generation;
 
     public ExtrasPage()
     {
@@ -54,7 +56,11 @@ public partial class ExtrasPage : ContentPage
 
             _timer = Dispatcher.CreateTimer();
             _timer.Interval = TimeSpan.FromSeconds(3);
-            _timer.Tick += (_, _) => Refresh();
+            _timer.Tick += (_, _) =>
+            {
+                if (_generation != AppTabs.Generation) { _timer?.Stop(); _timer = null; return; }
+                Refresh();
+            };
             _timer.Start();
         }
         else
@@ -90,7 +96,7 @@ public partial class ExtrasPage : ContentPage
                 Id = item.Id,
                 Label = item.Label,
                 Price = item.UnitPrice,
-                PriceText = $"{item.UnitPrice:0.##} {s.Currency}/шт",
+                PriceText = $"{item.UnitPrice:0.##} {s.Currency}/{L.T("шт")}",
                 Count = count,
                 CanIncrement = canEdit,
                 CanDecrement = canEdit && count > 0
@@ -116,8 +122,8 @@ public partial class ExtrasPage : ContentPage
         if (existing is { Archived: false })
         {
             // Ціну активного типу тут не міняємо — для цього є меню «⋯» біля нього.
-            await DisplayAlert("Вже є",
-                $"«{existing.Label}» уже в списку за {existing.UnitPrice:0.##}. Щоб змінити ціну, натисни «⋯» біля нього.", "OK");
+            await DisplayAlert(L.T("Вже є"),
+                L.F("«{0}» уже в списку за {1:0.##}. Щоб змінити ціну, натисни «⋯» біля нього.", existing.Label, existing.UnitPrice), "OK");
             return;
         }
 
@@ -135,44 +141,44 @@ public partial class ExtrasPage : ContentPage
     {
         if (sender is not Button { CommandParameter: ExtraItemRow row }) return;
 
-        const string changePrice = "Змінити ціну";
-        const string rename = "Перейменувати";
-        const string remove = "Прибрати зі списку";
+        var changePrice = L.T("Змінити ціну");
+        var rename = L.T("Перейменувати");
+        var remove = L.T("Прибрати зі списку");
 
-        var action = await DisplayActionSheet(row.Label, "Скасувати", null, changePrice, rename, remove);
+        var action = await DisplayActionSheet(row.Label, L.T("Скасувати"), null, changePrice, rename, remove);
 
         switch (action)
         {
-            case changePrice:
+            case var a when a == changePrice:
             {
                 var text = await DisplayPromptAsync(
-                    row.Label, "Нова ціна за одиницю. Минулі підрахунки не зміняться.",
-                    "Зберегти", "Скасувати", keyboard: Keyboard.Numeric, initialValue: row.Price.ToString("0.##"));
+                    row.Label, L.T("Нова ціна за одиницю. Минулі підрахунки не зміняться."),
+                    L.T("Зберегти"), L.T("Скасувати"), keyboard: Keyboard.Numeric, initialValue: row.Price.ToString("0.##"));
                 if (!Input.TryDecimal(text, out var price) || price <= 0) return;
                 ShiftManager.UpdateExtraItem(row.Id, row.Label, price);
                 break;
             }
-            case rename:
+            case var a when a == rename:
             {
                 var name = (await DisplayPromptAsync(
-                    "Нова назва", row.Label, "Зберегти", "Скасувати", initialValue: row.Label))?.Trim();
+                    L.T("Нова назва"), row.Label, L.T("Зберегти"), L.T("Скасувати"), initialValue: row.Label))?.Trim();
                 if (string.IsNullOrWhiteSpace(name)) return;
 
                 var clash = ShiftStore.LoadExtraItems().Any(i => i.Id != row.Id
                     && string.Equals(i.Label, name, StringComparison.OrdinalIgnoreCase));
                 if (clash)
                 {
-                    await DisplayAlert("Назва зайнята", $"Тип «{name}» уже існує.", "OK");
+                    await DisplayAlert(L.T("Назва зайнята"), L.F("Тип «{0}» уже існує.", name), "OK");
                     return;
                 }
                 ShiftManager.UpdateExtraItem(row.Id, name, row.Price);
                 break;
             }
-            case remove:
+            case var a when a == remove:
             {
-                var ok = await DisplayAlert("Прибрати зі списку?",
-                    $"«{row.Label}» зникне зі списку, але минулі підрахунки в журналі збережуться.",
-                    "Прибрати", "Скасувати");
+                var ok = await DisplayAlert(L.T("Прибрати зі списку?"),
+                    L.F("«{0}» зникне зі списку, але минулі підрахунки в журналі збережуться.", row.Label),
+                    L.T("Прибрати"), L.T("Скасувати"));
                 if (!ok) return;
                 ShiftManager.ArchiveExtraItem(row.Id);
                 break;

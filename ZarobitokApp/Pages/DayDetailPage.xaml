@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.DayDetailPage"
              BackgroundColor="{DynamicResource Bg}">
 
@@ -15,30 +16,30 @@
 
                 <VerticalStackLayout Spacing="12">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Зароблено за день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Зароблено за день&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="TotalLabel"
                                FontSize="17" FontAttributes="Bold" TextColor="{DynamicResource Accent}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Відпрацьовано" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Відпрацьовано&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="HoursLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Змін за день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Змін за день&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="ShiftCountLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середня ₴/год по ставці" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Середня ₴/год по ставці&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="AvgRateLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середня ₴/год з допзаробітком" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Середня ₴/год з допзаробітком&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="AvgEffectiveLabel"
                                FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Accent}" />
                     </Grid>
@@ -46,13 +47,13 @@
                     <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Допзаробіток за день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Допзаробіток за день&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label Grid.Column="1" x:Name="ExtrasTotalLabel" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ЗМІНИ ЦЬОГО ДНЯ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ЗМІНИ ЦЬОГО ДНЯ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
             <CollectionView x:Name="ShiftsView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -84,10 +85,10 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Label Text="ДОПЗАРОБІТОК ЗА ДЕНЬ, ПО ВИДАХ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ДОПЗАРОБІТОК ЗА ДЕНЬ, ПО ВИДАХ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Label x:Name="MultiShiftHintLabel"
-                   Text="За день кілька змін — редагування кількості недоступне, щоб не було неоднозначно, до якої зміни віднести правку."
+                   Text="{loc:T &quot;За день кілька змін — редагування кількості недоступне, щоб не було неоднозначно, до якої зміни віднести правку.&quot;}"
                    FontSize="12"
                    TextColor="{DynamicResource TextMuted}"
                    IsVisible="False" />
@@ -95,7 +96,7 @@
             <!-- Один шифт за день: можна редагувати кількість +/- -->
             <CollectionView x:Name="EditableExtrasView" IsVisible="False">
                 <CollectionView.EmptyView>
-                    <Label Text="Ще немає жодного типу" TextColor="{DynamicResource TextFaint}" HorizontalOptions="Center" Margin="0,12" />
+                    <Label Text="{loc:T &quot;Ще немає жодного типу&quot;}" TextColor="{DynamicResource TextFaint}" HorizontalOptions="Center" Margin="0,12" />
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -124,7 +125,7 @@
             <!-- Кілька змін за день: лише перегляд -->
             <CollectionView x:Name="ExtrasBreakdownView" IsVisible="False">
                 <CollectionView.EmptyView>
-                    <Label Text="Не було" TextColor="{DynamicResource TextFaint}" HorizontalOptions="Center" Margin="0,12" />
+                    <Label Text="{loc:T &quot;Не було&quot;}" TextColor="{DynamicResource TextFaint}" HorizontalOptions="Center" Margin="0,12" />
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -141,7 +142,7 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Button Text="Закрити"
+            <Button Text="{loc:T &quot;Закрити&quot;}"
                     Clicked="OnCloseClicked"
                     BackgroundColor="{DynamicResource Surface}"
                     TextColor="{DynamicResource TextSecondary}"

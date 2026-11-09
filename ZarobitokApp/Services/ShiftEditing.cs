@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Models;
 
 namespace ZarobitokApp.Services;
@@ -16,16 +17,16 @@ public static class ShiftEditing
         IEnumerable<ShiftLogEntry> others, DateTime startUtc, DateTime endUtc,
         DateTime nowUtc, DateTime? runningStartUtc)
     {
-        if (endUtc <= startUtc) return "Кінець має бути після початку.";
-        if (endUtc - startUtc > MaxDuration) return "Зміна не може бути довшою за 48 годин.";
-        if (endUtc > nowUtc) return "Кінець зміни не може бути в майбутньому.";
+        if (endUtc <= startUtc) return L.T("Кінець має бути після початку.");
+        if (endUtc - startUtc > MaxDuration) return L.T("Зміна не може бути довшою за 48 годин.");
+        if (endUtc > nowUtc) return L.T("Кінець зміни не може бути в майбутньому.");
 
         foreach (var o in others)
             if (startUtc < o.EndedAtUtc && endUtc > o.StartedAtUtc)
-                return "Зміна перетинається з іншою у журналі.";
+                return L.T("Зміна перетинається з іншою у журналі.");
 
         if (runningStartUtc is { } rs && endUtc > rs)
-            return "Зміна перетинається з поточною (активною).";
+            return L.T("Зміна перетинається з поточною (активною).");
 
         return null;
     }

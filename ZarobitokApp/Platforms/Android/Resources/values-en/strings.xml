@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Earnings</string>
+    <string name="widget_description">Shows the amount you earn during a shift</string>
+    <string name="shortcut_start_short">Start shift</string>
+    <string name="shortcut_start_long">Start a shift now</string>
+    <string name="shortcut_stop_short">End shift</string>
+    <string name="shortcut_stop_long">End the shift</string>
+</resources>

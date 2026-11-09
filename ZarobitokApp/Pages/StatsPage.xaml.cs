@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Pages;
@@ -6,29 +7,23 @@ public partial class StatsPage : ContentPage
 {
     private const double ChartBarMaxHeight = 80;
 
-    private static readonly string[] MonthNames =
-    {
-        "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
-        "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
-    };
-
-    private static readonly string[] DayNames = { "Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
-
     private bool _visible;
+    private readonly int _generation = AppTabs.Generation;
     private int _shownVersion = -1;
     private DateTime _shownDay;
 
     public StatsPage()
     {
         InitializeComponent();
-        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(() => { if (_visible) Refresh(); });
+        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(() => { if (_visible && _generation == AppTabs.Generation) Refresh(); });
 
         // Заздалегідь, поки користувач на першому екрані, а не під час першого свайпу.
-        UiTiming.RunLater(TimeSpan.FromSeconds(3), () => { if (IsStale()) Refresh(); });
+        UiTiming.RunLater(TimeSpan.FromSeconds(3), () => { if (_generation == AppTabs.Generation && IsStale()) Refresh(); });
 
         // Колір стовпчиків графіка задається в коді.
         ThemeManager.Changed += () =>
         {
+            if (_generation != AppTabs.Generation) return;
             _shownVersion = -1;
             if (_visible) Refresh();
         };
@@ -67,12 +62,12 @@ public partial class StatsPage : ContentPage
         var month = StatsCalculator.ForMonth(log, items, ticks, today.Year, today.Month);
         var previous = StatsCalculator.ForMonth(log, items, ticks, prev.Year, prev.Month);
 
-        MonthTitleLabel.Text = $"{MonthNames[today.Month - 1].ToUpperInvariant()} {today.Year}";
+        MonthTitleLabel.Text = $"{L.Months[today.Month - 1].ToUpperInvariant()} {today.Year}";
         MonthTotalLabel.Text = EarningsCalculator.Format(month.Total, s.Currency);
 
         MonthNetLabel.IsVisible = s.TaxPercent > 0;
-        MonthNetLabel.Text = $"після податку {s.TaxPercent:0.##}%: " +
-                             EarningsCalculator.Format(StatsCalculator.Net(month.Total, s.TaxPercent), s.Currency);
+        MonthNetLabel.Text = L.F("після податку {0:0.##}%: {1}",
+            s.TaxPercent, EarningsCalculator.Format(StatsCalculator.Net(month.Total, s.TaxPercent), s.Currency));
 
         if (s.MonthlyGoal > 0)
         {
@@ -80,26 +75,28 @@ public partial class StatsPage : ContentPage
             GoalProgress.Progress = Math.Clamp((double)(month.Total / s.MonthlyGoal), 0, 1);
             var left = s.MonthlyGoal - month.Total;
             GoalLabel.Text = left > 0
-                ? $"Ціль {EarningsCalculator.Format(s.MonthlyGoal, s.Currency)} — лишилось {EarningsCalculator.Format(left, s.Currency)} ({month.Total / s.MonthlyGoal:P0})"
-                : $"Ціль {EarningsCalculator.Format(s.MonthlyGoal, s.Currency)} виконано! ({month.Total / s.MonthlyGoal:P0})";
+                ? L.F("Ціль {0} — лишилось {1} ({2:P0})",
+                    EarningsCalculator.Format(s.MonthlyGoal, s.Currency), EarningsCalculator.Format(left, s.Currency), month.Total / s.MonthlyGoal)
+                : L.F("Ціль {0} виконано! ({1:P0})",
+                    EarningsCalculator.Format(s.MonthlyGoal, s.Currency), month.Total / s.MonthlyGoal);
         }
         else
         {
             GoalProgress.IsVisible = false;
-            GoalLabel.Text = "Ціль на місяць можна задати в налаштуваннях";
+            GoalLabel.Text = L.T("Ціль на місяць можна задати в налаштуваннях");
         }
 
         if (previous.Total > 0)
         {
             var diff = month.Total - previous.Total;
             var sign = diff >= 0 ? "+" : "−";
-            CompareLabel.Text =
-                $"Минулий місяць: {EarningsCalculator.Format(previous.Total, s.Currency)} " +
-                $"({sign}{EarningsCalculator.Format(Math.Abs(diff), s.Currency)}, {sign}{Math.Abs(diff / previous.Total):P0})";
+            CompareLabel.Text = L.F("Минулий місяць: {0} ({1}{2}, {1}{3:P0})",
+                EarningsCalculator.Format(previous.Total, s.Currency), sign,
+                EarningsCalculator.Format(Math.Abs(diff), s.Currency), Math.Abs(diff / previous.Total));
         }
         else
         {
-            CompareLabel.Text = "Минулого місяця даних немає";
+            CompareLabel.Text = L.T("Минулого місяця даних немає");
         }
 
         PerHourLabel.Text = month.Shifts > 0 ? EarningsCalculator.Format(month.PerHour, s.Currency) : "—";
@@ -140,7 +137,7 @@ public partial class StatsPage : ContentPage
             });
             column.Add(new Label
             {
-                Text = DayNames[(int)day.DayOfWeek],
+                Text = L.DayName(day.DayOfWeek),
                 FontSize = 11,
                 FontAttributes = day == today ? FontAttributes.Bold : FontAttributes.None,
                 TextColor = ThemeManager.Get(day == today ? "TextPrimary" : "TextMuted"),

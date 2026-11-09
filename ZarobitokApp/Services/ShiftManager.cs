@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Models;
 
 #if ANDROID
@@ -188,7 +189,7 @@ public static class ShiftManager
         var s = ShiftStore.Load();
         var log = ShiftStore.LoadLog();
         var i = log.FindIndex(e => e.StartedAtUtc == old.StartedAtUtc && e.EndedAtUtc == old.EndedAtUtc);
-        if (i < 0) return "Запис не знайдено — можливо, його вже видалено.";
+        if (i < 0) return L.T("Запис не знайдено — можливо, його вже видалено.");
 
         var others = log.Where((_, idx) => idx != i);
         var error = ShiftEditing.Validate(others, startUtc, endUtc, DateTime.UtcNow, s.StartedAtUtc);

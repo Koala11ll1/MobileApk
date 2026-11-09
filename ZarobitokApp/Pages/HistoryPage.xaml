@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.HistoryPage"
-             Title="Журнал"
+             Title="{loc:T &quot;Журнал&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <Grid RowDefinitions="Auto,Auto,*" Padding="20,20,20,0" RowSpacing="10">
@@ -10,20 +11,20 @@
         <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
             <Button Grid.Column="0"
                     x:Name="ListModeButton"
-                    Text="Список"
+                    Text="{loc:T &quot;Список&quot;}"
                     Clicked="OnListModeClicked"
                     CornerRadius="12"
                     HeightRequest="42"
                     FontAttributes="Bold" />
             <Button Grid.Column="1"
                     x:Name="CalendarModeButton"
-                    Text="Календар"
+                    Text="{loc:T &quot;Календар&quot;}"
                     Clicked="OnCalendarModeClicked"
                     CornerRadius="12"
                     HeightRequest="42"
                     FontAttributes="Bold" />
             <Button Grid.Column="2"
-                    Text="＋ Зміна"
+                    Text="{loc:T &quot;＋ Зміна&quot;}"
                     Clicked="OnAddShiftClicked"
                     BackgroundColor="{DynamicResource Surface}"
                     TextColor="{DynamicResource Accent}"
@@ -34,13 +35,13 @@
 
         <Label Grid.Row="1"
                x:Name="HintLabel"
-               Text="Тапни по зміні, щоб побачити деталі за день і виправити час. «＋ Зміна» додає пропущену зміну вручну. Помилкову можна видалити."
+               Text="{loc:T &quot;Тапни по зміні, щоб побачити деталі за день і виправити час. «＋ Зміна» додає пропущену зміну вручну. Помилкову можна видалити.&quot;}"
                FontSize="12"
                TextColor="{DynamicResource TextMuted}" />
 
         <CollectionView Grid.Row="2" x:Name="HistoryView" IsGrouped="True">
             <CollectionView.EmptyView>
-                <Label Text="Поки порожньо"
+                <Label Text="{loc:T &quot;Поки порожньо&quot;}"
                        TextColor="{DynamicResource TextFaint}"
                        HorizontalOptions="Center"
                        Margin="0,24" />
@@ -137,13 +138,13 @@
                    TextColor="{DynamicResource Accent}" />
 
             <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,4,0,0">
-                <Label Grid.Column="0" x:Name="Wd0" Text="Пн" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="1" x:Name="Wd1" Text="Вт" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="2" x:Name="Wd2" Text="Ср" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="3" x:Name="Wd3" Text="Чт" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="4" x:Name="Wd4" Text="Пт" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="5" x:Name="Wd5" Text="Сб" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="6" x:Name="Wd6" Text="Нд" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="0" x:Name="Wd0" Text="{loc:T &quot;Пн&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="1" x:Name="Wd1" Text="{loc:T &quot;Вт&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="2" x:Name="Wd2" Text="{loc:T &quot;Ср&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="3" x:Name="Wd3" Text="{loc:T &quot;Чт&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="4" x:Name="Wd4" Text="{loc:T &quot;Пт&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="5" x:Name="Wd5" Text="{loc:T &quot;Сб&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="6" x:Name="Wd6" Text="{loc:T &quot;Нд&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
             </Grid>
 
             <CollectionView x:Name="CalendarView">

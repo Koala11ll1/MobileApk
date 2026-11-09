@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.ExtrasPage"
-             Title="Допзаробіток"
+             Title="{loc:T &quot;Допзаробіток&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="20,20,20,0" RowSpacing="14">
@@ -17,19 +18,19 @@
             </Border.StrokeShape>
 
             <VerticalStackLayout Spacing="10">
-                <Label Text="Новий тип" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                <Label Text="{loc:T &quot;Новий тип&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                 <Entry x:Name="LabelEntry"
-                       Placeholder="Наприклад: продав ред бул"
+                       Placeholder="{loc:T &quot;Наприклад: продав ред бул&quot;}"
                        PlaceholderColor="{DynamicResource TextMuted}"
                        TextColor="{DynamicResource TextPrimary}"
                        BackgroundColor="{DynamicResource Surface}" />
                 <Entry x:Name="PriceEntry"
-                       Placeholder="Ціна за одиницю"
+                       Placeholder="{loc:T &quot;Ціна за одиницю&quot;}"
                        Keyboard="Numeric"
                        PlaceholderColor="{DynamicResource TextMuted}"
                        TextColor="{DynamicResource TextPrimary}"
                        BackgroundColor="{DynamicResource Surface}" />
-                <Button Text="Додати тип"
+                <Button Text="{loc:T &quot;Додати тип&quot;}"
                         Clicked="OnAddClicked"
                         BackgroundColor="{DynamicResource Accent}"
                         TextColor="{DynamicResource AccentOn}"
@@ -41,13 +42,13 @@
 
         <Label Grid.Row="1"
                x:Name="NoShiftLabel"
-               Text="Лічильники активні тільки під час зміни — типи можна створювати завжди, а +/- запрацює після старту."
+               Text="{loc:T &quot;Лічильники активні тільки під час зміни — типи можна створювати завжди, а +/- запрацює після старту.&quot;}"
                FontSize="13"
                TextColor="{DynamicResource TextSecondary}"
                IsVisible="False" />
 
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="4,0">
-            <Label Text="ЦЯ ЗМІНА" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+            <Label Text="{loc:T &quot;ЦЯ ЗМІНА&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
             <Label Grid.Column="1" x:Name="ShiftExtrasTotalLabel"
                    FontSize="12" TextColor="{DynamicResource Accent}" FontAttributes="Bold" />
         </Grid>
@@ -56,7 +57,7 @@
 
         <CollectionView Grid.Row="4" x:Name="ItemsView">
             <CollectionView.EmptyView>
-                <Label Text="Ще немає жодного типу"
+                <Label Text="{loc:T &quot;Ще немає жодного типу&quot;}"
                        TextColor="{DynamicResource TextFaint}"
                        HorizontalOptions="Center"
                        Margin="0,24" />

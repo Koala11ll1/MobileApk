@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using Android.App;
 using Android.Appwidget;
 using Android.Content;
@@ -79,6 +80,7 @@ public class EarningsWidget : AppWidgetProvider
     {
         var state = ShiftStore.Load();
         var now = DateTime.UtcNow;
+        L.Use(state.Language);   // процес міг стартувати з нуля (будильник)
 
         var views = new RemoteViews(context.PackageName, Resource.Layout.widget_earnings);
 
@@ -111,6 +113,7 @@ public class EarningsWidget : AppWidgetProvider
             views.SetChronometer(Resource.Id.widget_chrono, SystemClock.ElapsedRealtime(), "%s", false);
 
             views.SetViewVisibility(Resource.Id.widget_chrono, ViewStates.Gone);
+            views.SetTextViewText(Resource.Id.widget_idle, L.T("Зміна не активна"));
             views.SetViewVisibility(Resource.Id.widget_idle, ViewStates.Visible);
         }
 

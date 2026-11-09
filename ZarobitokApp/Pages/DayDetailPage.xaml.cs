@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Models;
 using ZarobitokApp.Services;
 
@@ -86,7 +87,7 @@ public partial class DayDetailPage : ContentPage
             {
                 Entry = e,
                 TimeText = $"{Time(e.StartedAtUtc)} — {Time(e.EndedAtUtc)}",
-                DetailText = $"{EarningsCalculator.FormatDuration(e.Duration)} · {e.RatePerHour:0.##} {_currency}/год",
+                DetailText = $"{EarningsCalculator.FormatDuration(e.Duration)} · {e.RatePerHour:0.##} {_currency}/{L.T("год")}",
                 AmountText = EarningsCalculator.Format(e.Earned + ExtrasFor(e), _currency)
             })
             .ToList();
@@ -108,7 +109,7 @@ public partial class DayDetailPage : ContentPage
                     {
                         Id = item.Id,
                         Label = item.Label,
-                        PriceText = $"{item.UnitPrice:0.##} {_currency}/шт",
+                        PriceText = $"{item.UnitPrice:0.##} {_currency}/{L.T("шт")}",
                         Count = count,
                         CanDecrement = count > 0
                     };
@@ -129,7 +130,7 @@ public partial class DayDetailPage : ContentPage
                 .Where(t => _dayEntries.Any(e => t.AtUtc >= e.StartedAtUtc && t.AtUtc <= e.EndedAtUtc))
                 .GroupBy(t => t.ItemId)
                 .Select(g => (
-                    label: _items.FirstOrDefault(i => i.Id == g.Key)?.Label ?? "Невідомий тип",
+                    label: _items.FirstOrDefault(i => i.Id == g.Key)?.Label ?? L.T("Невідомий тип"),
                     count: g.Sum(t => t.Delta),
                     amount: g.Sum(t => EarningsCalculator.TickValue(t, priceById))))
                 .Where(x => x.count != 0)
@@ -167,18 +168,18 @@ public partial class DayDetailPage : ContentPage
         var entry = row.Entry;
 
         var startText = await DisplayPromptAsync(
-            "Початок зміни", "Година:хвилина (наприклад 09:30)", "Далі", "Скасувати",
+            L.T("Початок зміни"), L.T("Година:хвилина (наприклад 09:30)"), L.T("Далі"), L.T("Скасувати"),
             keyboard: Keyboard.Text, initialValue: entry.StartedAtUtc.ToLocalTime().ToString("HH:mm"));
         if (startText is null) return;
 
         var endText = await DisplayPromptAsync(
-            "Кінець зміни", "Година:хвилина. Якщо раніше за початок — це наступна доба.", "Зберегти", "Скасувати",
+            L.T("Кінець зміни"), L.T("Година:хвилина. Якщо раніше за початок — це наступна доба."), L.T("Зберегти"), L.T("Скасувати"),
             keyboard: Keyboard.Text, initialValue: entry.EndedAtUtc.ToLocalTime().ToString("HH:mm"));
         if (endText is null) return;
 
         if (!Input.TryTimeOfDay(startText, out var startTod) || !Input.TryTimeOfDay(endText, out var endTod))
         {
-            await DisplayAlert("Невірний час", "Введи час у форматі ГГ:ХХ, наприклад 09:30.", "OK");
+            await DisplayAlert(L.T("Невірний час"), L.T("Введи час у форматі ГГ:ХХ, наприклад 09:30."), "OK");
             return;
         }
 
@@ -186,7 +187,7 @@ public partial class DayDetailPage : ContentPage
         var error = ShiftManager.EditLogEntry(entry, startUtc, endUtc);
         if (error is not null)
         {
-            await DisplayAlert("Не збережено", error, "OK");
+            await DisplayAlert(L.T("Не збережено"), error, "OK");
             return;
         }
 
@@ -204,8 +205,8 @@ public partial class DayDetailPage : ContentPage
 
     private static string DayTitle(DateTime day)
     {
-        if (day == DateTime.Today) return "Сьогодні";
-        if (day == DateTime.Today.AddDays(-1)) return "Вчора";
+        if (day == DateTime.Today) return L.T("Сьогодні");
+        if (day == DateTime.Today.AddDays(-1)) return L.T("Вчора");
         return day.ToString("dd.MM.yyyy");
     }
 }

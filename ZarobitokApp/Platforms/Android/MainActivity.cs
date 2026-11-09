@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -26,11 +27,12 @@ public class MainActivity : MauiAppCompatActivity
         // того, як узагалі стартує MAUI-конвеєр (Window/Page). Якщо апка
         // валиться десь усередині нього, MainPage.OnAppearing ніколи не
         // встигає спрацювати, а цей рядок — встигає.
+        L.Use(ShiftStore.Load().Language);
         var crash = ShiftStore.TakeLastCrash();
         if (crash is not null)
         {
             var dialog = new AlertDialog.Builder(this);
-            dialog.SetTitle("Останній збій застосунку");
+            dialog.SetTitle(L.T("Останній збій застосунку"));
             dialog.SetMessage(crash);
             dialog.SetCancelable(false);
             dialog.SetPositiveButton("OK", (_, _) => { });

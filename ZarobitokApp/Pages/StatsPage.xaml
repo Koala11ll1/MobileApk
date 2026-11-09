@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.StatsPage"
-             Title="Статистика"
+             Title="{loc:T &quot;Статистика&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
@@ -35,30 +36,30 @@
 
                 <VerticalStackLayout Spacing="12">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середній заробіток за годину" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Середній заробіток за годину&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="PerHourLabel" Grid.Column="1" FontSize="14" FontAttributes="Bold" TextColor="{DynamicResource Accent}" />
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середній заробіток за зміну" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Середній заробіток за зміну&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="PerShiftLabel" Grid.Column="1" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Середній за робочий день" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Середній за робочий день&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="PerDayLabel" Grid.Column="1" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
                     <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Відпрацьовано" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Відпрацьовано&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="WorkedLabel" Grid.Column="1" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Змін / робочих днів" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Змін / робочих днів&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
                         <Label x:Name="CountsLabel" Grid.Column="1" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ОСТАННІ 7 ДНІВ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ОСТАННІ 7 ДНІВ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1" Stroke="{DynamicResource HairlineBrush}" Padding="16">
                 <Border.StrokeShape>

@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using ZarobitokApp.Models;
 using ZarobitokApp.Services;
 
@@ -38,18 +39,13 @@ public sealed class CalendarDayCell
 
 public partial class HistoryPage : ContentPage
 {
-    private static readonly string[] MonthNames =
-    {
-        "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
-        "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
-    };
-
     private bool _showCalendar;
     private DateTime _visibleMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
 
     // Що саме показано зараз: версія даних і день. Якщо вони не змінились,
     // при появі вкладки перебудовувати нічого не треба.
     private bool _visible;
+    private readonly int _generation = AppTabs.Generation;
     private int _shownVersion = -1;
     private DateTime _shownDay;
 
@@ -61,14 +57,15 @@ public partial class HistoryPage : ContentPage
         // Зміна могла прийти ззовні (автостоп, ярлик, правка в деталях дня, +1 на іншій
         // вкладці). Перебудовуємо лише коли вкладка на виду, інакше це вкрадає кадри в
         // екрана, на якому користувач зараз: решту доробить OnAppearing.
-        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(() => { if (_visible) Reload(); });
+        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(() => { if (_visible && _generation == AppTabs.Generation) Reload(); });
 
         // Заздалегідь, поки користувач на першому екрані, а не під час першого свайпу.
-        UiTiming.RunLater(TimeSpan.FromSeconds(2), () => { if (IsStale()) Reload(); });
+        UiTiming.RunLater(TimeSpan.FromSeconds(2), () => { if (_generation == AppTabs.Generation && IsStale()) Reload(); });
 
         // Кольори кнопок режиму й клітинок календаря задаються в коді — при зміні теми оновлюємо.
         ThemeManager.Changed += () =>
         {
+            if (_generation != AppTabs.Generation) return;
             SetMode(_showCalendar);
             _shownVersion = -1;
             if (_visible) Reload();
@@ -134,7 +131,7 @@ public partial class HistoryPage : ContentPage
                      Day = g.Key,
                      TimeText = $"{Time(x.entry.StartedAtUtc, s)} — {Time(x.entry.EndedAtUtc, s)}",
                      DetailText = $"{EarningsCalculator.FormatDuration(x.entry.Duration)} · " +
-                                  $"{x.entry.RatePerHour:0.##} {s.Currency}/год",
+                                  $"{x.entry.RatePerHour:0.##} {s.Currency}/{L.T("год")}",
                      AmountText = EarningsCalculator.Format(x.total, s.Currency)
                  })))
             .ToList();
@@ -161,10 +158,10 @@ public partial class HistoryPage : ContentPage
         var shiftDays = monthEntries.Select(e => e.EndedAtUtc.ToLocalTime().Date).ToHashSet();
         var monthTotal = monthEntries.Sum(Total);
 
-        MonthLabel.Text = $"{MonthNames[_visibleMonth.Month - 1]} {_visibleMonth.Year}";
-        MonthTotalLabel.Text = $"Заробіток за місяць: {EarningsCalculator.Format(monthTotal, s.Currency)}";
+        MonthLabel.Text = $"{L.Months[_visibleMonth.Month - 1]} {_visibleMonth.Year}";
+        MonthTotalLabel.Text = L.F("Заробіток за місяць: {0}", EarningsCalculator.Format(monthTotal, s.Currency));
         if (s.TaxPercent > 0)
-            MonthTotalLabel.Text += $"\nпісля податку: {EarningsCalculator.Format(StatsCalculator.Net(monthTotal, s.TaxPercent), s.Currency)}";
+            MonthTotalLabel.Text += L.F("\nпісля податку: {0}", EarningsCalculator.Format(StatsCalculator.Net(monthTotal, s.TaxPercent), s.Currency));
 
         SetWeekdayHeaders(s.WeekStartsOnSunday);
         CalendarView.ItemsSource = BuildCalendarCells(_visibleMonth, shiftDays, s.WeekStartsOnSunday);
@@ -210,9 +207,7 @@ public partial class HistoryPage : ContentPage
 
     private void SetWeekdayHeaders(bool sundayFirst)
     {
-        string[] names = sundayFirst
-            ? new[] { "Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" }
-            : new[] { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд" };
+        var names = L.Weekdays(sundayFirst);
         var labels = new[] { Wd0, Wd1, Wd2, Wd3, Wd4, Wd5, Wd6 };
         for (var i = 0; i < 7; i++) labels[i].Text = names[i];
     }
@@ -220,16 +215,16 @@ public partial class HistoryPage : ContentPage
     private async void OnAddShiftClicked(object? sender, EventArgs e)
     {
         var dateText = await DisplayPromptAsync(
-            "Додати зміну", "Дата початку (дд.мм.рррр)", "Далі", "Скасувати",
+            L.T("Додати зміну"), L.T("Дата початку (дд.мм.рррр)"), L.T("Далі"), L.T("Скасувати"),
             initialValue: DateTime.Today.ToString("dd.MM.yyyy"));
         if (dateText is null) return;
 
         var startText = await DisplayPromptAsync(
-            "Початок зміни", "Година:хвилина (наприклад 09:00)", "Далі", "Скасувати");
+            L.T("Початок зміни"), L.T("Година:хвилина (наприклад 09:00)"), L.T("Далі"), L.T("Скасувати"));
         if (startText is null) return;
 
         var endText = await DisplayPromptAsync(
-            "Кінець зміни", "Година:хвилина. Якщо раніше за початок — це наступна доба.", "Додати", "Скасувати");
+            L.T("Кінець зміни"), L.T("Година:хвилина. Якщо раніше за початок — це наступна доба."), L.T("Додати"), L.T("Скасувати"));
         if (endText is null) return;
 
         if (!DateTime.TryParseExact(dateText.Trim(), "dd.MM.yyyy",
@@ -237,14 +232,14 @@ public partial class HistoryPage : ContentPage
             || !Input.TryTimeOfDay(startText, out var startTod)
             || !Input.TryTimeOfDay(endText, out var endTod))
         {
-            await DisplayAlert("Невірні дані", "Дата має бути дд.мм.рррр, а час — ГГ:ХХ.", "OK");
+            await DisplayAlert(L.T("Невірні дані"), L.T("Дата має бути дд.мм.рррр, а час — ГГ:ХХ."), "OK");
             return;
         }
 
         var (startUtc, endUtc) = ShiftEditing.ResolveRange(date, startTod, endTod);
         var error = ShiftManager.AddManualShift(startUtc, endUtc);
         if (error is not null)
-            await DisplayAlert("Не додано", error, "OK");
+            await DisplayAlert(L.T("Не додано"), error, "OK");
     }
 
     private void OnListModeClicked(object? sender, EventArgs e) => SetMode(showCalendar: false);
@@ -313,10 +308,10 @@ public partial class HistoryPage : ContentPage
         if (sender is not Button { CommandParameter: ShiftRow row }) return;
 
         var confirmed = await DisplayAlert(
-            "Видалити зміну?",
+            L.T("Видалити зміну?"),
             $"{row.TimeText} · {row.AmountText}",
-            "Видалити",
-            "Скасувати");
+            L.T("Видалити"),
+            L.T("Скасувати"));
 
         if (!confirmed) return;
 
@@ -327,8 +322,8 @@ public partial class HistoryPage : ContentPage
 
     private static string DayText(DateTime day)
     {
-        if (day == DateTime.Today) return "Сьогодні";
-        if (day == DateTime.Today.AddDays(-1)) return "Вчора";
+        if (day == DateTime.Today) return L.T("Сьогодні");
+        if (day == DateTime.Today.AddDays(-1)) return L.T("Вчора");
         return day.ToString("dd.MM.yyyy");
     }
 }

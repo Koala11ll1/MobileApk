@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text;
@@ -12,12 +13,17 @@ public partial class SettingsPage : ContentPage
     // Порядок збігається з пунктами списку в пікері.
     private static readonly string[] ThemeCodes = { ThemeManager.Dark, ThemeManager.Light, ThemeManager.System };
 
+    private static readonly string[] LanguageCodes = { L.Ukrainian, L.EnglishCode, L.SystemCode };
+
     private string _appliedTheme = ThemeManager.Dark;
+    private string _appliedLanguage = L.Ukrainian;
 
     public SettingsPage()
     {
         InitializeComponent();
-        ThemePicker.ItemsSource = new[] { "Темна", "Світла", "Як у системи" };
+        ThemePicker.ItemsSource = new[] { L.T("Темна"), L.T("Світла"), L.T("Як у системи") };
+        // Назви мов — рідною мовою, щоб їх можна було знайти, навіть якщо інтерфейс не зрозумілий.
+        LanguagePicker.ItemsSource = new[] { "Українська", "English", L.T("Як у системи") };
     }
 
     private int _shownVersion = -1;
@@ -54,6 +60,9 @@ public partial class SettingsPage : ContentPage
 
         _appliedTheme = ThemeManager.Normalize(s.Theme);
         ThemePicker.SelectedIndex = Math.Max(0, Array.IndexOf(ThemeCodes, _appliedTheme));
+
+        _appliedLanguage = L.Normalize(s.Language);
+        LanguagePicker.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, _appliedLanguage));
 
         WeekSundaySwitch.IsToggled = s.WeekStartsOnSunday;
         Hour12Switch.IsToggled = s.Use12Hour;
@@ -125,14 +134,25 @@ public partial class SettingsPage : ContentPage
             s.Use12Hour = Hour12Switch.IsToggled;
 
             if (ThemePicker.SelectedIndex >= 0) s.Theme = ThemeCodes[ThemePicker.SelectedIndex];
+            if (LanguagePicker.SelectedIndex >= 0) s.Language = LanguageCodes[LanguagePicker.SelectedIndex];
         });
 
         // Тему застосовуємо лише коли вона справді змінилась — це перемальовує екрани.
-        var theme = ThemeManager.Normalize(ShiftStore.Load().Theme);
+        var saved = ShiftStore.Load();
+        var theme = ThemeManager.Normalize(saved.Theme);
         if (theme != _appliedTheme)
         {
             _appliedTheme = theme;
             ThemeManager.Apply(theme);
+        }
+
+        // Мова: тексти беруться під час створення сторінок, тож перебудовуємо інтерфейс.
+        var language = L.Normalize(saved.Language);
+        if (language != _appliedLanguage)
+        {
+            _appliedLanguage = language;
+            L.Use(language);
+            AppTabs.Rebuild();
         }
 
         // UpdateSettings підняв версію даних, але поля вже відповідають збереженому.
@@ -151,19 +171,19 @@ public partial class SettingsPage : ContentPage
     {
         var s = ShiftStore.Load();
         var csv = DataExport.ToCsv(ShiftStore.LoadLog(), ShiftStore.LoadExtraItems(), ShiftStore.LoadExtraTicks(), s.Currency);
-        await ShareTextFileAsync($"zarobitok-{DateTime.Today:yyyy-MM-dd}.csv", csv, "Експорт змін");
+        await ShareTextFileAsync($"zarobitok-{DateTime.Today:yyyy-MM-dd}.csv", csv, L.T("Експорт змін"));
     }
 
     private async void OnBackupClicked(object? sender, EventArgs e)
     {
         var json = DataExport.ToBackupJson(
             ShiftStore.Load(), ShiftStore.LoadLog(), ShiftStore.LoadExtraItems(), ShiftStore.LoadExtraTicks());
-        await ShareTextFileAsync($"zarobitok-backup-{DateTime.Today:yyyy-MM-dd}.json", json, "Резервна копія");
+        await ShareTextFileAsync($"zarobitok-backup-{DateTime.Today:yyyy-MM-dd}.json", json, L.T("Резервна копія"));
     }
 
     private async void OnRestoreClicked(object? sender, EventArgs e)
     {
-        var file = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Файл резервної копії" });
+        var file = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = L.T("Файл резервної копії") });
         if (file is null) return;
 
         string text;
@@ -174,20 +194,20 @@ public partial class SettingsPage : ContentPage
         var data = DataExport.FromBackupJson(text);
         if (data is null)
         {
-            await DisplayAlert("Не вдалося відновити", "Це не схоже на резервну копію «Заробітку» або файл пошкоджений.", "OK");
+            await DisplayAlert(L.T("Не вдалося відновити"), L.T("Це не схоже на резервну копію «Заробітку» або файл пошкоджений."), "OK");
             return;
         }
 
         var ok = await DisplayAlert(
-            "Замінити всі дані?",
-            $"У копії: змін — {data.Log.Count}, типів допзаробітку — {data.Items.Count}. " +
-            "Усі поточні дані та налаштування буде замінено.",
-            "Замінити", "Скасувати");
+            L.T("Замінити всі дані?"),
+            L.F("У копії: змін — {0}, типів допзаробітку — {1}. Усі поточні дані та налаштування буде замінено.",
+                data.Log.Count, data.Items.Count),
+            L.T("Замінити"), L.T("Скасувати"));
         if (!ok) return;
 
         ShiftManager.RestoreAll(data);
         FillFields();   // підтягнути відновлені значення в поля
-        await DisplayAlert("Готово", "Дані відновлено.", "OK");
+        await DisplayAlert(L.T("Готово"), L.T("Дані відновлено."), "OK");
     }
 
     private async Task ShareTextFileAsync(string fileName, string content, string title)
@@ -201,7 +221,7 @@ public partial class SettingsPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Не вдалося поділитись файлом", ex.Message, "OK");
+            await DisplayAlert(L.T("Не вдалося поділитись файлом"), ex.Message, "OK");
         }
     }
 }

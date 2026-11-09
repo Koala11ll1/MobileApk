@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.SettingsPage"
-             Title="Налаштування"
+             Title="{loc:T &quot;Налаштування&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="18">
 
-            <Label Text="НАЛАШТУВАННЯ ЗМІНИ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;НАЛАШТУВАННЯ ЗМІНИ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -19,7 +20,7 @@
                 <VerticalStackLayout Spacing="14">
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Ставка за годину" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Ставка за годину&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="RateEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
@@ -29,7 +30,7 @@
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Валюта" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Валюта&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="CurrencyEntry"
                                Keyboard="Default"
                                MaxLength="4"
@@ -40,7 +41,7 @@
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Планова тривалість, год" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Планова тривалість, год&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="PlannedEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
@@ -50,7 +51,7 @@
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Неоплачувана перерва, хв" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Неоплачувана перерва, хв&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="BreakEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
@@ -62,7 +63,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="РОЗКЛАД СТАВОК" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;РОЗКЛАД СТАВОК&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -73,29 +74,29 @@
                 <VerticalStackLayout Spacing="14">
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Ставка у вихідні (сб, нд)" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Ставка у вихідні (сб, нд)&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="WeekendRateEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="Порожньо — така сама, як звичайна." FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;Порожньо — така сама, як звичайна.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Нічна ставка" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Нічна ставка&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="NightRateEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="Порожньо — не використовується. Нічна перекриває вихідну." FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;Порожньо — не використовується. Нічна перекриває вихідну.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Ніч починається о (година 0–23)" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Ніч починається о (година 0–23)&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="NightStartEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
@@ -105,7 +106,7 @@
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Ніч закінчується о (година 0–23)" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Ніч закінчується о (година 0–23)&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="NightEndEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
@@ -117,7 +118,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ЦІЛЬ І ПОДАТКИ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ЦІЛЬ І ПОДАТКИ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -128,31 +129,31 @@
                 <VerticalStackLayout Spacing="14">
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Ціль на місяць" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Ціль на місяць&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="GoalEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="0 або порожньо — без цілі." FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;0 або порожньо — без цілі.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Податок / відрахування, %" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Податок / відрахування, %&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Entry x:Name="TaxEntry"
                                Keyboard="Numeric"
                                TextColor="{DynamicResource TextPrimary}"
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="Показується «чиста» сума поруч із повною." FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;Показується «чиста» сума поруч із повною.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="СПОВІЩЕННЯ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;СПОВІЩЕННЯ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -164,22 +165,22 @@
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
-                            <Label Text="Сповістити, коли зміна завершилась" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
-                            <Label Text="По закінченню планової тривалості." FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                            <Label Text="{loc:T &quot;Сповістити, коли зміна завершилась&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{loc:T &quot;По закінченню планової тривалості.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
                         </VerticalStackLayout>
                         <Switch x:Name="NotifyEndSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
-                            <Label Text="Щоденне нагадування почати зміну" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
-                            <Label Text="Не показується, якщо зміна вже йде." FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                            <Label Text="{loc:T &quot;Щоденне нагадування почати зміну&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{loc:T &quot;Не показується, якщо зміна вже йде.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
                         </VerticalStackLayout>
                         <Switch x:Name="ReminderSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Час нагадування" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Час нагадування&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <TimePicker x:Name="ReminderPicker"
                                     Format="HH:mm"
                                     TextColor="{DynamicResource TextPrimary}"
@@ -190,7 +191,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ВИГЛЯД" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ВИГЛЯД&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -201,8 +202,16 @@
                 <VerticalStackLayout Spacing="14">
 
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Тема" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Label Text="{loc:T &quot;Тема&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
                         <Picker x:Name="ThemePicker"
+                                TextColor="{DynamicResource TextPrimary}"
+                                BackgroundColor="{DynamicResource Surface}"
+                                SelectedIndexChanged="OnAppearanceChanged" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="{loc:T &quot;Мова&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
+                        <Picker x:Name="LanguagePicker"
                                 TextColor="{DynamicResource TextPrimary}"
                                 BackgroundColor="{DynamicResource Surface}"
                                 SelectedIndexChanged="OnAppearanceChanged" />
@@ -211,7 +220,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ФОРМАТИ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ФОРМАТИ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -223,14 +232,14 @@
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
-                            <Label Text="Тиждень починається з неділі" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{loc:T &quot;Тиждень починається з неділі&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                         </VerticalStackLayout>
                         <Switch x:Name="WeekSundaySwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
-                            <Label Text="12-годинний формат часу" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                            <Label Text="{loc:T &quot;12-годинний формат часу&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
                         </VerticalStackLayout>
                         <Switch x:Name="Hour12Switch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
@@ -238,7 +247,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="ДАНІ" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+            <Label Text="{loc:T &quot;ДАНІ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
             <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}" Padding="16">
@@ -248,22 +257,22 @@
 
                 <VerticalStackLayout Spacing="14">
 
-                    <Button Text="Експорт у CSV (Excel)" Clicked="OnExportCsvClicked"
+                    <Button Text="{loc:T &quot;Експорт у CSV (Excel)&quot;}" Clicked="OnExportCsvClicked"
                             BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
                             CornerRadius="12" HeightRequest="46" />
 
-                    <Button Text="Зберегти резервну копію" Clicked="OnBackupClicked"
+                    <Button Text="{loc:T &quot;Зберегти резервну копію&quot;}" Clicked="OnBackupClicked"
                             BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
                             CornerRadius="12" HeightRequest="46" />
 
-                    <Button Text="Відновити з копії" Clicked="OnRestoreClicked"
+                    <Button Text="{loc:T &quot;Відновити з копії&quot;}" Clicked="OnRestoreClicked"
                             BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource Danger}"
                             CornerRadius="12" HeightRequest="46" />
 
                 </VerticalStackLayout>
             </Border>
 
-            <Label Text="Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки. По закінченню планової тривалості зміна завершується сама. Нічна ставка діє між зазначеними годинами за місцевим часом; зміна, що перетинає межу, рахується частинами."
+            <Label Text="{loc:T &quot;Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки. По закінченню планової тривалості зміна завершується сама. Нічна ставка діє між зазначеними годинами за місцевим часом; зміна, що перетинає межу, рахується частинами.&quot;}"
                    FontSize="12"
                    TextColor="{DynamicResource TextMuted}"
                    Margin="4,0,4,20" />

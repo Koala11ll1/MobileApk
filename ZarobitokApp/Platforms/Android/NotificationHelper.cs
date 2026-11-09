@@ -1,3 +1,4 @@
+using ZarobitokApp.Localization;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -16,7 +17,7 @@ public static class NotificationHelper
         if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
         {
             manager.CreateNotificationChannel(
-                new NotificationChannel(ChannelId, "Нагадування", NotificationImportance.Default));
+                new NotificationChannel(ChannelId, L.T("Нагадування"), NotificationImportance.Default));
         }
 
         var open = PendingIntent.GetActivity(
