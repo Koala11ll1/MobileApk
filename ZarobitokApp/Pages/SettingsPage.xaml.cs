@@ -36,6 +36,7 @@ public partial class SettingsPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        RefreshAboutUi();   // збої могли з'явитись, поки екран був закритий
         if (_shownVersion == ShiftManager.Version) return;   // поля вже актуальні
         FillFields();
     }
@@ -78,6 +79,41 @@ public partial class SettingsPage : ContentPage
         _shownVersion = ShiftManager.Version;
 
         RefreshSecurityUi();
+    }
+
+    // ---- Про застосунок ----
+
+    private const string ReleasesUrl = "https://github.com/Koala11ll1/MobileApk/releases";
+
+    private void RefreshAboutUi()
+    {
+        VersionLabel.Text = $"{AppInfo.Current.VersionString} ({AppInfo.Current.BuildString})";
+
+        var crashes = Crashes.Log.Entries.Count;
+        CrashLabel.Text = crashes == 0 ? L.T("Збоїв не було") : L.F("Збоїв зафіксовано: {0}", crashes);
+        SendCrashButton.IsVisible = crashes > 0;
+        ClearCrashButton.IsVisible = crashes > 0;
+    }
+
+    private async void OnOpenReleasesClicked(object? sender, EventArgs e)
+    {
+        try { await Launcher.Default.OpenAsync(ReleasesUrl); }
+        catch (Exception ex) { await DisplayAlert(L.T("Не вдалося відкрити посилання"), ex.Message, "OK"); }
+    }
+
+    private async void OnSendCrashesClicked(object? sender, EventArgs e)
+    {
+        var text = CrashLog.FormatReport(Crashes.Log.Entries);
+        await Share.Default.RequestAsync(new ShareTextRequest { Title = L.T("Звіт про збої"), Text = text });
+    }
+
+    private async void OnClearCrashesClicked(object? sender, EventArgs e)
+    {
+        var ok = await DisplayAlert(L.T("Очистити звіти про збої?"), L.T("Журнал збоїв буде видалено."), L.T("Очистити"), L.T("Скасувати"));
+        if (!ok) return;
+
+        Crashes.Log.Clear();
+        RefreshAboutUi();
     }
 
     // ---- Захист ----

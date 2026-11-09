@@ -1,13 +1,13 @@
 namespace ZarobitokApp.Services;
 
-/// <summary>Сховище для налаштувань замка. На Android це SharedPreferences, у тестах — пам'ять.</summary>
-public interface ILockStore
+/// <summary>Просте сховище ключ-значення (замок, журнал збоїв). На Android це SharedPreferences, у тестах — пам'ять.</summary>
+public interface IKeyValueStore
 {
     string? Get(string key);
     void Set(string key, string? value);   // null — видалити
 }
 
-public sealed class MemoryLockStore : ILockStore
+public sealed class MemoryKeyValueStore : IKeyValueStore
 {
     private readonly Dictionary<string, string> _data = new();
 
@@ -37,10 +37,10 @@ public sealed class AppLockState
     private const string KeyBiometric = "lock_biometric";
     private const string KeyGrace = "lock_grace_min";
 
-    private readonly ILockStore _store;
+    private readonly IKeyValueStore _store;
     private DateTime? _backgroundedAtUtc;
 
-    public AppLockState(ILockStore store) => _store = store;
+    public AppLockState(IKeyValueStore store) => _store = store;
 
     public bool IsEnabled => !string.IsNullOrEmpty(_store.Get(KeyHash));
 
@@ -144,5 +144,5 @@ public sealed class AppLockState
 public static class AppLock
 {
     /// <summary>Підміняється при старті реальним сховищем (див. MauiProgram).</summary>
-    public static AppLockState Current { get; set; } = new(new MemoryLockStore());
+    public static AppLockState Current { get; set; } = new(new MemoryKeyValueStore());
 }

@@ -1,5 +1,6 @@
 using Android.App;
 using Android.Content;
+using Android.OS;
 using Android.Runtime;
 using ZarobitokApp.Services;
 
@@ -34,14 +35,30 @@ public class MainApplication : MauiApplication
 
         try
         {
-            var prefs = ApplicationContext?.GetSharedPreferences(ShiftStore.PrefsName, FileCreationMode.Private);
-            using var editor = prefs?.Edit();
-            editor?.PutString(ShiftStore.CrashKey, ex.ToString());
-            editor?.Commit();
+            // Запис синхронний (Commit): процес ось-ось помре, Apply() міг би не встигнути.
+            Crashes.Log.Add(new CrashEntry(
+                DateTime.UtcNow,
+                AppVersionText(),
+                $"{Build.Manufacturer} {Build.Model}",
+                $"{Build.VERSION.Release} (API {(int)Build.VERSION.SdkInt})",
+                ex.ToString()));
         }
         catch
         {
             // Процес вже помирає — це найкраще, що можемо тут зробити.
+        }
+    }
+
+    private string AppVersionText()
+    {
+        try
+        {
+            var info = PackageManager?.GetPackageInfo(PackageName!, 0);
+            return $"{info?.VersionName} ({info?.LongVersionCode})";
+        }
+        catch
+        {
+            return "?";
         }
     }
 

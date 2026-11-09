@@ -110,6 +110,82 @@ public partial class StatsPage : ContentPage
         RenderChart(StatsCalculator.LastDays(log, items, ticks, today, 7), today);
     }
 
+    // ---- Звіт за період (PDF) ----
+
+    private async void OnReportClicked(object? sender, EventArgs e)
+    {
+        var today = DateTime.Today;
+        var thisMonth = L.T("Цей місяць");
+        var lastMonth = L.T("Минулий місяць");
+        var thisYear = L.T("Цей рік");
+        var custom = L.T("Свій період…");
+
+        var choice = await DisplayActionSheet(L.T("Звіт за період"), L.T("Скасувати"), null, thisMonth, lastMonth, thisYear, custom);
+        if (choice is null || choice == L.T("Скасувати")) return;
+
+        (DateTime From, DateTime To) period;
+        if (choice == thisMonth) period = ReportPeriods.ThisMonth(today);
+        else if (choice == lastMonth) period = ReportPeriods.LastMonth(today);
+        else if (choice == thisYear) period = ReportPeriods.ThisYear(today);
+        else if (choice == custom)
+        {
+            var asked = await AskCustomPeriodAsync(today);
+            if (asked is null) return;
+            period = asked.Value;
+        }
+        else return;
+
+        try
+        {
+            var s = ShiftStore.Load();
+            var data = ReportBuilder.Build(
+                ShiftStore.LoadLog(), ShiftStore.LoadExtraItems(), ShiftStore.LoadExtraTicks(),
+                period.From, period.To, s.TaxPercent);
+
+            if (data.ShiftCount == 0)
+            {
+                await DisplayAlert(L.T("Немає даних"), L.T("За цей період змін немає."), "OK");
+                return;
+            }
+
+            var rows = ReportRows.Build(data, s.Currency, s.Use12Hour);
+            var path = Path.Combine(FileSystem.CacheDirectory, $"zarobitok-report-{period.From:yyyy-MM-dd}_{period.To:yyyy-MM-dd}.pdf");
+
+            await Task.Run(() => ReportExporter.WritePdf(rows, path));
+            await Share.Default.RequestAsync(new ShareFileRequest(L.T("Звіт про заробіток"), new ShareFile(path, "application/pdf")));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert(L.T("Не вдалося створити звіт"), ex.Message, "OK");
+        }
+    }
+
+    private async Task<(DateTime From, DateTime To)?> AskCustomPeriodAsync(DateTime today)
+    {
+        var fromText = await DisplayPromptAsync(
+            L.T("Початок періоду"), L.T("Дата (дд.мм.рррр)"), L.T("Далі"), L.T("Скасувати"),
+            initialValue: new DateTime(today.Year, today.Month, 1).ToString("dd.MM.yyyy"));
+        if (fromText is null) return null;
+
+        var toText = await DisplayPromptAsync(
+            L.T("Кінець періоду"), L.T("Дата (дд.мм.рррр)"), L.T("Створити"), L.T("Скасувати"),
+            initialValue: today.ToString("dd.MM.yyyy"));
+        if (toText is null) return null;
+
+        var ok = DateTime.TryParseExact(fromText.Trim(), "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture,
+                     System.Globalization.DateTimeStyles.None, out var from)
+                 & DateTime.TryParseExact(toText.Trim(), "dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture,
+                     System.Globalization.DateTimeStyles.None, out var to);
+
+        if (!ok || to < from)
+        {
+            await DisplayAlert(L.T("Невірні дані"), L.T("Дата має бути дд.мм.рррр, а початок — не пізніше за кінець."), "OK");
+            return null;
+        }
+
+        return (from, to);
+    }
+
     private void RenderChart(List<(DateTime Day, decimal Total)> days, DateTime today)
     {
         ChartGrid.Children.Clear();

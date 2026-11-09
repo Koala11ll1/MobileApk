@@ -8,7 +8,7 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         // Замок застосунку читає свої налаштування з тих самих SharedPreferences, що й решта даних.
-        AppLock.Current = new AppLockState(new ShiftStoreLockStore());
+        AppLock.Current = new AppLockState(new ShiftStoreKeyValueStore());
 
         var builder = MauiApp.CreateBuilder();
 

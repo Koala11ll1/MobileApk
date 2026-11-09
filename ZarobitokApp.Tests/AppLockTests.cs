@@ -48,7 +48,7 @@ public class AppLockStateTests
 {
     private static readonly DateTime T0 = new(2026, 1, 5, 12, 0, 0, DateTimeKind.Utc);
 
-    private static AppLockState Fresh() => new(new MemoryLockStore());
+    private static AppLockState Fresh() => new(new MemoryKeyValueStore());
 
     [Fact]
     public void Not_enabled_until_a_pin_is_set_and_disable_removes_it()
@@ -100,7 +100,7 @@ public class AppLockStateTests
     [Fact]
     public void Failed_attempts_and_lockout_survive_a_restart()
     {
-        var store = new MemoryLockStore();
+        var store = new MemoryKeyValueStore();
         var a = new AppLockState(store);
         a.SetPin("1234");
         for (var i = 0; i < 5; i++) a.TryVerify("0000", T0);

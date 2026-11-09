@@ -17,6 +17,9 @@
     <Compile Include="..\ZarobitokApp\Services\ShiftEditing.cs" />
     <Compile Include="..\ZarobitokApp\Services\Input.cs" />
     <Compile Include="..\ZarobitokApp\Services\TicksIndex.cs" />
+    <Compile Include="..\ZarobitokApp\Services\CrashLog.cs" />
+    <Compile Include="..\ZarobitokApp\Services\ReportBuilder.cs" />
+    <Compile Include="..\ZarobitokApp\Services\ReportRows.cs" />
     <Compile Include="..\ZarobitokApp\Services\PinLock.cs" />
     <Compile Include="..\ZarobitokApp\Services\AppLock.cs" />
 <Compile Include="..\ZarobitokApp\Localization\L.cs" />

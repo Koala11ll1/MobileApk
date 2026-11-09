@@ -28,19 +28,36 @@ public class MainActivity : MauiAppCompatActivity
         // валиться десь усередині нього, MainPage.OnAppearing ніколи не
         // встигає спрацювати, а цей рядок — встигає.
         L.Use(ShiftStore.Load().Language);
-        var crash = ShiftStore.TakeLastCrash();
+        var crash = Crashes.Log.TakeUnseen();
         if (crash is not null)
         {
             var dialog = new AlertDialog.Builder(this);
             dialog.SetTitle(L.T("Останній збій застосунку"));
-            dialog.SetMessage(crash);
+            dialog.SetMessage(Summary(crash));
             dialog.SetCancelable(false);
-            dialog.SetPositiveButton("OK", (_, _) => { });
+            dialog.SetPositiveButton(L.T("Надіслати звіт"), (_, _) => SendReport(crash));
+            dialog.SetNegativeButton(L.T("Закрити"), (_, _) => { });
             dialog.Show();
         }
 
         base.OnCreate(savedInstanceState);
         HandleShortcut(Intent);
+    }
+
+    // У діалозі — коротко: час і перші рядки стеку; повний текст іде у звіті.
+    private static string Summary(CrashEntry e)
+    {
+        var lines = e.Stack.Split('\n').Take(4);
+        return $"{e.AtUtc.ToLocalTime():yyyy-MM-dd HH:mm}  ·  {e.AppVersion}\n\n{string.Join('\n', lines)}";
+    }
+
+    private void SendReport(CrashEntry crash)
+    {
+        var send = new Intent(Intent.ActionSend);
+        send.SetType("text/plain");
+        send.PutExtra(Intent.ExtraSubject, "Заробіток — звіт про збій");
+        send.PutExtra(Intent.ExtraText, CrashLog.FormatReport(new[] { crash }));
+        StartActivity(Intent.CreateChooser(send, L.T("Надіслати звіт")));
     }
 
     protected override void OnNewIntent(Intent? intent)

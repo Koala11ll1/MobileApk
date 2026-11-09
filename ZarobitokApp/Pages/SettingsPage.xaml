@@ -324,6 +324,48 @@
                 </VerticalStackLayout>
             </Border>
 
+            <Label Text="{loc:T &quot;ПРО ЗАСТОСУНОК&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
+
+            <Border BackgroundColor="{DynamicResource Card}" StrokeThickness="1"
+                    Stroke="{DynamicResource HairlineBrush}" Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{loc:T &quot;Версія&quot;}" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+                        <Label x:Name="VersionLabel" Grid.Column="1" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
+                    </Grid>
+
+                    <Button Text="{loc:T &quot;Нові версії на GitHub&quot;}"
+                            Clicked="OnOpenReleasesClicked"
+                            BackgroundColor="{DynamicResource Surface}"
+                            TextColor="{DynamicResource TextPrimary}"
+                            CornerRadius="12" HeightRequest="46" />
+
+                    <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
+
+                    <Label x:Name="CrashLabel" FontSize="14" TextColor="{DynamicResource TextSecondary}" />
+
+                    <Button x:Name="SendCrashButton"
+                            Text="{loc:T &quot;Надіслати звіт про збої&quot;}"
+                            Clicked="OnSendCrashesClicked"
+                            BackgroundColor="{DynamicResource Surface}"
+                            TextColor="{DynamicResource TextPrimary}"
+                            CornerRadius="12" HeightRequest="46" />
+
+                    <Button x:Name="ClearCrashButton"
+                            Text="{loc:T &quot;Очистити звіти про збої&quot;}"
+                            Clicked="OnClearCrashesClicked"
+                            BackgroundColor="{DynamicResource Surface}"
+                            TextColor="{DynamicResource Danger}"
+                            CornerRadius="12" HeightRequest="46" />
+
+                </VerticalStackLayout>
+            </Border>
+
             <Label Text="{loc:T &quot;Зміни застосовуються одразу. Ставка перераховує всю поточну зміну, а не лише час після правки. По закінченню планової тривалості зміна завершується сама. Нічна ставка діє між зазначеними годинами за місцевим часом; зміна, що перетинає межу, рахується частинами.&quot;}"
                    FontSize="12"
                    TextColor="{DynamicResource TextMuted}"

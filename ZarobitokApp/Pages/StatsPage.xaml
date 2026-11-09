@@ -68,6 +68,14 @@
                 <Grid x:Name="ChartGrid" ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="6" HeightRequest="150" />
             </Border>
 
+            <Button x:Name="ReportButton"
+                    Text="{loc:T &quot;Звіт за період (PDF)&quot;}"
+                    Clicked="OnReportClicked"
+                    BackgroundColor="{DynamicResource Accent}"
+                    TextColor="{DynamicResource AccentOn}"
+                    FontAttributes="Bold" CornerRadius="14" HeightRequest="52"
+                    Margin="0,4,0,20" />
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
