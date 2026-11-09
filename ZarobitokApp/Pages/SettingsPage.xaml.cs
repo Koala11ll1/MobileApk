@@ -14,10 +14,17 @@ public partial class SettingsPage : ContentPage
         InitializeComponent();
     }
 
+    private int _shownVersion = -1;
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        if (_shownVersion == ShiftManager.Version) return;   // поля вже актуальні
+        FillFields();
+    }
 
+    private void FillFields()
+    {
         _loading = true;
         var s = ShiftStore.Load();
         var inv = CultureInfo.InvariantCulture;
@@ -44,6 +51,7 @@ public partial class SettingsPage : ContentPage
         ReminderPicker.Format = s.Use12Hour ? "h:mm tt" : "HH:mm";
 
         _loading = false;
+        _shownVersion = ShiftManager.Version;
     }
 
     private void OnSettingsChanged(object? sender, EventArgs e) => Save();
@@ -105,6 +113,9 @@ public partial class SettingsPage : ContentPage
             s.WeekStartsOnSunday = WeekSundaySwitch.IsToggled;
             s.Use12Hour = Hour12Switch.IsToggled;
         });
+
+        // UpdateSettings підняв версію даних, але поля вже відповідають збереженому.
+        _shownVersion = ShiftManager.Version;
     }
 
     private static void ApplyOptionalRate(string? text, Action<decimal?> set)
@@ -154,7 +165,7 @@ public partial class SettingsPage : ContentPage
         if (!ok) return;
 
         ShiftManager.RestoreAll(data);
-        OnAppearing();   // підтягнути відновлені значення в поля
+        FillFields();   // підтягнути відновлені значення в поля
         await DisplayAlert("Готово", "Дані відновлено.", "OK");
     }
 

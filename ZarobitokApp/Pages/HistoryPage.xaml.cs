@@ -47,19 +47,35 @@ public partial class HistoryPage : ContentPage
     private bool _showCalendar;
     private DateTime _visibleMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
 
+    // Що саме показано зараз: версія даних і день. Якщо вони не змінились,
+    // при появі вкладки перебудовувати нічого не треба.
+    private bool _visible;
+    private int _shownVersion = -1;
+    private DateTime _shownDay;
+
     public HistoryPage()
     {
         InitializeComponent();
         SetMode(showCalendar: false);
 
-        // Зміна могла прийти ззовні (автостоп, ярлик, правка в деталях дня).
-        ShiftManager.Changed += () => Dispatcher.Dispatch(Reload);
+        // Зміна могла прийти ззовні (автостоп, ярлик, правка в деталях дня, +1 на іншій
+        // вкладці). Перебудовуємо лише коли вкладка на виду, інакше це вкрадає кадри в
+        // екрана, на якому користувач зараз: решту доробить OnAppearing.
+        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(() => { if (_visible) Reload(); });
+
+        // Заздалегідь, поки користувач на першому екрані, а не під час першого свайпу.
+        UiTiming.RunLater(TimeSpan.FromSeconds(2), () => { if (IsStale()) Reload(); });
     }
+
+    private bool IsStale() => _shownVersion != ShiftManager.Version || _shownDay != DateTime.Today;
 
     private void Reload()
     {
         LoadHistory();
         if (_showCalendar) RenderCalendar();
+
+        _shownVersion = ShiftManager.Version;
+        _shownDay = DateTime.Today;
     }
 
     private static string Time(DateTime utc, ShiftState s)
@@ -68,8 +84,16 @@ public partial class HistoryPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        LoadHistory();
-        if (_showCalendar) RenderCalendar();
+        _visible = true;
+
+        if (!IsStale()) return;
+        UiTiming.RunLater(UiTiming.AfterSwipe, () => { if (_visible && IsStale()) Reload(); });
+    }
+
+    protected override void OnDisappearing()
+    {
+        _visible = false;
+        base.OnDisappearing();
     }
 
     private void LoadHistory()
@@ -82,27 +106,28 @@ public partial class HistoryPage : ContentPage
         // Сума за зміну = час-заробіток (Earned) + допзаробіток по її
         // діапазону, порахований наживо з тіків — це і дає можливість
         // редагувати кількість тіків для вже завершеної зміни заднім числом.
-        decimal Total(ShiftLogEntry e)
-            => e.Earned + EarningsCalculator.TicksTotal(items, ticks, e.StartedAtUtc, e.EndedAtUtc);
+        var index = new TicksIndex(items, ticks);
+        decimal Total(ShiftLogEntry e) => StatsCalculator.ShiftTotal(e, index);
 
         // Групуємо за днем ЗАВЕРШЕННЯ зміни — так само, як EarnedToday
         // рахує "сьогодні". Інакше зміна через північ показувалась би
         // під іншим днем тут, ніж на вкладці «Зміна» й у віджеті.
         HistoryView.ItemsSource = log
-            .GroupBy(e => e.EndedAtUtc.ToLocalTime().Date)
+            .Select(e => (entry: e, total: Total(e)))   // суму зміни рахуємо один раз
+            .GroupBy(x => x.entry.EndedAtUtc.ToLocalTime().Date)
             .OrderByDescending(g => g.Key)
             .Select(g => new DayGroup(
                 DayText(g.Key),
-                EarningsCalculator.Format(g.Sum(e => Total(e)), s.Currency),
-                g.OrderByDescending(e => e.StartedAtUtc)
-                 .Select(e => new ShiftRow
+                EarningsCalculator.Format(g.Sum(x => x.total), s.Currency),
+                g.OrderByDescending(x => x.entry.StartedAtUtc)
+                 .Select(x => new ShiftRow
                  {
-                     Entry = e,
+                     Entry = x.entry,
                      Day = g.Key,
-                     TimeText = $"{Time(e.StartedAtUtc, s)} — {Time(e.EndedAtUtc, s)}",
-                     DetailText = $"{EarningsCalculator.FormatDuration(e.Duration)} · " +
-                                  $"{e.RatePerHour:0.##} {s.Currency}/год",
-                     AmountText = EarningsCalculator.Format(Total(e), s.Currency)
+                     TimeText = $"{Time(x.entry.StartedAtUtc, s)} — {Time(x.entry.EndedAtUtc, s)}",
+                     DetailText = $"{EarningsCalculator.FormatDuration(x.entry.Duration)} · " +
+                                  $"{x.entry.RatePerHour:0.##} {s.Currency}/год",
+                     AmountText = EarningsCalculator.Format(x.total, s.Currency)
                  })))
             .ToList();
     }
@@ -114,8 +139,8 @@ public partial class HistoryPage : ContentPage
         var items = ShiftStore.LoadExtraItems();
         var ticks = ShiftStore.LoadExtraTicks();
 
-        decimal Total(ShiftLogEntry e)
-            => e.Earned + EarningsCalculator.TicksTotal(items, ticks, e.StartedAtUtc, e.EndedAtUtc);
+        var index = new TicksIndex(items, ticks);
+        decimal Total(ShiftLogEntry e) => StatsCalculator.ShiftTotal(e, index);
 
         var monthEntries = log
             .Where(e =>

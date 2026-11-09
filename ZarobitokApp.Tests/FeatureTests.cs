@@ -373,3 +373,43 @@ public class NextReminderTests
         => Assert.Equal(new DateTime(2026, 1, 6, 9, 0, 0),
             ShiftEditing.NextReminder(new DateTime(2026, 1, 5, h, m, 0), 9 * 60));
 }
+
+public class TicksIndexTests
+{
+    [Fact]
+    public void Index_matches_the_straightforward_calculation_on_random_data()
+    {
+        var rnd = new Random(42);
+        var items = Enumerable.Range(0, 5).Select(i => new ExtraItem(Guid.NewGuid(), $"i{i}", rnd.Next(1, 200))).ToList();
+        var t0 = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        var ticks = Enumerable.Range(0, 500).Select(_ =>
+        {
+            var item = items[rnd.Next(items.Count)];
+            var price = rnd.Next(3) == 0 ? (decimal?)null : rnd.Next(1, 300);   // частина зі знімком, частина "стара"
+            return new ExtraTick(Guid.NewGuid(), item.Id, t0.AddMinutes(rnd.Next(0, 60 * 24 * 30)), rnd.Next(-1, 3), price);
+        })
+        // тік із ціною невідомого типу та тік рівно на межі
+        .Append(new ExtraTick(Guid.NewGuid(), Guid.NewGuid(), t0.AddHours(5), 2))
+        .Append(new ExtraTick(Guid.NewGuid(), items[0].Id, t0.AddHours(10), 1, 7m))
+        .ToList();
+
+        var index = new TicksIndex(items, ticks);
+
+        for (var i = 0; i < 200; i++)
+        {
+            var from = t0.AddMinutes(rnd.Next(0, 60 * 24 * 30));
+            var to = from.AddMinutes(rnd.Next(0, 60 * 24 * 3));
+            Assert.Equal(EarningsCalculator.TicksTotal(items, ticks, from, to), index.Total(from, to));
+        }
+
+        // межі включені з обох боків
+        Assert.Equal(EarningsCalculator.TicksTotal(items, ticks, t0.AddHours(10), t0.AddHours(10)),
+                     index.Total(t0.AddHours(10), t0.AddHours(10)));
+    }
+
+    [Fact]
+    public void Empty_index_returns_zero()
+        => Assert.Equal(0m, new TicksIndex(Array.Empty<ExtraItem>(), Array.Empty<ExtraTick>())
+            .Total(DateTime.MinValue, DateTime.MaxValue));
+}

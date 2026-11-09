@@ -21,6 +21,12 @@ public static class ShiftManager
     /// </summary>
     public static event Action? Changed;
 
+    /// <summary>
+    /// Лічильник змін даних. Екрани запам'ятовують, з якою версією вони останній раз
+    /// перемалювались, і при появі пропускають роботу, якщо нічого не змінилось.
+    /// </summary>
+    public static int Version { get; private set; }
+
     public static ShiftState Current => ShiftStore.Load();
 
     public static void StartShift() => StartShiftAt(DateTime.UtcNow);
@@ -246,6 +252,7 @@ public static class ShiftManager
     /// <summary>Примусово перемалювати всі екземпляри віджета.</summary>
     public static void PushWidget()
     {
+        Version++;
         Changed?.Invoke();
 #if ANDROID
         EarningsWidget.RefreshAll(Application.Context);

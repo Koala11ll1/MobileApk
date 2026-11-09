@@ -16,6 +16,7 @@
     <Compile Include="..\ZarobitokApp\Services\DataExport.cs" />
     <Compile Include="..\ZarobitokApp\Services\ShiftEditing.cs" />
     <Compile Include="..\ZarobitokApp\Services\Input.cs" />
+    <Compile Include="..\ZarobitokApp\Services\TicksIndex.cs" />
   </ItemGroup>
 
   <ItemGroup>

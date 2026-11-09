@@ -13,22 +13,20 @@ public sealed record MonthStats(
 /// <summary>Статистика з журналу. Зміна належить дню її ЗАВЕРШЕННЯ (як усюди в апці).</summary>
 public static class StatsCalculator
 {
-    public static decimal ShiftTotal(
-        ShiftLogEntry e, IEnumerable<ExtraItem> items, IEnumerable<ExtraTick> ticks)
-        => e.Earned + EarningsCalculator.TicksTotal(items, ticks, e.StartedAtUtc, e.EndedAtUtc);
+    public static decimal ShiftTotal(ShiftLogEntry e, TicksIndex ticks)
+        => e.Earned + ticks.Total(e.StartedAtUtc, e.EndedAtUtc);
 
     public static MonthStats ForMonth(
         IEnumerable<ShiftLogEntry> log, IEnumerable<ExtraItem> items, IEnumerable<ExtraTick> ticks,
         int year, int month)
     {
-        var itemList = items.ToList();
-        var tickList = ticks.ToList();
+        var index = new TicksIndex(items, ticks);
 
         var entries = log
             .Where(e => EndLocal(e) is var d && d.Year == year && d.Month == month)
             .ToList();
 
-        var total = entries.Sum(e => ShiftTotal(e, itemList, tickList));
+        var total = entries.Sum(e => ShiftTotal(e, index));
         var worked = entries.Aggregate(TimeSpan.Zero, (sum, e) => sum + e.Duration);
         var days = entries.Select(e => EndLocal(e).Date).Distinct().Count();
         var hours = (decimal)worked.TotalHours;
@@ -47,15 +45,16 @@ public static class StatsCalculator
         IEnumerable<ShiftLogEntry> log, IEnumerable<ExtraItem> items, IEnumerable<ExtraTick> ticks,
         DateTime today, int days)
     {
-        var itemList = items.ToList();
-        var tickList = ticks.ToList();
-        var entries = log.ToList();
+        var index = new TicksIndex(items, ticks);
+
+        // Групуємо журнал за днем один раз, а не фільтруємо весь журнал для кожного дня.
+        var byDay = log
+            .GroupBy(e => EndLocal(e).Date)
+            .ToDictionary(g => g.Key, g => g.Sum(e => ShiftTotal(e, index)));
 
         return Enumerable.Range(0, days)
             .Select(i => today.Date.AddDays(i - (days - 1)))
-            .Select(day => (day, entries
-                .Where(e => EndLocal(e).Date == day)
-                .Sum(e => ShiftTotal(e, itemList, tickList))))
+            .Select(day => (day, byDay.GetValueOrDefault(day, 0m)))
             .ToList();
     }
 

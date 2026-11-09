@@ -15,18 +15,27 @@ public partial class StatsPage : ContentPage
     private static readonly string[] DayNames = { "Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
 
     private bool _visible;
+    private int _shownVersion = -1;
+    private DateTime _shownDay;
 
     public StatsPage()
     {
         InitializeComponent();
-        ShiftManager.Changed += () => Dispatcher.Dispatch(() => { if (_visible) Refresh(); });
+        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(() => { if (_visible) Refresh(); });
+
+        // Заздалегідь, поки користувач на першому екрані, а не під час першого свайпу.
+        UiTiming.RunLater(TimeSpan.FromSeconds(3), () => { if (IsStale()) Refresh(); });
     }
+
+    private bool IsStale() => _shownVersion != ShiftManager.Version || _shownDay != DateTime.Today;
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
         _visible = true;
-        Refresh();
+
+        if (!IsStale()) return;
+        UiTiming.RunLater(UiTiming.AfterSwipe, () => { if (_visible && IsStale()) Refresh(); });
     }
 
     protected override void OnDisappearing()
@@ -37,6 +46,9 @@ public partial class StatsPage : ContentPage
 
     private void Refresh()
     {
+        _shownVersion = ShiftManager.Version;
+        _shownDay = DateTime.Today;
+
         var s = ShiftStore.Load();
         var log = ShiftStore.LoadLog();
         var items = ShiftStore.LoadExtraItems();

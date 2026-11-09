@@ -25,16 +25,26 @@ public partial class ShiftPage : ContentPage
         // Зміну могли почати/завершити ззовні (ярлик, автостоп, правка журналу) —
         // кеш має це підхопити. Екран перемальовуємо лише коли він на виду,
         // щоб не оживляти таймер на прихованій вкладці.
-        ShiftManager.Changed += () => Dispatcher.Dispatch(OnDataChanged);
+        ShiftManager.Changed += () => MainThread.BeginInvokeOnMainThread(OnDataChanged);
     }
 
-    private void OnDataChanged()
+    private int _cacheVersion = -1;
+
+    private void ReloadCaches()
     {
         _log = ShiftStore.LoadLog();
         _items = ShiftStore.LoadExtraItems();
         _ticks = ShiftStore.LoadExtraTicks();
+        _cacheVersion = ShiftManager.Version;
+    }
 
+    private void OnDataChanged()
+    {
+        // Прихований екран нічого не перечитує — це б вкрало кадри в того, що зараз на виду.
+        // Кеш застаріє за версією, і OnAppearing його оновить.
         if (!_visible) return;
+
+        ReloadCaches();
         LoadStartTimeIntoUi();
         Refresh();
     }
@@ -44,9 +54,7 @@ public partial class ShiftPage : ContentPage
         base.OnAppearing();
         _visible = true;
 
-        _log = ShiftStore.LoadLog();
-        _items = ShiftStore.LoadExtraItems();
-        _ticks = ShiftStore.LoadExtraTicks();
+        if (_cacheVersion != ShiftManager.Version) ReloadCaches();
         LoadStartTimeIntoUi();
 
         Refresh();
@@ -170,9 +178,7 @@ public partial class ShiftPage : ContentPage
         if (ShiftStore.Load().IsRunning) ShiftManager.StopShift();
         else ShiftManager.StartShiftAt(ToUtcStart(StartTimePicker.Time));
 
-        _log = ShiftStore.LoadLog();
-        _items = ShiftStore.LoadExtraItems();
-        _ticks = ShiftStore.LoadExtraTicks();
+        ReloadCaches();
         LoadStartTimeIntoUi();
         Refresh();
     }

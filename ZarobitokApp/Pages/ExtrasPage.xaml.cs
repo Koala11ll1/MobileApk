@@ -22,10 +22,15 @@ public partial class ExtrasPage : ContentPage
         InitializeComponent();
     }
 
+    private int _shownVersion = -1;
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        Refresh();
+
+        // Поки нічого не змінилось і зміна не йде (лічильники стоять на 0) — перемальовувати нема чого.
+        if (_shownVersion == ShiftManager.Version && _timer is null) return;
+        UiTiming.RunLater(UiTiming.AfterSwipe, Refresh);
     }
 
     protected override void OnDisappearing()
@@ -61,6 +66,7 @@ public partial class ExtrasPage : ContentPage
 
     private void Refresh()
     {
+        _shownVersion = ShiftManager.Version;
         var s = ShiftStore.Load();
         var items = ShiftStore.LoadExtraItems();
         var ticks = ShiftStore.LoadExtraTicks();
