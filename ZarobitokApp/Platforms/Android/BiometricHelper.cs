@@ -7,13 +7,17 @@ namespace ZarobitokApp.Platforms.Android;
 
 public static class BiometricHelper
 {
+    // У біндингах .NET немає констант BiometricManager.Authenticators — беремо значення з Android SDK.
+    private const int BiometricWeak = 0x00FF;   // BiometricManager.Authenticators.BIOMETRIC_WEAK
+    private const int Success = 0;              // BiometricManager.BIOMETRIC_SUCCESS
+
     public static bool IsAvailable()
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(30)) return false;
 
         var manager = (BiometricManager?)global::Android.App.Application.Context.GetSystemService(Context.BiometricService);
         return manager is not null
-            && manager.CanAuthenticate(BiometricManager.Authenticators.BiometricWeak) == (int)BiometricCode.Success;
+            && manager.CanAuthenticate(BiometricWeak) == Success;
     }
 
     public static Task<bool> AuthenticateAsync(string title, string cancelText)
@@ -30,7 +34,7 @@ public static class BiometricHelper
         var executor = activity.MainExecutor!;
         var prompt = new BiometricPrompt.Builder(activity)
             .SetTitle(title)!
-            .SetAllowedAuthenticators(BiometricManager.Authenticators.BiometricWeak)!
+            .SetAllowedAuthenticators(BiometricWeak)!
             .SetNegativeButton(cancelText, executor, new NegativeClick(tcs))!
             .Build();
 
