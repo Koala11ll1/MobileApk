@@ -27,9 +27,12 @@ cat > /tmp/store.xml <<XML
   <string name="extra_ticks_json">[{"Id":"22222222-2222-2222-2222-222222222222","ItemId":"$ITEM","AtUtc":"$(iso $((now - 1800)))","Delta":2},{"Id":"33333333-3333-3333-3333-333333333333","ItemId":"$ITEM","AtUtc":"$(iso $((now - 86400 - 3600)))","Delta":1}]</string>
 </map>
 XML
-adb shell run-as $PKG mkdir -p shared_prefs
-adb shell "run-as $PKG sh -c 'cat > shared_prefs/zarobitok_shared_store.xml'" < /tmp/store.xml
-adb shell run-as $PKG ls -la shared_prefs
+# Збірка не debuggable, тож run-as недоступний; образ google_apis дає root.
+adb root >/dev/null; sleep 3
+UID_APP=$(adb shell stat -c %u /data/data/$PKG | tr -d '\r')
+adb push /tmp/store.xml /data/local/tmp/store.xml >/dev/null
+adb shell "mkdir -p /data/data/$PKG/shared_prefs && cp /data/local/tmp/store.xml /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml && chown -R $UID_APP:$UID_APP /data/data/$PKG/shared_prefs && chmod 660 /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml && restorecon -R /data/data/$PKG/shared_prefs"
+echo "seeded:"; adb shell ls -la /data/data/$PKG/shared_prefs
 
 adb logcat -c
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1
@@ -92,7 +95,8 @@ echo "=== logcat: .NET / Java exceptions ==="
 adb logcat -d | grep -E "FATAL EXCEPTION|Unhandled|XamlParse|System\.[A-Za-z.]+Exception|Java\.Lang\.[A-Za-z]+Exception|E AndroidRuntime|Process: $PKG|DOTNET|monodroid" | head -80
 
 echo "=== stored crash ==="
-adb shell run-as $PKG cat shared_prefs/zarobitok_shared_store.xml 2>/dev/null | grep -A12 'name="last_crash"' | head -40
+adb shell cat /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml 2>/dev/null | grep -A12 'name="last_crash"' | head -40
+echo '--- state after run:'; adb shell cat /data/data/$PKG/shared_prefs/zarobitok_shared_store.xml | cut -c1-400 | head -12
 
 adb logcat -d | grep -q "FATAL EXCEPTION" && FAILED=1
 if [ "$FAILED" = 0 ]; then echo "SMOKE OK"; else echo "SMOKE FAILED"; exit 1; fi
