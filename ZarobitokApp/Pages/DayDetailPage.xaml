@@ -71,8 +71,8 @@
                             <Button Grid.Column="2"
                                     Text="✎"
                                     FontSize="16"
-                                    WidthRequest="44"
-                                    HeightRequest="44"
+                                    WidthRequest="48"
+                                    HeightRequest="48"
                                     Padding="0"
                                     CornerRadius="12"
                                     BackgroundColor="{DynamicResource Surface}"
@@ -107,13 +107,13 @@
                             </VerticalStackLayout>
 
                             <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
-                                <Button Text="−" FontSize="18" WidthRequest="40" HeightRequest="40" Padding="0"
+                                <Button Text="−" FontSize="18" WidthRequest="48" HeightRequest="48" Padding="0"
                                         CornerRadius="10" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource Danger}"
                                         IsEnabled="{Binding CanDecrement}"
                                         CommandParameter="{Binding .}" Clicked="OnMinusClicked" />
                                 <Label Text="{Binding Count}" TextColor="{DynamicResource TextPrimary}" FontSize="17" FontAttributes="Bold"
                                        WidthRequest="26" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                                <Button Text="+" FontSize="18" WidthRequest="40" HeightRequest="40" Padding="0"
+                                <Button Text="+" FontSize="18" WidthRequest="48" HeightRequest="48" Padding="0"
                                         CornerRadius="10" BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource Accent}"
                                         CommandParameter="{Binding .}" Clicked="OnPlusClicked" />
                             </HorizontalStackLayout>

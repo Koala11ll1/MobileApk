@@ -7,21 +7,24 @@
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,0,20,28" Spacing="18">
+
+            <Label Text="{loc:T &quot;Зміна&quot;}" Style="{StaticResource PageTitle}" />
+
 
             <!-- ЖИВИЙ ЛІЧИЛЬНИК -->
             <Border BackgroundColor="{DynamicResource Card}"
                     StrokeThickness="1"
                     Stroke="{DynamicResource HairlineBrush}"
-                    Padding="22">
+                    Padding="24,28">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="22" />
+                    <RoundRectangle CornerRadius="28" />
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="6">
                     <Label x:Name="AmountLabel"
                            Text="0.00"
-                           FontSize="46"
+                           FontSize="56"
                            FontAttributes="Bold"
                            TextColor="{DynamicResource TextPrimary}"
                            HorizontalOptions="Center" />
@@ -46,8 +49,8 @@
             <Button x:Name="ToggleButton"
                     FontSize="17"
                     FontAttributes="Bold"
-                    HeightRequest="56"
-                    CornerRadius="16"
+                    HeightRequest="64"
+                    CornerRadius="32"
                     Clicked="OnToggleClicked" />
 
             <!-- ПОЧАТОК ЗМІНИ -->

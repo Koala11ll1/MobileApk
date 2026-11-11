@@ -11,21 +11,25 @@ public static class ThemeManager
     public const string Light = "light";
     public const string System = "system";
 
+    // Темна тема — справжній чорний фон: на AMOLED (Galaxy S24 Ultra тощо) чорні пікселі вимкнені,
+    // це економить батарею й дає глибокий контраст. Усі пари текст/фон тримають ≥ 4.5:1 (WCAG AA),
+    // окрім TextFaint — лише для декоративного (порожні стани, дні поза місяцем).
     private static readonly (string Key, string Dark, string Light)[] Palette =
     {
-        ("Bg",            "#0B0B12", "#F3F4F8"),   // фон екрана
-        ("Card",          "#12121A", "#FFFFFF"),   // картки
-        ("Surface",       "#1C1C26", "#E7E9F0"),   // поля вводу, другорядні кнопки
-        ("Hairline",      "#22FFFFFF", "#1F000000"), // тонкі рамки й роздільники
-        ("TextPrimary",   "#FFFFFF", "#111827"),
-        ("TextSecondary", "#9CA3AF", "#4B5563"),
-        ("TextMuted",     "#6B7280", "#6B7280"),
-        ("TextFaint",     "#4B5563", "#9CA3AF"),
+        ("Bg",            "#000000", "#F4F5F7"),   // фон екрана
+        ("Card",          "#141418", "#FFFFFF"),   // картки
+        ("Surface",       "#202027", "#ECEEF2"),   // поля вводу, другорядні кнопки
+        ("Hairline",      "#1FFFFFFF", "#1A000000"), // тонкі рамки й роздільники
+        ("TextPrimary",   "#F5F5F7", "#0F1115"),
+        ("TextSecondary", "#B3B8C2", "#454B55"),
+        ("TextMuted",     "#8F96A3", "#5F6672"),
+        ("TextFaint",     "#5C626D", "#9AA0AA"),
         ("Accent",        "#4ADE80", "#15803D"),   // у світлій темі темніший, щоб читався на білому
-        ("AccentOn",      "#06210F", "#FFFFFF"),   // текст на кнопці акценту
+        ("AccentOn",      "#04210E", "#FFFFFF"),   // текст на кнопці акценту
         ("Danger",        "#F87171", "#DC2626"),
         ("DangerOn",      "#2A0A0A", "#FFFFFF"),
     };
+
 
     /// <summary>Спрацьовує після кожної зміни кольорів — екрани з кольорами, заданими в коді, перемальовуються.</summary>
     public static event Action? Changed;
@@ -61,7 +65,12 @@ public static class ThemeManager
             app.Resources[key] = Color.FromArgb(dark ? d : l);
 
         // Рамка (Stroke) приймає Brush, а не Color.
-        app.Resources["HairlineBrush"] = new SolidColorBrush(Color.FromArgb(dark ? "#22FFFFFF" : "#1F000000"));
+        app.Resources["HairlineBrush"] = new SolidColorBrush(Color.FromArgb(dark ? "#1FFFFFFF" : "#1A000000"));
+
+#if ANDROID
+        // Статус-бар і навігаційна панель — у колір фону, іконки на них — контрастні до теми.
+        ZarobitokApp.Platforms.Android.SystemBars.Apply();
+#endif
 
         Changed?.Invoke();
     }

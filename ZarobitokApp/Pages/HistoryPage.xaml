@@ -6,178 +6,183 @@
              Title="{loc:T &quot;Журнал&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="20,20,20,0" RowSpacing="10">
+    <Grid RowDefinitions="Auto,*">
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
-            <Button Grid.Column="0"
-                    x:Name="ListModeButton"
-                    Text="{loc:T &quot;Список&quot;}"
-                    Clicked="OnListModeClicked"
-                    CornerRadius="12"
-                    HeightRequest="42"
-                    FontAttributes="Bold" />
-            <Button Grid.Column="1"
-                    x:Name="CalendarModeButton"
-                    Text="{loc:T &quot;Календар&quot;}"
-                    Clicked="OnCalendarModeClicked"
-                    CornerRadius="12"
-                    HeightRequest="42"
-                    FontAttributes="Bold" />
-            <Button Grid.Column="2"
-                    Text="{loc:T &quot;＋ Зміна&quot;}"
-                    Clicked="OnAddShiftClicked"
-                    BackgroundColor="{DynamicResource Surface}"
-                    TextColor="{DynamicResource Accent}"
-                    CornerRadius="12"
-                    HeightRequest="42"
-                    FontAttributes="Bold" />
-        </Grid>
+        <Label Grid.Row="0" Text="{loc:T &quot;Журнал&quot;}" Style="{StaticResource PageTitle}" Margin="24,28,20,8" />
 
-        <Label Grid.Row="1"
-               x:Name="HintLabel"
-               Text="{loc:T &quot;Тапни по зміні, щоб побачити деталі за день і виправити час. «＋ Зміна» додає пропущену зміну вручну. Помилкову можна видалити.&quot;}"
-               FontSize="12"
-               TextColor="{DynamicResource TextMuted}" />
+        <Grid RowDefinitions="Auto,Auto,*" Grid.Row="1" Padding="20,0,20,0" RowSpacing="10">
 
-        <CollectionView Grid.Row="2" x:Name="HistoryView" IsGrouped="True">
-            <CollectionView.EmptyView>
-                <Label Text="{loc:T &quot;Поки порожньо&quot;}"
-                       TextColor="{DynamicResource TextFaint}"
-                       HorizontalOptions="Center"
-                       Margin="0,24" />
-            </CollectionView.EmptyView>
-
-            <CollectionView.GroupHeaderTemplate>
-                <DataTemplate>
-                    <Grid Padding="4,16,4,6" ColumnDefinitions="*,Auto">
-                        <Label Text="{Binding DayText}"
-                               TextColor="{DynamicResource TextSecondary}"
-                               FontSize="13"
-                               FontAttributes="Bold" />
-                        <Label Grid.Column="1"
-                               Text="{Binding TotalText}"
-                               TextColor="{DynamicResource Accent}"
-                               FontSize="13"
-                               FontAttributes="Bold" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.GroupHeaderTemplate>
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnRowTapped" CommandParameter="{Binding .}" />
-                        </Grid.GestureRecognizers>
-
-                        <VerticalStackLayout Spacing="2">
-                            <Label Text="{Binding TimeText}" TextColor="{DynamicResource TextPrimary}" FontSize="15" />
-                            <Label Text="{Binding DetailText}" TextColor="{DynamicResource TextMuted}" FontSize="12" />
-                        </VerticalStackLayout>
-
-                        <Label Grid.Column="1"
-                               Text="{Binding AmountText}"
-                               TextColor="{DynamicResource Accent}"
-                               FontAttributes="Bold"
-                               FontSize="16"
-                               VerticalOptions="Center" />
-
-                        <Button Grid.Column="2"
-                                Text="✕"
-                                FontSize="16"
-                                WidthRequest="44"
-                                HeightRequest="44"
-                                Padding="0"
-                                CornerRadius="12"
-                                BackgroundColor="{DynamicResource Surface}"
-                                TextColor="{DynamicResource Danger}"
-                                VerticalOptions="Center"
-                                CommandParameter="{Binding .}"
-                                Clicked="OnDeleteClicked" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-        <VerticalStackLayout Grid.Row="2" x:Name="CalendarContainer" IsVisible="False" Spacing="14">
-
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
                 <Button Grid.Column="0"
-                        Text="‹"
-                        Clicked="OnPrevMonthClicked"
-                        BackgroundColor="{DynamicResource Surface}"
-                        TextColor="{DynamicResource TextPrimary}"
-                        WidthRequest="44"
-                        HeightRequest="44"
-                        Padding="0"
+                        x:Name="ListModeButton"
+                        Text="{loc:T &quot;Список&quot;}"
+                        Clicked="OnListModeClicked"
                         CornerRadius="12"
-                        FontSize="18" />
-                <Label Grid.Column="1"
-                       x:Name="MonthLabel"
-                       HorizontalTextAlignment="Center"
-                       VerticalOptions="Center"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       TextColor="{DynamicResource TextPrimary}" />
+                        HeightRequest="48"
+                        FontAttributes="Bold" />
+                <Button Grid.Column="1"
+                        x:Name="CalendarModeButton"
+                        Text="{loc:T &quot;Календар&quot;}"
+                        Clicked="OnCalendarModeClicked"
+                        CornerRadius="12"
+                        HeightRequest="48"
+                        FontAttributes="Bold" />
                 <Button Grid.Column="2"
-                        Text="›"
-                        Clicked="OnNextMonthClicked"
+                        Text="{loc:T &quot;＋ Зміна&quot;}"
+                        Clicked="OnAddShiftClicked"
                         BackgroundColor="{DynamicResource Surface}"
-                        TextColor="{DynamicResource TextPrimary}"
-                        WidthRequest="44"
-                        HeightRequest="44"
-                        Padding="0"
+                        TextColor="{DynamicResource Accent}"
                         CornerRadius="12"
-                        FontSize="18" />
+                        HeightRequest="48"
+                        FontAttributes="Bold" />
             </Grid>
 
-            <Label x:Name="MonthTotalLabel"
-                   HorizontalOptions="Center"
-                   FontSize="15"
-                   FontAttributes="Bold"
-                   TextColor="{DynamicResource Accent}" />
+            <Label Grid.Row="1"
+                   x:Name="HintLabel"
+                   Text="{loc:T &quot;Тапни по зміні, щоб побачити деталі за день і виправити час. «＋ Зміна» додає пропущену зміну вручну. Помилкову можна видалити.&quot;}"
+                   FontSize="12"
+                   TextColor="{DynamicResource TextMuted}" />
 
-            <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,4,0,0">
-                <Label Grid.Column="0" x:Name="Wd0" Text="{loc:T &quot;Пн&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="1" x:Name="Wd1" Text="{loc:T &quot;Вт&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="2" x:Name="Wd2" Text="{loc:T &quot;Ср&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="3" x:Name="Wd3" Text="{loc:T &quot;Чт&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="4" x:Name="Wd4" Text="{loc:T &quot;Пт&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="5" x:Name="Wd5" Text="{loc:T &quot;Сб&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-                <Label Grid.Column="6" x:Name="Wd6" Text="{loc:T &quot;Нд&quot;}" HorizontalTextAlignment="Center" FontSize="11" TextColor="{DynamicResource TextMuted}" />
-            </Grid>
+            <CollectionView Grid.Row="2" x:Name="HistoryView" IsGrouped="True">
+                <CollectionView.EmptyView>
+                    <Label Text="{loc:T &quot;Поки порожньо&quot;}"
+                           TextColor="{DynamicResource TextFaint}"
+                           HorizontalOptions="Center"
+                           Margin="0,24" />
+                </CollectionView.EmptyView>
 
-            <CollectionView x:Name="CalendarView">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical"
-                                      Span="7"
-                                      HorizontalItemSpacing="4"
-                                      VerticalItemSpacing="4" />
-                </CollectionView.ItemsLayout>
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate>
+                        <Grid Padding="4,16,4,6" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding DayText}"
+                                   TextColor="{DynamicResource TextSecondary}"
+                                   FontSize="13"
+                                   FontAttributes="Bold" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding TotalText}"
+                                   TextColor="{DynamicResource Accent}"
+                                   FontSize="13"
+                                   FontAttributes="Bold" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border BackgroundColor="{Binding BackgroundColor}"
-                                StrokeThickness="0"
-                                HeightRequest="42"
-                                Padding="0">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="10" />
-                            </Border.StrokeShape>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnCalendarDayTapped" CommandParameter="{Binding .}" />
-                            </Border.GestureRecognizers>
-                            <Label Text="{Binding DayText}"
-                                   TextColor="{Binding TextColor}"
-                                   FontAttributes="{Binding FontAttributes}"
-                                   FontSize="14"
-                                   HorizontalTextAlignment="Center"
-                                   VerticalTextAlignment="Center" />
-                        </Border>
+                        <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnRowTapped" CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding TimeText}" TextColor="{DynamicResource TextPrimary}" FontSize="15" />
+                                <Label Text="{Binding DetailText}" TextColor="{DynamicResource TextMuted}" FontSize="12" />
+                            </VerticalStackLayout>
+
+                            <Label Grid.Column="1"
+                                   Text="{Binding AmountText}"
+                                   TextColor="{DynamicResource Accent}"
+                                   FontAttributes="Bold"
+                                   FontSize="16"
+                                   VerticalOptions="Center" />
+
+                            <Button Grid.Column="2"
+                                    Text="✕"
+                                    FontSize="16"
+                                    WidthRequest="48"
+                                    HeightRequest="48"
+                                    Padding="0"
+                                    CornerRadius="12"
+                                    BackgroundColor="{DynamicResource Surface}"
+                                    TextColor="{DynamicResource Danger}"
+                                    VerticalOptions="Center"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnDeleteClicked" />
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-        </VerticalStackLayout>
+            <VerticalStackLayout Grid.Row="2" x:Name="CalendarContainer" IsVisible="False" Spacing="14">
 
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Grid.Column="0"
+                            Text="‹"
+                            Clicked="OnPrevMonthClicked"
+                            BackgroundColor="{DynamicResource Surface}"
+                            TextColor="{DynamicResource TextPrimary}"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            Padding="0"
+                            CornerRadius="12"
+                            FontSize="18" />
+                    <Label Grid.Column="1"
+                           x:Name="MonthLabel"
+                           HorizontalTextAlignment="Center"
+                           VerticalOptions="Center"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{DynamicResource TextPrimary}" />
+                    <Button Grid.Column="2"
+                            Text="›"
+                            Clicked="OnNextMonthClicked"
+                            BackgroundColor="{DynamicResource Surface}"
+                            TextColor="{DynamicResource TextPrimary}"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            Padding="0"
+                            CornerRadius="12"
+                            FontSize="18" />
+                </Grid>
+
+                <Label x:Name="MonthTotalLabel"
+                       HorizontalOptions="Center"
+                       FontSize="15"
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource Accent}" />
+
+                <Grid ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,4,0,0">
+                    <Label Grid.Column="0" x:Name="Wd0" Text="{loc:T &quot;Пн&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Label Grid.Column="1" x:Name="Wd1" Text="{loc:T &quot;Вт&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Label Grid.Column="2" x:Name="Wd2" Text="{loc:T &quot;Ср&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Label Grid.Column="3" x:Name="Wd3" Text="{loc:T &quot;Чт&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Label Grid.Column="4" x:Name="Wd4" Text="{loc:T &quot;Пт&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Label Grid.Column="5" x:Name="Wd5" Text="{loc:T &quot;Сб&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Label Grid.Column="6" x:Name="Wd6" Text="{loc:T &quot;Нд&quot;}" HorizontalTextAlignment="Center" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                </Grid>
+
+                <CollectionView x:Name="CalendarView">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical"
+                                          Span="7"
+                                          HorizontalItemSpacing="4"
+                                          VerticalItemSpacing="4" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{Binding BackgroundColor}"
+                                    StrokeThickness="0"
+                                    HeightRequest="48"
+                                    Padding="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCalendarDayTapped" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Label Text="{Binding DayText}"
+                                       TextColor="{Binding TextColor}"
+                                       FontAttributes="{Binding FontAttributes}"
+                                       FontSize="14"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center" />
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+
+        </Grid>
     </Grid>
 </ContentPage>

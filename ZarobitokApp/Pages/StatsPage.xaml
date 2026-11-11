@@ -7,7 +7,10 @@
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,0,20,28" Spacing="18">
+
+            <Label Text="{loc:T &quot;Статистика&quot;}" Style="{StaticResource PageTitle}" />
+
 
             <Label x:Name="MonthTitleLabel" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 

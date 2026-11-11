@@ -1,4 +1,5 @@
 using ZarobitokApp.Localization;
+using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
 using ZarobitokApp.Pages;
 
 namespace ZarobitokApp;
@@ -19,11 +20,17 @@ public class AppTabs : TabbedPage
         ApplyColors();
         ThemeManager.Changed += ApplyColors;
 
-        Children.Add(new ShiftPage());
-        Children.Add(new ExtrasPage());
-        Children.Add(new HistoryPage());
-        Children.Add(new StatsPage());
-        Children.Add(new SettingsPage());
+        // Вкладки внизу: на високому екрані (S24 Ultra, 6.8") верх недосяжний однією рукою.
+        // Гортання вкладок пальцем лишається, як і було.
+        var android = On<Microsoft.Maui.Controls.PlatformConfiguration.Android>();
+        android.SetToolbarPlacement(ToolbarPlacement.Bottom);
+        android.SetIsSwipePagingEnabled(true);
+
+        Children.Add(new ShiftPage { IconImageSource = "tab_shift.png" });
+        Children.Add(new ExtrasPage { IconImageSource = "tab_extras.png" });
+        Children.Add(new HistoryPage { IconImageSource = "tab_history.png" });
+        Children.Add(new StatsPage { IconImageSource = "tab_stats.png" });
+        Children.Add(new SettingsPage { IconImageSource = "tab_settings.png" });
 
         if (OpenSettingsOnLaunch)
         {

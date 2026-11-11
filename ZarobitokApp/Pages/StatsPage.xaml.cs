@@ -200,7 +200,7 @@ public partial class StatsPage : ContentPage
             column.Add(new Label
             {
                 Text = total > 0 ? total.ToString("0") : "",
-                FontSize = 10,
+                FontSize = 12,
                 TextColor = ThemeManager.Get("TextSecondary"),
                 HorizontalTextAlignment = TextAlignment.Center
             });
@@ -214,7 +214,7 @@ public partial class StatsPage : ContentPage
             column.Add(new Label
             {
                 Text = L.DayName(day.DayOfWeek),
-                FontSize = 11,
+                FontSize = 12,
                 FontAttributes = day == today ? FontAttributes.Bold : FontAttributes.None,
                 TextColor = ThemeManager.Get(day == today ? "TextPrimary" : "TextMuted"),
                 HorizontalTextAlignment = TextAlignment.Center

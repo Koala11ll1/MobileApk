@@ -6,119 +6,124 @@
              Title="{loc:T &quot;Допзаробіток&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Padding="20,20,20,0" RowSpacing="14">
+    <Grid RowDefinitions="Auto,*">
 
-        <Border Grid.Row="0"
-                BackgroundColor="{DynamicResource Card}"
-                StrokeThickness="1"
-                Stroke="{DynamicResource HairlineBrush}"
-                Padding="16">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="18" />
-            </Border.StrokeShape>
+        <Label Grid.Row="0" Text="{loc:T &quot;Допзаробіток&quot;}" Style="{StaticResource PageTitle}" Margin="24,28,20,8" />
 
-            <VerticalStackLayout Spacing="10">
-                <Label Text="{loc:T &quot;Новий тип&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
-                <Entry x:Name="LabelEntry"
-                       Placeholder="{loc:T &quot;Наприклад: продав ред бул&quot;}"
-                       PlaceholderColor="{DynamicResource TextMuted}"
-                       TextColor="{DynamicResource TextPrimary}"
-                       BackgroundColor="{DynamicResource Surface}" />
-                <Entry x:Name="PriceEntry"
-                       Placeholder="{loc:T &quot;Ціна за одиницю&quot;}"
-                       Keyboard="Numeric"
-                       PlaceholderColor="{DynamicResource TextMuted}"
-                       TextColor="{DynamicResource TextPrimary}"
-                       BackgroundColor="{DynamicResource Surface}" />
-                <Button Text="{loc:T &quot;Додати тип&quot;}"
-                        Clicked="OnAddClicked"
-                        BackgroundColor="{DynamicResource Accent}"
-                        TextColor="{DynamicResource AccentOn}"
-                        FontAttributes="Bold"
-                        CornerRadius="14"
-                        HeightRequest="48" />
-            </VerticalStackLayout>
-        </Border>
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Grid.Row="1" Padding="20,0,20,0" RowSpacing="14">
 
-        <Label Grid.Row="1"
-               x:Name="NoShiftLabel"
-               Text="{loc:T &quot;Лічильники активні тільки під час зміни — типи можна створювати завжди, а +/- запрацює після старту.&quot;}"
-               FontSize="13"
-               TextColor="{DynamicResource TextSecondary}"
-               IsVisible="False" />
+            <Border Grid.Row="0"
+                    BackgroundColor="{DynamicResource Card}"
+                    StrokeThickness="1"
+                    Stroke="{DynamicResource HairlineBrush}"
+                    Padding="16">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
 
-        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="4,0">
-            <Label Text="{loc:T &quot;ЦЯ ЗМІНА&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
-            <Label Grid.Column="1" x:Name="ShiftExtrasTotalLabel"
-                   FontSize="12" TextColor="{DynamicResource Accent}" FontAttributes="Bold" />
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{loc:T &quot;Новий тип&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                    <Entry x:Name="LabelEntry"
+                           Placeholder="{loc:T &quot;Наприклад: продав ред бул&quot;}"
+                           PlaceholderColor="{DynamicResource TextMuted}"
+                           TextColor="{DynamicResource TextPrimary}"
+                           BackgroundColor="{DynamicResource Surface}" />
+                    <Entry x:Name="PriceEntry"
+                           Placeholder="{loc:T &quot;Ціна за одиницю&quot;}"
+                           Keyboard="Numeric"
+                           PlaceholderColor="{DynamicResource TextMuted}"
+                           TextColor="{DynamicResource TextPrimary}"
+                           BackgroundColor="{DynamicResource Surface}" />
+                    <Button Text="{loc:T &quot;Додати тип&quot;}"
+                            Clicked="OnAddClicked"
+                            BackgroundColor="{DynamicResource Accent}"
+                            TextColor="{DynamicResource AccentOn}"
+                            FontAttributes="Bold"
+                            CornerRadius="14"
+                            HeightRequest="48" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Grid.Row="1"
+                   x:Name="NoShiftLabel"
+                   Text="{loc:T &quot;Лічильники активні тільки під час зміни — типи можна створювати завжди, а +/- запрацює після старту.&quot;}"
+                   FontSize="13"
+                   TextColor="{DynamicResource TextSecondary}"
+                   IsVisible="False" />
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="4,0">
+                <Label Text="{loc:T &quot;ЦЯ ЗМІНА&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
+                <Label Grid.Column="1" x:Name="ShiftExtrasTotalLabel"
+                       FontSize="12" TextColor="{DynamicResource Accent}" FontAttributes="Bold" />
+            </Grid>
+
+            <BoxView Grid.Row="3" HeightRequest="1" Color="{DynamicResource Hairline}" Margin="4,0" />
+
+            <CollectionView Grid.Row="4" x:Name="ItemsView">
+                <CollectionView.EmptyView>
+                    <Label Text="{loc:T &quot;Ще немає жодного типу&quot;}"
+                           TextColor="{DynamicResource TextFaint}"
+                           HorizontalOptions="Center"
+                           Margin="0,24" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding Label}" TextColor="{DynamicResource TextPrimary}" FontSize="15" />
+                                <Label Text="{Binding PriceText}" TextColor="{DynamicResource TextMuted}" FontSize="12" />
+                            </VerticalStackLayout>
+
+                            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                <Button Text="−"
+                                        FontSize="18"
+                                        WidthRequest="48"
+                                        HeightRequest="48"
+                                        Padding="0"
+                                        CornerRadius="10"
+                                        BackgroundColor="{DynamicResource Surface}"
+                                        TextColor="{DynamicResource Danger}"
+                                        IsEnabled="{Binding CanDecrement}"
+                                        CommandParameter="{Binding .}"
+                                        Clicked="OnMinusClicked" />
+                                <Label Text="{Binding Count}"
+                                       TextColor="{DynamicResource TextPrimary}"
+                                       FontSize="17"
+                                       FontAttributes="Bold"
+                                       WidthRequest="26"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalOptions="Center" />
+                                <Button Text="+"
+                                        FontSize="18"
+                                        WidthRequest="48"
+                                        HeightRequest="48"
+                                        Padding="0"
+                                        CornerRadius="10"
+                                        BackgroundColor="{DynamicResource Surface}"
+                                        TextColor="{DynamicResource Accent}"
+                                        IsEnabled="{Binding CanIncrement}"
+                                        CommandParameter="{Binding .}"
+                                        Clicked="OnPlusClicked" />
+                            </HorizontalStackLayout>
+
+                            <Button Grid.Column="2"
+                                    Text="⋯"
+                                    FontSize="18"
+                                    WidthRequest="48"
+                                    HeightRequest="48"
+                                    Padding="0"
+                                    CornerRadius="10"
+                                    BackgroundColor="{DynamicResource Surface}"
+                                    TextColor="{DynamicResource TextSecondary}"
+                                    VerticalOptions="Center"
+                                    CommandParameter="{Binding .}"
+                                    Clicked="OnMenuClicked" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
         </Grid>
-
-        <BoxView Grid.Row="3" HeightRequest="1" Color="{DynamicResource Hairline}" Margin="4,0" />
-
-        <CollectionView Grid.Row="4" x:Name="ItemsView">
-            <CollectionView.EmptyView>
-                <Label Text="{loc:T &quot;Ще немає жодного типу&quot;}"
-                       TextColor="{DynamicResource TextFaint}"
-                       HorizontalOptions="Center"
-                       Margin="0,24" />
-            </CollectionView.EmptyView>
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Padding="0,10" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                        <VerticalStackLayout Spacing="2">
-                            <Label Text="{Binding Label}" TextColor="{DynamicResource TextPrimary}" FontSize="15" />
-                            <Label Text="{Binding PriceText}" TextColor="{DynamicResource TextMuted}" FontSize="12" />
-                        </VerticalStackLayout>
-
-                        <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
-                            <Button Text="−"
-                                    FontSize="18"
-                                    WidthRequest="40"
-                                    HeightRequest="40"
-                                    Padding="0"
-                                    CornerRadius="10"
-                                    BackgroundColor="{DynamicResource Surface}"
-                                    TextColor="{DynamicResource Danger}"
-                                    IsEnabled="{Binding CanDecrement}"
-                                    CommandParameter="{Binding .}"
-                                    Clicked="OnMinusClicked" />
-                            <Label Text="{Binding Count}"
-                                   TextColor="{DynamicResource TextPrimary}"
-                                   FontSize="17"
-                                   FontAttributes="Bold"
-                                   WidthRequest="26"
-                                   HorizontalTextAlignment="Center"
-                                   VerticalOptions="Center" />
-                            <Button Text="+"
-                                    FontSize="18"
-                                    WidthRequest="40"
-                                    HeightRequest="40"
-                                    Padding="0"
-                                    CornerRadius="10"
-                                    BackgroundColor="{DynamicResource Surface}"
-                                    TextColor="{DynamicResource Accent}"
-                                    IsEnabled="{Binding CanIncrement}"
-                                    CommandParameter="{Binding .}"
-                                    Clicked="OnPlusClicked" />
-                        </HorizontalStackLayout>
-
-                        <Button Grid.Column="2"
-                                Text="⋯"
-                                FontSize="18"
-                                WidthRequest="40"
-                                HeightRequest="40"
-                                Padding="0"
-                                CornerRadius="10"
-                                BackgroundColor="{DynamicResource Surface}"
-                                TextColor="{DynamicResource TextSecondary}"
-                                VerticalOptions="Center"
-                                CommandParameter="{Binding .}"
-                                Clicked="OnMenuClicked" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
     </Grid>
 </ContentPage>

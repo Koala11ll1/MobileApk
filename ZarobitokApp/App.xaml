@@ -5,19 +5,47 @@
     <Application.Resources>
         <ResourceDictionary>
             <!-- Значення за замовчуванням (темна тема). Під час роботи їх підміняє ThemeManager. -->
-            <Color x:Key="Bg">#0B0B12</Color>
-            <Color x:Key="Card">#12121A</Color>
-            <Color x:Key="Surface">#1C1C26</Color>
-            <Color x:Key="Hairline">#22FFFFFF</Color>
-            <Color x:Key="TextPrimary">#FFFFFF</Color>
-            <Color x:Key="TextSecondary">#9CA3AF</Color>
-            <Color x:Key="TextMuted">#6B7280</Color>
-            <Color x:Key="TextFaint">#4B5563</Color>
+            <Color x:Key="Bg">#000000</Color>
+            <Color x:Key="Card">#141418</Color>
+            <Color x:Key="Surface">#202027</Color>
+            <Color x:Key="Hairline">#1FFFFFFF</Color>
+            <Color x:Key="TextPrimary">#F5F5F7</Color>
+            <Color x:Key="TextSecondary">#B3B8C2</Color>
+            <Color x:Key="TextMuted">#8F96A3</Color>
+            <Color x:Key="TextFaint">#5C626D</Color>
             <Color x:Key="Accent">#4ADE80</Color>
-            <Color x:Key="AccentOn">#06210F</Color>
+            <Color x:Key="AccentOn">#04210E</Color>
             <Color x:Key="Danger">#F87171</Color>
             <Color x:Key="DangerOn">#2A0A0A</Color>
-            <SolidColorBrush x:Key="HairlineBrush" Color="#22FFFFFF" />
+            <SolidColorBrush x:Key="HairlineBrush" Color="#1FFFFFFF" />
+
+            <!-- Мінімальна зона дотику на Android — 48 dp (Material / One UI). -->
+            <Style TargetType="Button">
+                <Setter Property="MinimumHeightRequest" Value="48" />
+                <Setter Property="FontSize" Value="15" />
+            </Style>
+            <Style TargetType="Entry">
+                <Setter Property="MinimumHeightRequest" Value="48" />
+                <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style TargetType="Picker">
+                <Setter Property="MinimumHeightRequest" Value="48" />
+            </Style>
+            <Style TargetType="TimePicker">
+                <Setter Property="MinimumHeightRequest" Value="48" />
+            </Style>
+            <Style TargetType="DatePicker">
+                <Setter Property="MinimumHeightRequest" Value="48" />
+            </Style>
+
+            <!-- Великий заголовок угорі вкладки (як в One UI): верхня частина екрана — для перегляду,
+                 керування опускається нижче, ближче до великого пальця. -->
+            <Style x:Key="PageTitle" TargetType="Label">
+                <Setter Property="FontSize" Value="30" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="Margin" Value="4,28,0,8" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

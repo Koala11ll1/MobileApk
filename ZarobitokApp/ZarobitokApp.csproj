@@ -33,8 +33,10 @@
 
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg" />
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#0B0B12" BaseSize="128,128" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#000000" BaseSize="128,128" />
     <MauiFont Include="Resources\Fonts\*" />
+    <!-- Іконки нижніх вкладок (24 dp, тонуються кольором вкладки). -->
+    <MauiImage Include="Resources\Images\*.svg" />
   </ItemGroup>
 
   <ItemGroup>

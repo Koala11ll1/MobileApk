@@ -7,7 +7,10 @@
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="18">
+        <VerticalStackLayout Padding="20,0,20,28" Spacing="18">
+
+            <Label Text="{loc:T &quot;Налаштування&quot;}" Style="{StaticResource PageTitle}" />
+
 
             <Label Text="{loc:T &quot;НАЛАШТУВАННЯ ЗМІНИ&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" Margin="4,8,0,0" />
 
@@ -81,7 +84,7 @@
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="{loc:T &quot;Порожньо — така сама, як звичайна.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;Порожньо — така сама, як звичайна.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
@@ -92,7 +95,7 @@
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="{loc:T &quot;Порожньо — не використовується. Нічна перекриває вихідну.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;Порожньо — не використовується. Нічна перекриває вихідну.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
@@ -136,7 +139,7 @@
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="{loc:T &quot;0 або порожньо — без цілі.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;0 або порожньо — без цілі.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="4">
@@ -147,7 +150,7 @@
                                BackgroundColor="{DynamicResource Surface}"
                                Completed="OnSettingsChanged"
                                Unfocused="OnSettingsChanged" />
-                        <Label Text="{loc:T &quot;Показується «чиста» сума поруч із повною.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                        <Label Text="{loc:T &quot;Показується «чиста» сума поруч із повною.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
@@ -166,7 +169,7 @@
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{loc:T &quot;Сповістити, коли зміна завершилась&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
-                            <Label Text="{loc:T &quot;По закінченню планової тривалості.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                            <Label Text="{loc:T &quot;По закінченню планової тривалості.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                         </VerticalStackLayout>
                         <Switch x:Name="NotifyEndSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
@@ -174,7 +177,7 @@
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{loc:T &quot;Щоденне нагадування почати зміну&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
-                            <Label Text="{loc:T &quot;Не показується, якщо зміна вже йде.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                            <Label Text="{loc:T &quot;Не показується, якщо зміна вже йде.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                         </VerticalStackLayout>
                         <Switch x:Name="ReminderSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
@@ -260,7 +263,7 @@
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{loc:T &quot;PIN-код при вході&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
-                            <Label Text="{loc:T &quot;Також ховає суму зі скриншотів і зі списку недавніх застосунків.&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                            <Label Text="{loc:T &quot;Також ховає суму зі скриншотів і зі списку недавніх застосунків.&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                         </VerticalStackLayout>
                         <Switch x:Name="PinSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnPinToggled" />
                     </Grid>
@@ -270,7 +273,7 @@
                             Clicked="OnChangePinClicked"
                             BackgroundColor="{DynamicResource Surface}"
                             TextColor="{DynamicResource TextPrimary}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                     <VerticalStackLayout x:Name="GraceBox" Spacing="4">
                         <Label Text="{loc:T &quot;Блокувати знову&quot;}" FontSize="13" TextColor="{DynamicResource TextSecondary}" />
@@ -288,13 +291,13 @@
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="{loc:T &quot;Ховати суму у віджеті&quot;}" FontSize="14" TextColor="{DynamicResource TextPrimary}" />
-                            <Label Text="{loc:T &quot;На головному екрані замість суми буде «••••».&quot;}" FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                            <Label Text="{loc:T &quot;На головному екрані замість суми буде «••••».&quot;}" FontSize="12" TextColor="{DynamicResource TextMuted}" />
                         </VerticalStackLayout>
                         <Switch x:Name="HideWidgetSwitch" Grid.Column="1" OnColor="{DynamicResource Accent}" Toggled="OnToggled" />
                     </Grid>
 
                     <Label Text="{loc:T &quot;Якщо забудете PIN, доступ можна відновити лише перевстановленням застосунку — дані зникнуть. Зробіть резервну копію. Сам PIN у копію не потрапляє.&quot;}"
-                           FontSize="11" TextColor="{DynamicResource TextMuted}" />
+                           FontSize="12" TextColor="{DynamicResource TextMuted}" />
 
                 </VerticalStackLayout>
             </Border>
@@ -311,15 +314,15 @@
 
                     <Button Text="{loc:T &quot;Експорт у CSV (Excel)&quot;}" Clicked="OnExportCsvClicked"
                             BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                     <Button Text="{loc:T &quot;Зберегти резервну копію&quot;}" Clicked="OnBackupClicked"
                             BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource TextPrimary}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                     <Button Text="{loc:T &quot;Відновити з копії&quot;}" Clicked="OnRestoreClicked"
                             BackgroundColor="{DynamicResource Surface}" TextColor="{DynamicResource Danger}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                 </VerticalStackLayout>
             </Border>
@@ -343,7 +346,7 @@
                             Clicked="OnOpenReleasesClicked"
                             BackgroundColor="{DynamicResource Surface}"
                             TextColor="{DynamicResource TextPrimary}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                     <BoxView HeightRequest="1" Color="{DynamicResource Hairline}" />
 
@@ -354,14 +357,14 @@
                             Clicked="OnSendCrashesClicked"
                             BackgroundColor="{DynamicResource Surface}"
                             TextColor="{DynamicResource TextPrimary}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                     <Button x:Name="ClearCrashButton"
                             Text="{loc:T &quot;Очистити звіти про збої&quot;}"
                             Clicked="OnClearCrashesClicked"
                             BackgroundColor="{DynamicResource Surface}"
                             TextColor="{DynamicResource Danger}"
-                            CornerRadius="12" HeightRequest="46" />
+                            CornerRadius="12" HeightRequest="48" />
 
                 </VerticalStackLayout>
             </Border>
