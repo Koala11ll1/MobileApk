@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Знак застосунку: дві зчеплені петлі (передній план адаптивної іконки, прозорий фон). -->
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#4ADE80" stroke-width="62" stroke-linejoin="miter">
+        <path d="M304 722 V306 H548 A60 60 0 0 1 608 366 V582" />
+        <path d="M416 425 V631 A60 60 0 0 0 476 691 H658 A60 60 0 0 0 718 631 V275" />
+    </g>
+</svg>
