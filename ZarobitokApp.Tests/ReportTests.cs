@@ -4,6 +4,7 @@ using ZarobitokApp.Services;
 
 namespace ZarobitokApp.Tests;
 
+[Collection("Language")]   // див. LocalizationTests: мова — спільний статичний стан
 public class ReportTests : IDisposable
 {
     public ReportTests() => L.Use("uk");

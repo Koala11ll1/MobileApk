@@ -3,6 +3,8 @@ using ZarobitokApp.Localization;
 
 namespace ZarobitokApp.Tests;
 
+// Мова — глобальний статичний стан: класи, що її перемикають, не мають іти паралельно.
+[Collection("Language")]
 public class LocalizationTests : IDisposable
 {
     public LocalizationTests() => L.Use("uk");
