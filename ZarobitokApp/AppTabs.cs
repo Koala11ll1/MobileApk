@@ -1,5 +1,4 @@
 using ZarobitokApp.Localization;
-using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
 using ZarobitokApp.Pages;
 
 namespace ZarobitokApp;
@@ -23,8 +22,9 @@ public class AppTabs : TabbedPage
         // Вкладки внизу: на високому екрані (S24 Ultra, 6.8") верх недосяжний однією рукою.
         // Гортання вкладок пальцем лишається, як і було.
         var android = On<Microsoft.Maui.Controls.PlatformConfiguration.Android>();
-        android.SetToolbarPlacement(ToolbarPlacement.Bottom);
-        android.SetIsSwipePagingEnabled(true);
+        Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.TabbedPage.SetToolbarPlacement(
+            android, Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.ToolbarPlacement.Bottom);
+        Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.TabbedPage.SetIsSwipePagingEnabled(android, true);
 
         Children.Add(new ShiftPage { IconImageSource = "tab_shift.png" });
         Children.Add(new ExtrasPage { IconImageSource = "tab_extras.png" });
