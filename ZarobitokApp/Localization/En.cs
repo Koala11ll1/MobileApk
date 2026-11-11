@@ -40,6 +40,7 @@ internal static class En
         ["Додати зміну"] = "Add a shift",
         ["Додати тип"] = "Add type",
         ["Допзаробіток"] = "Extras",
+        ["Додатково"] = "Extras",           // коротка назва вкладки
         ["Допзаробіток за день"] = "Extras for the day",
         ["Експорт змін"] = "Shift export",
         ["Експорт у CSV (Excel)"] = "Export to CSV (Excel)",
@@ -82,6 +83,7 @@ internal static class En
         ["Нагадування"] = "Reminders",
         ["Назва зайнята"] = "Name already taken",
         ["Налаштування"] = "Settings",
+        ["Параметри"] = "Settings",         // коротка назва вкладки
         ["Наприклад: продав ред бул"] = "For example: sold a Red Bull",
         ["Нд"] = "Sun",
         ["Не було"] = "None",

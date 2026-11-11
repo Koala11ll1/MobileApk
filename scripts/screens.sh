@@ -60,10 +60,14 @@ for theme in dark light; do
   sleep 25
   shot "${theme}_1_shift"
   i=2
-  for t in "Допзаробіток" "Журнал" "Статистика" "Налаштування"; do
-    tap "$t"; shot "${theme}_${i}_$t"; i=$((i+1))
+  # Нижні вкладки — 5 рівних колонок; тиснемо за координатами (підписи можуть бути обрізані).
+  for t in extras history stats settings; do
+    adb shell input tap $(( 1080 * (2 * i - 1) / 10 )) 2170; sleep 4
+    shot "${theme}_${i}_$t"; i=$((i+1))
   done
-  tap "Журнал" && tap "Календар" && shot "${theme}_6_calendar"
+  adb shell input swipe 540 1700 540 600 400; sleep 2; shot "${theme}_6_settings_scrolled"
+  adb shell input tap 540 2170; sleep 4   # «Журнал» — третя вкладка
+  tap "Календар" && shot "${theme}_7_calendar"
   adb shell input swipe 540 1700 540 500 300; sleep 1
   adb logcat -d > "screens/${theme}_logcat.txt"
   grep -q "FATAL EXCEPTION" "screens/${theme}_logcat.txt" && echo "CRASH in $theme"

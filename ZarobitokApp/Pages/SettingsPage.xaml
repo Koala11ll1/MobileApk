@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.SettingsPage"
-             Title="{loc:T &quot;Налаштування&quot;}"
+             Title="{loc:T &quot;Параметри&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <ScrollView>

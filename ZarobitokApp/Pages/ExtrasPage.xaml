@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:loc="clr-namespace:ZarobitokApp.Localization"
              x:Class="ZarobitokApp.Pages.ExtrasPage"
-             Title="{loc:T &quot;Допзаробіток&quot;}"
+             Title="{loc:T &quot;Додатково&quot;}"
              BackgroundColor="{DynamicResource Bg}">
 
     <Grid RowDefinitions="Auto,*">
